@@ -6,6 +6,8 @@
 #include "sprite.h"
 #include "shader.h"
 
+#include "tmx_parser.h"
+
 int main(int argc, char** argv)
 {
 	//Font rendering in GL
@@ -16,6 +18,9 @@ int main(int argc, char** argv)
 	//create our new sprite
 	Sprite newSprite("assets/darkel.png", new Transform(glm::vec2(0,0), 0.0f));
 	newSprite.getTransform()->setPosition(glm::vec2(0, 0));
+	newSprite.getTransform()->setScale(glm::vec2(500.0f, 500.0f));
+
+	TMX_Parser tmxparser("assets/test_2.tmx");
 
 	while (!graphics.isClosed())
 	{

@@ -2,7 +2,3 @@
 *.sln
 *.sdf
 *.opensdf
-
-Ankh2D/
-Debug/
-Release/
