@@ -68,6 +68,10 @@ TMX_Parser::TMX_Parser(const char* _name)
 				//Add all of the rotation tile code here...
 			}
 
+			//check if the data in the layer is in XML format
+			if (newLayer.data.size() == 0)
+				log_fprint("Export the TMX file as XML layer format");
+
 			m_map.layer.push_back(newLayer);
 		}
 	}

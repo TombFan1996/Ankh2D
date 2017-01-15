@@ -8,7 +8,6 @@
 #include <string>
 
 #include "logger.h"
-#include "sprite.h"
 
 const char* loadShader(const char* _filename);
 void checkShader(GLuint _shader, GLuint _flag, bool _isProgram);
@@ -18,11 +17,13 @@ class Shader
 {
 	public:
 		Shader(char* _filename, float _width, float _height);
-		void update(Sprite& _sprite);
-		GLuint getProgram(){return m_program;}
+		glm::mat4 getProjection(){return m_projection;}
+		void getUniformMat4(GLuint _uniform, glm::mat4 _matrix4);
+		GLuint& getProgram(){return m_program;}
+		GLuint getUniformLocation(char* _uniform);
 		~Shader();
 	private:
-		glm::mat4 m_perspective;
+		glm::mat4 m_projection;
 		GLuint m_program;
 
 		enum
@@ -32,16 +33,8 @@ class Shader
 			NUM_SHADERS
 		};
 
-		enum
-		{
-			MODEL,
-			PROJECTION,
-			NUM_UNIFORMS
-		};
-
 		//vert & frag
 		GLuint m_shaders[NUM_SHADERS];
-		GLuint m_uniforms[NUM_UNIFORMS];
 };
 
 #endif

@@ -94,31 +94,20 @@ Shader::Shader(char* _filename, float _width, float _height)
 	glValidateProgram(m_program);
 	checkShader(m_program, GL_VALIDATE_STATUS, true);
 
-	//get our transform uniform from vertex shader
-	m_uniforms[MODEL] = glGetUniformLocation(m_program, "model");
-	m_uniforms[PROJECTION] = glGetUniformLocation(m_program, "projection");
-
 	//setup normalised orthographic view
-	m_perspective = glm::ortho(0.0f, _width, _height, 0.0f, -1.0f, 1.0f);
+	m_projection = glm::ortho(0.0f, _width, _height, 0.0f, -1.0f, 1.0f);
 
 	log_fprint("'%s' shader successfully loaded", _filename);
 }
 
-void Shader::update(Sprite& _sprite)
+GLuint Shader::getUniformLocation(char* _uniform)
 {
-	//bind our program
-	glUseProgram(m_program);
+	return glGetUniformLocation(m_program, _uniform);
+}
 
-	//provide model data to the shader via the sprite transform
-	glUniformMatrix4fv(m_uniforms[MODEL], 1, GL_FALSE, &_sprite.getTransform()->getModelMatrix()[0][0]);
-
-	//provide projection data to the shader via the sprite transform
-	glUniformMatrix4fv(m_uniforms[PROJECTION], 1, GL_FALSE, &m_perspective[0][0]);
-
-	//bind our texture for rendering
-	_sprite.getTexture()->bind();
-	//draw our sprite to the window
-	_sprite.draw();
+void Shader::getUniformMat4(GLuint _uniform, glm::mat4 _matrix4)
+{
+	glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4[0][0]);
 }
 
 Shader::~Shader()
