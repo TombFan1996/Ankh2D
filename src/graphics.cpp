@@ -5,6 +5,7 @@ Graphics::Graphics(const char* _title, uint16_t _w, uint16_t _h, bool _fs)
 	//clear previous logs
 	log_fclear();
 
+	m_title = _title;
 	m_width = _w;
 	m_height = _h;
 	log_fprint("Window Size: %i x %i", _w, _h);
@@ -21,6 +22,10 @@ Graphics::Graphics(const char* _title, uint16_t _w, uint16_t _h, bool _fs)
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	log_fprint("RGBA: 32 bits");
+
+	//disable vsync
+	SDL_GL_SetSwapInterval(0);
+	log_fprint("VSync: disabled");
 
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	log_fprint("Buffer size: 32 bits");
@@ -49,6 +54,11 @@ Graphics::Graphics(const char* _title, uint16_t _w, uint16_t _h, bool _fs)
 		log_fprint("Glew failed to init");
 
 	m_closed = false;
+
+	m_numFrames = 0;
+
+	//get the starting time
+	m_startTime = SDL_GetTicks();
 }
 
 void Graphics::clear()
@@ -69,6 +79,31 @@ void Graphics::update()
 
 		if (event.key.keysym.sym == SDLK_ESCAPE)
 			m_closed = true;
+	}
+
+	this->getFPS();
+}
+
+void Graphics::getFPS()
+{
+	m_endTime = SDL_GetTicks();
+	m_numFrames++;
+
+	//limit the drawing of fps
+	if ((m_endTime - m_startTime > 1000) && m_numFrames > 10)
+	{
+		double fps = (double)m_numFrames / (m_endTime / m_startTime);
+		//update our starting time again
+		m_startTime = m_endTime;
+		//reset the frames
+		m_numFrames = 0;
+
+		std::stringstream ss;
+		ss << m_title;
+		ss << " | ";
+		ss << fps;
+		ss << "fps";
+		SDL_SetWindowTitle(m_window, ss.str().c_str());
 	}
 }
 
