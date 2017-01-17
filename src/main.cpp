@@ -20,10 +20,10 @@ int main(int argc, char** argv)
 	
 	//create our new sprite
 	Sprite darkel("assets/darkel.png", &shader, 
-		new Transform(glm::vec2(625, 350), 0.0f));
+		new Transform(glm::vec2(0, 0), 0.0f));
 	 
 	//load our map in
-	TMX_Parser tmxParser("assets/test_1.tmx");
+	TMX_Parser tmxParser("assets/test_3.tmx");
 	//convert map data to a sprite
 	TMX_Sprite tmxSprite(tmxParser.getMap(), &shader, new Transform(glm::vec2(600, 300), 0.0f));
 

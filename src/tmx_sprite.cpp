@@ -29,9 +29,6 @@ TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
 	float image_normalX = (1.0f / m_tilemap->getWidth()) * tileSizeX;
 	float image_normalY = (1.0f / m_tilemap->getHeight()) * tileSizeY;
 
-	uint16_t numTilesX = m_tilemap->getWidth() / tileSizeX;
-	uint16_t numTilesY = m_tilemap->getHeight() / tileSizeY;
-
 	//create x amount of new vbos,vaos
 	m_VAO = new GLuint[m_vboSize];
 	m_VBO = new GLuint[m_vboSize];
@@ -45,14 +42,14 @@ TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
 	{
 		uint16_t index = m_map.layer[0].data[i].tile_id - 1;
 		//get x and y coord via mod and div
-		uint16_t tileCoordX = index % numTilesX;
-		uint16_t tileCoordY = index / numTilesY;
+		uint16_t tileCoordX = index % mapSizeX;
+		uint16_t tileCoordY = index / mapSizeY;
 
 		//what tile are we traversing
 		currentTileX = i % mapSizeX;
 		
 		//if we are mod 0, new line of sprites
-		if ((currentTileX % 4) == 0)
+		if ((currentTileX % mapSizeX) == 0)
 			currentTileY++;
 
 		GLfloat vertices[] = {
