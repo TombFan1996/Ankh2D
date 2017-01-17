@@ -12,11 +12,11 @@ class Transform
 		{
 			m_pos = glm::vec2(0.0f, 0.0f);
 			m_rot = 0.0f;
-			m_sca = glm::vec2(100.0f, 100.0f);
+			m_sca = glm::vec2(50.0f, 50.0f);
 		}
 
 		Transform(glm::vec2 _pos, float _rot, 
-			glm::vec2 _sca = glm::vec2(100.0f, 100.0f))
+			glm::vec2 _sca = glm::vec2(50.0f, 50.0f))
 		{
 			m_pos = _pos;
 			m_rot = _rot;
@@ -40,9 +40,9 @@ class Transform
 		inline void setRotation(float _rot){m_rot = _rot;}
 		inline void setScale(glm::vec2 _sca){m_sca = _sca;}
 
-		inline glm::vec2* getPosition(){return &m_pos;}
-		inline float* getRotation(){return &m_rot;}
-		inline glm::vec2* getScale(){return &m_sca;}
+		inline glm::vec2& getPosition(){return m_pos;}
+		inline float& getRotation(){return m_rot;}
+		inline glm::vec2& getScale(){return m_sca;}
 	private:
 		glm::vec2 m_pos;
 		float m_rot;

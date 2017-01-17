@@ -16,7 +16,7 @@ class TMX_Sprite
 {
 	public:
 		TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans);
-		void draw();
+		void draw(glm::mat4 _projection);
 		~TMX_Sprite();
 	private:
 		GLuint m_model, m_projection;

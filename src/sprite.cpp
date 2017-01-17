@@ -32,6 +32,10 @@ Sprite::Sprite(char* _texName, Shader* _shader, Transform* _trans)
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);  
     glBindVertexArray(0);
+
+	m_speed = 0.25f;
+	spriteState = SDir::SPRITE_STILL;
+	m_keys = SDL_GetKeyboardState(NULL);
 }
 
 void Sprite::setTexture(Texture2D* _newTex)
@@ -42,7 +46,47 @@ void Sprite::setTexture(Texture2D* _newTex)
 		m_texture = _newTex;
 }
 
-void Sprite::draw()
+void Sprite::update()
+{
+	SDL_PumpEvents();
+
+	if (m_keys[SDL_SCANCODE_W])
+		spriteState = SDir::SPRITE_UP;
+
+	else if (m_keys[SDL_SCANCODE_A])
+		spriteState = SDir::SPRITE_LEFT;
+
+	else if (m_keys[SDL_SCANCODE_S])
+		spriteState = SDir::SPRITE_DOWN;
+
+	else if (m_keys[SDL_SCANCODE_D])
+		spriteState = SDir::SPRITE_RIGHT;
+
+	else
+		spriteState = SDir::SPRITE_STILL;
+	
+	switch(spriteState)
+	{
+		case SDir::SPRITE_UP:
+			m_transform->setPosition(glm::vec2(m_transform->getPosition().x, 
+				m_transform->getPosition().y - m_speed));
+			break;
+		case SDir::SPRITE_LEFT:
+			m_transform->setPosition(glm::vec2(m_transform->getPosition().x - m_speed, 
+				m_transform->getPosition().y));
+			break;
+		case SDir::SPRITE_DOWN:
+			m_transform->setPosition(glm::vec2(m_transform->getPosition().x, 
+				m_transform->getPosition().y + m_speed));
+			break;
+		case SDir::SPRITE_RIGHT:
+			m_transform->setPosition(glm::vec2(m_transform->getPosition().x + m_speed, 
+				m_transform->getPosition().y));
+			break;
+	}
+}
+
+void Sprite::draw(glm::mat4 _projection)
 {
 	//bind our program
 	glUseProgram(m_shader->getProgram());
@@ -52,7 +96,7 @@ void Sprite::draw()
 	m_shader->getUniformMat4(m_model, m_transform->getModelMatrix());
 
 	//send the projection matrix off
-	m_shader->getUniformMat4(m_projection, m_shader->getProjection());
+	m_shader->getUniformMat4(m_projection, _projection);
 
 	//bind our texture
 	m_texture->bind();

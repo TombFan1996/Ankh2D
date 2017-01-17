@@ -12,7 +12,7 @@
 class Texture2D
 {
 	public:
-		Texture2D(char* _filename);
+		Texture2D(const char* _filename);
 		void bind();
 		uint16_t getWidth(){return m_width;}
 		uint16_t getHeight(){return m_height;}

@@ -9,12 +9,12 @@ TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
 	m_model = m_shader->getUniformLocation("model");
 	m_projection = m_shader->getUniformLocation("projection");
 
-	//WARNING: havent factored in layers for now
+	//WARNING: havent factored in tilesets for now
 	//WARNING: filename is going to be ruined.
-	//m_tilemap = new Texture2D(m_map.tileset[0].filename);
-
-	//temp hardcoding of the texture
-	m_tilemap = new Texture2D("assets/space_2.png");
+	
+	std::string filename("assets/");
+	filename += m_map.tileset[0].filename;
+	m_tilemap = new Texture2D(filename.c_str());
 	
 	m_vboSize = m_map.layer[0].data.size();
 
@@ -84,7 +84,7 @@ TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
 	}
 }
 
-void TMX_Sprite::draw()
+void TMX_Sprite::draw(glm::mat4 _projection)
 {
 	//bind our program
 	glUseProgram(m_shader->getProgram());
@@ -94,7 +94,7 @@ void TMX_Sprite::draw()
 	m_shader->getUniformMat4(m_model, m_transform->getModelMatrix());
 
 	//send the projection matrix off
-	m_shader->getUniformMat4(m_projection, m_shader->getProjection());
+	m_shader->getUniformMat4(m_projection, _projection);
 
 	//bind our texture
 	m_tilemap->bind();

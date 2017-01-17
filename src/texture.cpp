@@ -1,6 +1,6 @@
 #include "texture.h"
 
-Texture2D::Texture2D(char* _filename)
+Texture2D::Texture2D(const char* _filename)
 {
 	int width, height, numComponents;
 	unsigned char* imageBuffer = stbi_load(_filename, &width, &height, &numComponents, 4);

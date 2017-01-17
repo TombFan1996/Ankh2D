@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glm\gtx\transform.hpp>
+#include <glm\mat4x4.hpp>
 #include <GL\glew.h>
 #include <fstream>
 #include <stdint.h>
@@ -16,14 +16,12 @@ GLuint createShader(const char* _buffer, GLenum _shaderType);
 class Shader
 {
 	public:
-		Shader(char* _filename, float _width, float _height);
-		glm::mat4 getProjection(){return m_projection;}
+		Shader(char* _filename);
 		void getUniformMat4(GLuint _uniform, glm::mat4 _matrix4);
 		GLuint& getProgram(){return m_program;}
 		GLuint getUniformLocation(char* _uniform);
 		~Shader();
 	private:
-		glm::mat4 m_projection;
 		GLuint m_program;
 
 		enum

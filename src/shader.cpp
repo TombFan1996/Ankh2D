@@ -66,7 +66,7 @@ GLuint createShader(const char* _buffer, GLenum _shaderType)
 	return shader;
 }
 
-Shader::Shader(char* _filename, float _width, float _height)
+Shader::Shader(char* _filename)
 {
 	//create shader program
 	m_program = glCreateProgram();
@@ -93,9 +93,6 @@ Shader::Shader(char* _filename, float _width, float _height)
 	//check if valid (post link)
 	glValidateProgram(m_program);
 	checkShader(m_program, GL_VALIDATE_STATUS, true);
-
-	//setup normalised orthographic view
-	m_projection = glm::ortho(0.0f, _width, _height, 0.0f, -1.0f, 1.0f);
 
 	log_fprint("'%s' shader successfully loaded", _filename);
 }

@@ -2,10 +2,20 @@
 #define SPRITE_H
 
 #include <glm\vec2.hpp>
+#include "camera.h"
 #include "texture.h"
 #include "transform.h"
 
 #include "shader.h"
+
+enum SDir
+{
+	SPRITE_STILL,
+	SPRITE_LEFT,
+	SPRITE_RIGHT,
+	SPRITE_UP,
+	SPRITE_DOWN
+};
 
 class Sprite
 {
@@ -19,8 +29,12 @@ class Sprite
 		inline Transform* getTransform(){return m_transform;}
 		inline Texture2D* getTexture(){return m_texture;}
 	
-		void draw();
+		void update();
+		void draw(glm::mat4 _projection);
 	private:
+		SDir spriteState;
+		float m_speed;
+		const uint8_t* m_keys;
 		GLuint m_model, m_projection;
 		Shader* m_shader;
 		Transform* m_transform;
