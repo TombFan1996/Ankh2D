@@ -23,7 +23,7 @@ class Sprite;
 class Camera
 {
 	public:
-		Camera(SDL_Window* _window);
+		Camera();
 		void update();
 		void movement();
 		void update(Sprite& _sprite);

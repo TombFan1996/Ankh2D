@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "config.h"
+
 //the log name
 static const char* log_name = "Ankh2D.log";
 

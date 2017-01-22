@@ -9,23 +9,26 @@ void log_fclear()
 
 void log_fprint(const char *fmt, ...)
 {
-	FILE* file;
-	file = fopen(log_name, "a");
+	//only write if we're in debug
+	#ifdef ANKH2D_DEBUG
+		FILE* file;
+		file = fopen(log_name, "a");
 
-	char text[1024];
-	va_list ap;
+		char text[1024];
+		va_list ap;
 
-	if (fmt == NULL)
-    	*text=0;
+		if (fmt == NULL)
+    		*text=0;
 
-	else 
-	{	
-		va_start(ap, fmt);
-		vsprintf(text, fmt, ap);
-		va_end(ap);
-	}
+		else 
+		{	
+			va_start(ap, fmt);
+			vsprintf(text, fmt, ap);
+			va_end(ap);
+		}
 
-	fprintf(file, text);
-	fprintf(file, "\n");
-	fclose(file);
+		fprintf(file, text);
+		fprintf(file, "\n");
+		fclose(file);
+	#endif
 }

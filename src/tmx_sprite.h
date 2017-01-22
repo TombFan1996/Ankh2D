@@ -3,7 +3,7 @@
 
 #include <GL\glew.h>
 #include <glm\glm.hpp>
-#include "texture.h"
+#include "texture2d.h"
 #include "transform.h"
 #include "tmx_parser.h"
 

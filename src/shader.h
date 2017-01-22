@@ -17,7 +17,11 @@ class Shader
 {
 	public:
 		Shader(char* _filename);
-		void getUniformMat4(GLuint _uniform, glm::mat4 _matrix4);
+		void bindAttribLocation(uint8_t _index, char* _name);
+		void setUniformMat4(GLuint _uniform, glm::mat4 _matrix4);
+		void setUniformFloat(GLuint _uniform, float _float);
+		void setUniformVec2(GLuint _uniform, glm::vec2 _vec2);
+		void setUniformVec3(GLuint _uniform, glm::vec3 _vec3);
 		GLuint& getProgram(){return m_program;}
 		GLuint getUniformLocation(char* _uniform);
 		~Shader();

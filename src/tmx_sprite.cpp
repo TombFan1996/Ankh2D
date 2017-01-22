@@ -24,18 +24,18 @@ TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
 	uint8_t tileSizeX = m_map.tileset[0].tile_width;
 	uint8_t tileSizeY = m_map.tileset[0].tile_height;
 
-	//normalised coords for the whole texture
-	//normalised texture size
+	//normalised coords for the whole textures
 	float image_normalX = (1.0f / m_tilemap->getWidth()) * tileSizeX;
 	float image_normalY = (1.0f / m_tilemap->getHeight()) * tileSizeY;
 
+	//number of tiles in the map
 	uint16_t numTilesX = m_tilemap->getWidth() / tileSizeX;
 	uint16_t numTilesY = m_tilemap->getHeight() / tileSizeY;
 
 	//create x amount of new vbos,vaos
 	m_VAO = new GLuint[m_vboSize];
 	m_VBO = new GLuint[m_vboSize];
-
+	
 	uint16_t currentTileX = 0;
 	//starts on -1, 0 % tilesize = 0 
 	//(currentTileY becomes 1 on the 1st frame)
@@ -91,10 +91,10 @@ void TMX_Sprite::draw(glm::mat4 _projection)
 
 	//communicate w/ uniforms
 	//send the model matrix off
-	m_shader->getUniformMat4(m_model, m_transform->getModelMatrix());
+	m_shader->setUniformMat4(m_model, m_transform->getModelMatrix());
 
 	//send the projection matrix off
-	m_shader->getUniformMat4(m_projection, _projection);
+	m_shader->setUniformMat4(m_projection, _projection);
 
 	//bind our texture
 	m_tilemap->bind();

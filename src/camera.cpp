@@ -1,9 +1,11 @@
 #include "camera.h"
 
-Camera::Camera(SDL_Window* _window)
+Camera::Camera()
 {
 	int width, height;
-	SDL_GetWindowSize(_window, &width, &height);
+	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
+	m_projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	
 	m_screenHeight = height;
 	m_screenWidth = width;
 	//setup normalised orthographic view

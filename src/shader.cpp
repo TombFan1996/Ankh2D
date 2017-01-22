@@ -84,8 +84,8 @@ Shader::Shader(char* _filename)
 	}
 
 	//tells GL what part of data to read in shader
-	glBindAttribLocation(m_program, 0, "model");
-	glBindAttribLocation(m_program, 1, "projection");
+	//glBindAttribLocation(m_program, 0, "model");
+	//glBindAttribLocation(m_program, 1, "projection");
 
 	glLinkProgram(m_program);
 	checkShader(m_program, GL_LINK_STATUS, true);
@@ -97,12 +97,33 @@ Shader::Shader(char* _filename)
 	log_fprint("'%s' shader successfully loaded", _filename);
 }
 
+//bind a uniform to an index in the shader
+void Shader::bindAttribLocation(uint8_t _index, char* _name)
+{
+	glBindAttribLocation(m_program, _index, _name);
+}
+
 GLuint Shader::getUniformLocation(char* _uniform)
 {
 	return glGetUniformLocation(m_program, _uniform);
 }
 
-void Shader::getUniformMat4(GLuint _uniform, glm::mat4 _matrix4)
+void Shader::setUniformVec2(GLuint _uniform, glm::vec2 _vec2)
+{
+	glUniform2f(_uniform, _vec2.x, _vec2.y);
+}
+
+void Shader::setUniformVec3(GLuint _uniform, glm::vec3 _vec3)
+{
+	glUniform3f(_uniform, _vec3.x, _vec3.y, _vec3.z);
+}
+
+void Shader::setUniformFloat(GLuint _uniform, float _float)
+{
+	glUniform1f(_uniform, _float);
+}
+
+void Shader::setUniformMat4(GLuint _uniform, glm::mat4 _matrix4)
 {
 	glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4[0][0]);
 }

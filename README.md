@@ -11,10 +11,11 @@ A 2D C++/OpenGL framework
 
 ### What's being worked on now ###
 * Writing a basic 2D OpenGL 3.1 Rendersystem
-* Writing font renderer
+* Writing text renderer (w/ freetype)
 * TMX loader (XML format only)
 
 ### What will be worked on in the future ###
+* Optimising the TMX and font renderer
 * Removing stb_image and using my own BMP loader
 * Implementing OpenAL using my own WAV loader
 * Writing an alternate rendersystem

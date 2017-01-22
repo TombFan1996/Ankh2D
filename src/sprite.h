@@ -3,7 +3,7 @@
 
 #include <glm\vec2.hpp>
 #include "camera.h"
-#include "texture.h"
+#include "texture2d.h"
 #include "transform.h"
 
 #include "shader.h"
