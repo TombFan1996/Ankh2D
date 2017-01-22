@@ -8,30 +8,29 @@
 #include <glm\vec2.hpp>
 #include <glm\gtx\transform.hpp>
 
+#include "logger.h"
 #include "shader.h"
 #include "transform.h"
 #include "texture2d.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 class Text
 {
 	public:
-		Text(char* _fontName, glm::vec2 _charSize, uint8_t _asciiOffset, float _spacing, Shader* _shader);
-		Transform* getTransform(){return m_transform;}
+		Text(FT_Library& m_ft, char* _fontName, uint8_t _fontSize, Shader* _shader);
 		void setColour(glm::vec3 _colour){m_fontColour = _colour;}
-		void draw(std::string _text, glm::vec2 _pos);
+		void draw(std::string _text, glm::vec2 _pos, glm::vec2 _size);
 		~Text();
 	private:
-		Transform* m_transform;
+		GLuint m_fontTex;
+		FT_Face m_face;
 		glm::mat4 m_defaultProj;
 		GLuint m_VAO, m_VBO;
-		Texture2D* m_font;
-		GLuint m_model, m_projection, m_colour;
+		GLuint m_colour;
 		Shader* m_shader;
-		glm::vec2 m_characterSize;
 		glm::vec3 m_fontColour;
-		float m_spacing;
-		uint8_t m_asciiOffset;
-
 		float m_textNormalX, m_textNormalY;
 		uint16_t m_numTextX, m_numTextY;
 };

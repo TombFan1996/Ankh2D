@@ -13,6 +13,13 @@
 
 int main(int argc, char** argv)
 {
+	FT_Library ft_lib;
+
+	//setup the lib
+	if (FT_Init_FreeType(&ft_lib)){
+		log_fprint("Could not init freetype library!");
+	}
+
 	//Font rendering in GL
 	//http://blogs.agi.com/insight3d/index.php/2008/08/29/rendering-text-fast/
 	Graphics graphics("Ankh2D", 1366, 768, false);
@@ -23,16 +30,14 @@ int main(int argc, char** argv)
 	spriteShader.bindAttribLocation(1, "projection");
 
 	Shader textShader("assets/text");
-	textShader.bindAttribLocation(0, "model");
-	textShader.bindAttribLocation(1, "projection");
-	textShader.bindAttribLocation(2, "colour");
+	textShader.bindAttribLocation(0, "colour");
 
-	Text newText("assets/font.png", glm::vec2(15, 12), 22, 1.0f, &textShader);
-	newText.setColour(glm::vec3(0.25f, 0.0f, 0.0f));
+	Text* newText = new Text(ft_lib, "assets/arial.ttf", 24.0f, &textShader);
+	newText->setColour(glm::vec3(1.0f, 0.0f, 0.0f));
 
 	//create our new sprite
 	Sprite darkel("assets/darkel.png", &spriteShader, 
-		new Transform(glm::vec2(0, 0), 0.0f));
+		new Transform(glm::vec2(0, 0), 0.0f, glm::vec2(300,300)));
 	 
 	//load our map in
 	TMX_Parser tmxParser("assets/test_1.tmx");
@@ -49,7 +54,10 @@ int main(int argc, char** argv)
 		darkel.update();
 		darkel.draw(mainCamera.getProjection());
 
-		newText.draw("test", glm::vec2(10, 10));
+		float sx = 2.0 / graphics.getWidth();
+		float sy = 2.0 / graphics.getHeight();
+
+		newText->draw("It works!", glm::vec2(-1 + 8 * sx, 1 - 50 * sy), glm::vec2(sx, sy));
 		
 		//update and draw content here
 		mainCamera.update(darkel);
@@ -57,6 +65,12 @@ int main(int argc, char** argv)
 		//swap the buffers
 		graphics.update();
 	}
+
+	//needs to be called before destruction of freetype
+	delete newText;
+
+	//remove freetype
+	FT_Done_FreeType(ft_lib);
 
 	return 0;
 }

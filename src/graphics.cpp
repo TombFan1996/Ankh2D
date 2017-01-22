@@ -56,7 +56,6 @@ Graphics::Graphics(const char* _title, uint16_t _w, uint16_t _h, bool _fs)
 	m_closed = false;
 
 	m_numFrames = 0;
-
 	//get the starting time
 	m_startTime = SDL_GetTicks();
 }

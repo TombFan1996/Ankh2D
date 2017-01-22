@@ -79,5 +79,5 @@ TMX_Parser::TMX_Parser(const char* _name)
 
 TMX_Parser::~TMX_Parser()
 {
-
+	
 }

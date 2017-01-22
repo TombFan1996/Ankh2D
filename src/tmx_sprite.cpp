@@ -1,8 +1,8 @@
 #include "tmx_sprite.h"
 
-TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
+TMX_Sprite::TMX_Sprite(TMX_MAP& _map, Shader* _shader, Transform* _trans)
 {
-	m_map = _map;
+	m_map = &_map;
 	m_shader = _shader;
 	m_transform = _trans;
 
@@ -13,16 +13,16 @@ TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
 	//WARNING: filename is going to be ruined.
 	
 	std::string filename("assets/");
-	filename += m_map.tileset[0].filename;
+	filename += m_map->tileset[0].filename;
 	m_tilemap = new Texture2D(filename.c_str());
 	
-	m_vboSize = m_map.layer[0].data.size();
+	m_vboSize = m_map->layer[0].data.size();
 
-	uint16_t mapSizeX = m_map.layer[0].width;
-	uint16_t mapSizeY = m_map.layer[0].height;
+	uint16_t mapSizeX = m_map->layer[0].width;
+	uint16_t mapSizeY = m_map->layer[0].height;
 
-	uint8_t tileSizeX = m_map.tileset[0].tile_width;
-	uint8_t tileSizeY = m_map.tileset[0].tile_height;
+	uint8_t tileSizeX = m_map->tileset[0].tile_width;
+	uint8_t tileSizeY = m_map->tileset[0].tile_height;
 
 	//normalised coords for the whole textures
 	float image_normalX = (1.0f / m_tilemap->getWidth()) * tileSizeX;
@@ -43,7 +43,7 @@ TMX_Sprite::TMX_Sprite(TMX_MAP _map, Shader* _shader, Transform* _trans)
 
 	for (uint32_t i = 0; i < m_vboSize; i++)
 	{
-		uint16_t index = m_map.layer[0].data[i].tile_id - 1;
+		uint16_t index = m_map->layer[0].data[i].tile_id - 1;
 		//get x and y coord via mod and div
 		uint16_t tileCoordX = index % numTilesX;
 		uint16_t tileCoordY = index / numTilesY;
@@ -117,4 +117,6 @@ TMX_Sprite::~TMX_Sprite()
 		glDeleteBuffers(1, &m_VBO[i]);
 		glDeleteBuffers(1, &m_VAO[i]);
 	}
+
+	m_map = nullptr;
 }

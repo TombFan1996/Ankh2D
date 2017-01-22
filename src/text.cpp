@@ -3,15 +3,32 @@
 //charSize is how many pixels wide each font letter is
 //asciiOffset is incase the font texture does not exactly match the ascii table
 //spacing is how many pixels between each of the letters yous want
-Text::Text(char* _fontName, glm::vec2 _charSize, uint8_t _asciiOffset, float _spacing, Shader* _shader)
+Text::Text(FT_Library& m_ft, char* _fontName, uint8_t _fontSize, Shader* _shader)
 {
-	m_characterSize = _charSize;
-	m_asciiOffset = _asciiOffset;
-	m_spacing = _spacing;
+	//load the font into a face
+	if (FT_New_Face(m_ft, _fontName, 0, &m_face)){
+		log_fprint("Could not open %s", _fontName);
+	}
+
+	//set height to 48 pixels
+	FT_Set_Pixel_Sizes(m_face, 0, _fontSize);
+
+	//create and bind texture
+	glGenTextures(1, &m_fontTex);
+	glBindTexture(GL_TEXTURE_2D, m_fontTex);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//has to be disable because glyphs are 1 byte greyscale.
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	log_fprint("Disabled 4-byte alignment restriction for Freetype");
+
 	m_shader = _shader;
 
-	m_model = m_shader->getUniformLocation("model");
-	m_projection = m_shader->getUniformLocation("projection");
 	m_colour = m_shader->getUniformLocation("colour");
 
 	int width, height;
@@ -19,93 +36,76 @@ Text::Text(char* _fontName, glm::vec2 _charSize, uint8_t _asciiOffset, float _sp
 	m_defaultProj = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	//setup default transform
-	m_transform = new Transform(glm::vec2(0,0), 0, glm::vec2(50, 50));
 	m_fontColour = glm::vec3(1.0f, 1.0f, 1.0f);
-	m_font = new Texture2D(_fontName);
-
-	//normalised coords for sizing
-	m_textNormalX = (1.0f / m_font->getWidth()) * m_characterSize.x;
-	m_textNormalY = (1.0f / m_font->getHeight()) * m_characterSize.y;
-
-	//number of tiles in the map
-	m_numTextX = m_font->getWidth() / m_characterSize.x;
-	m_numTextY = m_font->getHeight() / m_characterSize.y;
 
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
 
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-
-	//6 (2 triangles) * 4 (2 pos, 2 tex)
-	//nothing to pass in yet
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 24, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);  
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-void Text::draw(std::string _text, glm::vec2 _pos)
-{
-	m_transform->setPosition(_pos);
-	
+void Text::draw(std::string _text, glm::vec2 _pos, glm::vec2 _size)
+{	
 	glBindVertexArray(m_VAO);
 
 	//bind our program
 	glUseProgram(m_shader->getProgram());
 
-	//communicate w/ uniforsms
-	//send the model matrix off
-	m_shader->setUniformMat4(m_model, m_transform->getModelMatrix());
-
-	//send the projection matrix off
-	m_shader->setUniformMat4(m_projection, m_defaultProj);
-
 	//set the font colour
 	m_shader->setUniformVec3(m_colour, m_fontColour);
 
-	//bind our texture
-	m_font->bind();
-
+	//transparency on the glyphs
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	for (uint32_t i = 0; i < _text.size(); i++)
 	{
-		//get the ascii equivalent of the char
-		uint8_t id = (uint8_t)_text[i] - m_asciiOffset;
+		FT_Load_Char(m_face, _text[i], FT_LOAD_RENDER);
 
-		//get x and y coord via mod and div
-		uint16_t idCoordX = id % m_numTextX;
-		uint16_t idCoordY = id / m_numTextY;
+		//change which texture GL is working w/
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_fontTex);
 
-		//nothing Y-axis related needs to be done in relation to positioning
-		float posX = i * 1.0f;
+		//assign the char in the ttf to the correct glyph
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows,
+			0, GL_RED, GL_UNSIGNED_BYTE, m_face->glyph->bitmap.buffer);
 
-		GLfloat vertices[] = {
-			// Pos					   // Tex
-			0.0f + posX, 1.0f, (m_textNormalX * idCoordX), (m_textNormalY * idCoordY) + m_textNormalY,
-			1.0f + posX, 0.0f, (m_textNormalX * idCoordX) + m_textNormalX, (m_textNormalY * idCoordY),
-			0.0f + posX, 0.0f, (m_textNormalX * idCoordX), (m_textNormalY * idCoordY), 
-   
-			0.0f + posX, 1.0f, (m_textNormalX * idCoordX), (m_textNormalY * idCoordY) + m_textNormalY,
-			1.0f + posX, 1.0f, (m_textNormalX * idCoordX) + m_textNormalX, (m_textNormalY * idCoordY) + m_textNormalY,
-			1.0f + posX, 0.0f, (m_textNormalX * idCoordX) + m_textNormalX, (m_textNormalY * idCoordY)
+		float x2 = _pos.x + m_face->glyph->bitmap_left * _size.x;
+		float y2 = -_pos.y - m_face->glyph->bitmap_top * _size.y;
+		float w = m_face->glyph->bitmap.width * _size.x;
+		float h = m_face->glyph->bitmap.rows * _size.y;
+
+		GLfloat box[4][4] = {
+			// Pos			 // Tex
+			x2,		-y2,	 0.0f, 0.0f,
+			x2 + w,	-y2,	 1.0f, 0.0f,
+			x2,		-y2 - h, 0.0f, 1.0f, 
+			x2 + w, -y2 - h, 1.0f, 1.0f,
 		};
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);  
+		glBufferData(GL_ARRAY_BUFFER, sizeof(box), box, GL_DYNAMIC_DRAW);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		_pos.x += (m_face->glyph->advance.x / 64) * _size.x;
+		_pos.y += (m_face->glyph->advance.y / 64) * _size.y;
 	}
 
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Text::~Text()
 {
+	glDeleteTextures(1, &m_fontTex);
+	glDeleteBuffers(1, &m_VBO);
+	glDeleteBuffers(1, &m_VAO);
 
+	// We Don't Need The Face Information Now That The Display
+	FT_Done_Face(m_face);
 }

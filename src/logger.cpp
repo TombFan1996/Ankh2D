@@ -14,19 +14,13 @@ void log_fprint(const char *fmt, ...)
 		FILE* file;
 		file = fopen(log_name, "a");
 
-		char text[1024];
+		char text[256];
 		va_list ap;
 
-		if (fmt == NULL)
-    		*text=0;
-
-		else 
-		{	
-			va_start(ap, fmt);
-			vsprintf(text, fmt, ap);
-			va_end(ap);
-		}
-
+		va_start(ap, fmt);
+		vsprintf(text, fmt, ap);
+		va_end(ap);
+		
 		fprintf(file, text);
 		fprintf(file, "\n");
 		fclose(file);
