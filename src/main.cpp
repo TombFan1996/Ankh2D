@@ -51,16 +51,14 @@ int main(int argc, char** argv)
 
 		tmxSprite.draw(mainCamera.getProjection());
 
-		darkel.update();
-		darkel.draw(mainCamera.getProjection());
+		//darkel.update();
+		//darkel.draw(mainCamera.getProjection());
 
-		float sx = 2.0 / graphics.getWidth();
-		float sy = 2.0 / graphics.getHeight();
+		newText->draw("It Works!", glm::vec2(-1 + 8 * (2.0f / graphics.getWidth()), 
+			1 - 50 * (2.0f / graphics.getHeight())));
 
-		newText->draw("It works!", glm::vec2(-1 + 8 * sx, 1 - 50 * sy), glm::vec2(sx, sy));
-		
 		//update and draw content here
-		mainCamera.update(darkel);
+		//mainCamera.update(darkel);
 
 		//swap the buffers
 		graphics.update();

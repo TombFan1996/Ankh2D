@@ -80,7 +80,9 @@ void Graphics::update()
 			m_closed = true;
 	}
 
-	this->getFPS();
+	#ifdef ANKH2D_DEBUG
+		this->getFPS();
+	#endif
 }
 
 void Graphics::getFPS()
