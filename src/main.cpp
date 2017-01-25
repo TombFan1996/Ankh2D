@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 		sprite_update(newSprite);
 		sprite_draw(newSprite, mainCamera->projection);
 
-		camera_update(newSprite);
+		camera_update(mainCamera);
 
 		//swap the buffers
 		graphics_update();

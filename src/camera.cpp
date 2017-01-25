@@ -40,16 +40,6 @@ camera* camera_create(float _speed)
 	return newCamera;
 }
 
-void camera_update()
-{
-	camera_movement(mainCamera);
-
-	//update orthographic camera normally
-	glm::vec2 position = mainCamera->transform->position;
-	mainCamera->projection = glm::ortho(position.x, position.x + mainCamera->screenWidth, 
-		position.y + mainCamera->screenHeight, position.y, -1.0f, 1.0f);
-}
-
 void camera_update(camera* _camera)
 {
 	camera_movement(_camera);
@@ -60,30 +50,15 @@ void camera_update(camera* _camera)
 		position.y + _camera->screenHeight, position.y, -1.0f, 1.0f);
 }
 
-void camera_update(sprite* _sprite)
-{
-	camera_movement(mainCamera);
-
-	//update orthographic camera following the sprite
-	glm::vec2 targetPos = _sprite->transform->position;
-	glm::vec2 position = mainCamera->transform->position;
-
-	mainCamera->transform->position = glm::vec2(targetPos.x - (mainCamera->screenWidth/2), targetPos.y - (mainCamera->screenHeight/2));
-	
-	mainCamera->projection = glm::ortho(position.x, position.x + mainCamera->screenWidth, 
-		position.y + mainCamera->screenHeight, position.y, -1.0f, 1.0f);
-}
-
 void camera_update(camera* _camera, sprite* _sprite)
 {
 	camera_movement(_camera);
 
 	//update orthographic camera following the sprite
 	glm::vec2 targetPos = _sprite->transform->position;
-	glm::vec2 position = _camera->transform->position;
-
 	_camera->transform->position = glm::vec2(targetPos.x - (_camera->screenWidth/2), targetPos.y - (_camera->screenHeight/2));
 	
+	glm::vec2 position = _camera->transform->position;
 	_camera->projection = glm::ortho(position.x, position.x + _camera->screenWidth, 
 		position.y + _camera->screenHeight, position.y, -1.0f, 1.0f);
 }

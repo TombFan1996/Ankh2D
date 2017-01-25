@@ -33,9 +33,7 @@ extern camera* mainCamera;
 
 camera* camera_create(float _speed);
 void camera_create();
-void camera_update();
 void camera_update(camera* _camera);
-void camera_update(sprite* _sprite);
 void camera_update(camera* _camera, sprite* _sprite);
 void camera_movement(camera* _camera);
 void camera_destroy();
