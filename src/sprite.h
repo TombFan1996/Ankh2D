@@ -1,11 +1,10 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
+#include <SDL.h>
 #include <glm\vec2.hpp>
-#include "camera.h"
-#include "texture2d.h"
 #include "transform.h"
-
+#include "texture2d.h"
 #include "shader.h"
 
 enum SDir
@@ -17,29 +16,22 @@ enum SDir
 	SPRITE_DOWN
 };
 
-class Sprite
+typedef struct
 {
-	public:
-		Sprite(char* _texName, Shader* _shader, Transform* _trans);
-		~Sprite();
+	SDir spriteState;
+	float speed;
+	const uint8_t* keys;
+	GLuint model, projection;
+	shader* shader;
+	transform* transform;
+	texture2d* texture;
+	GLuint vao, vbo;
+} sprite;
 
-		inline void setTransform(Transform* _trans){m_transform = _trans;}
-		void setTexture(Texture2D* _newTex);
-
-		inline Transform* getTransform(){return m_transform;}
-		inline Texture2D* getTexture(){return m_texture;}
-	
-		void update();
-		void draw(glm::mat4 _projection);
-	private:
-		SDir spriteState;
-		float m_speed;
-		const uint8_t* m_keys;
-		GLuint m_model, m_projection;
-		Shader* m_shader;
-		Transform* m_transform;
-		Texture2D* m_texture;
-		GLuint m_VAO, m_VBO;
-};
+sprite* sprite_create(const char* _name, shader* _shader, transform* _trans);
+void sprite_update(sprite* _sprite);
+void sprite_draw(sprite* _sprite, glm::mat4 _projection);
+void sprite_setTexture(sprite* _sprite, texture2d* _tex);
+void sprite_destroy(sprite* _sprite);
 
 #endif

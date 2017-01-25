@@ -1,6 +1,6 @@
 # Ankh2D
 
-A 2D C++/OpenGL framework
+A 2D C/OpenGL framework
 
 ### Dependencies ###
 * [SDL2](https://www.libsdl.org/download-2.0.php)

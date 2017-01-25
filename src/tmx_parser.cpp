@@ -1,9 +1,10 @@
 #include "tmx_parser.h"
 
-TMX_Parser::TMX_Parser(const char* _name)
+tmx_map* tmx_parser_create(const char* _filename)
 {
+	tmx_map* newMap = new tmx_map;
 	tinyxml2::XMLDocument m_xmlMap;
-	m_xmlMap.LoadFile(_name);
+	m_xmlMap.LoadFile(_filename);
 
 	if (m_xmlMap.Error()){
 		//tinyxml2 has shuddy error logging
@@ -16,10 +17,10 @@ TMX_Parser::TMX_Parser(const char* _name)
 		tinyxml2::XMLNode* map = m_xmlMap.FirstChildElement("map");
 		tinyxml2::XMLElement* mapElem = map->ToElement();
 
-		m_map.map_height = mapElem->IntAttribute("height");
-		m_map.map_width = mapElem->IntAttribute("width");
-		m_map.tile_width = mapElem->IntAttribute("tilewidth");
-		m_map.tile_height = mapElem->IntAttribute("tileheight");
+		newMap->map_height = mapElem->IntAttribute("height");
+		newMap->map_width = mapElem->IntAttribute("width");
+		newMap->tile_width = mapElem->IntAttribute("tilewidth");
+		newMap->tile_height = mapElem->IntAttribute("tileheight");
 
 		//get the tilesets used in the map
 		for (tinyxml2::XMLElement* childTileset = map->FirstChildElement("tileset"); childTileset != NULL; 
@@ -40,7 +41,7 @@ TMX_Parser::TMX_Parser(const char* _name)
 			memcpy(newSet.filename, filename, sizeof(newSet.filename));
 
 			//enter our new tileset data
-			m_map.tileset.push_back(newSet);
+			newMap->tileset.push_back(newSet);
 		}
 
 		//get all the layers in the map
@@ -72,12 +73,14 @@ TMX_Parser::TMX_Parser(const char* _name)
 			if (newLayer.data.size() == 0)
 				log_fprint("Export the TMX file as XML layer format");
 
-			m_map.layer.push_back(newLayer);
+			newMap->layer.push_back(newLayer);
 		}
 	}
+
+	return newMap;
 }
 
-TMX_Parser::~TMX_Parser()
+void tmx_parser_destroy(tmx_map* _tmxm)
 {
-	
+	delete _tmxm;
 }

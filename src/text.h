@@ -28,28 +28,27 @@ typedef struct
 
 	float bitmap_advanceX;
 	float bitmap_advanceY;
-} Char;
+} character;
 
-class Text
+typedef struct
 {
-	public:
-		Text(FT_Library& m_ft, char* _fontName, uint8_t _fontSize, Shader* _shader);
-		void createText();
-		void setColour(glm::vec3 _colour){m_fontColour = _colour;}
-		void setSize(uint8_t _fontSize){FT_Set_Pixel_Sizes(m_face, 0, _fontSize);}
-		void draw(std::string _text, glm::vec2 _pos);
-		~Text();
-	private:
-		uint16_t m_width, m_height;
-		Char m_characters[ASCII_SET_SIZE];
-		FT_Face m_face;
-		glm::mat4 m_defaultProj;
-		GLuint m_VAO, m_VBO;
-		GLuint m_colour;
-		Shader* m_shader;
-		glm::vec3 m_fontColour;
-		float m_textNormalX, m_textNormalY;
-		uint16_t m_numTextX, m_numTextY;
-};
+	uint16_t width, height;
+	character characters[ASCII_SET_SIZE];
+	FT_Face face;
+	glm::mat4 defaultProj;
+	GLuint vao, vbo;
+	GLuint colour;
+	shader* shader;
+	glm::vec3 fontColour;
+	float textNormalX, textNormalY;
+	uint16_t numTextX, numTextY;
+} text;
+
+text* text_create(FT_Library& m_ft, const char* _fontName, uint8_t _fontSize, shader* _shader);
+void text_loadCharacters(text* _text);
+void text_setColour(text* _text, glm::vec3 _colour);
+void text_setSize(text* _text, float _size);
+void text_draw(text* _text, std::string _str, glm::vec2 _pos);
+void text_destroy(text* _text);
 
 #endif

@@ -8,30 +8,23 @@
 
 #include "logger.h"
 
-class Graphics
+typedef struct
 {
-	public:
-		Graphics(const char* _title, uint16_t _w, uint16_t _h, bool _fs);
-		~Graphics();
+	bool closed;
+	const char* title;
+	uint32_t startTime, endTime;
+	uint32_t numFrames;
+	uint16_t width, height;
+	SDL_Window* window;
+	SDL_GLContext glContext;
+} graphics;
 
-		void clear();
-		void update();
-		bool isClosed(){return m_closed;}
-		void getFPS();
+extern graphics* mainGraphics;
 
-		uint16_t getWidth(){return m_width;}
-		uint16_t getHeight(){return m_height;}
-
-		SDL_GLContext getContext(){return m_glContext;}
-		SDL_Window* getWindow(){return m_window;}
-	private:
-		const char* m_title;
-		uint32_t m_startTime, m_endTime;
-		uint32_t m_numFrames;
-		uint16_t m_width, m_height;
-		bool m_closed;
-		SDL_Window* m_window;
-		SDL_GLContext m_glContext;
-};
+graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs);
+void graphics_clear();
+void graphics_update();
+void graphics_getFPS();
+void graphics_destroy();
 
 #endif

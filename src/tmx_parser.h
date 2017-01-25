@@ -47,16 +47,9 @@ typedef struct
 	uint8_t tile_height;
 	std::vector<TILESET> tileset;
 	std::vector<LAYER> layer;
-} TMX_MAP;
+} tmx_map;
 
-class TMX_Parser
-{
-	public:
-		TMX_Parser(const char* _name);
-		TMX_MAP getMap(){return m_map;}
-		~TMX_Parser();
-	private:
-		TMX_MAP m_map;
-};
+tmx_map* tmx_parser_create(const char* _filename);
+void tmx_parser_destroy(tmx_map* _tmxm);
 
 #endif

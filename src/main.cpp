@@ -11,6 +11,9 @@
 #include "tmx_parser.h"
 #include "tmx_sprite.h"
 
+//grapics handler = mainGraphics
+//camera handler = mainCamera;
+
 int main(int argc, char** argv)
 {
 	FT_Library ft_lib;
@@ -20,52 +23,63 @@ int main(int argc, char** argv)
 		log_fprint("Could not init freetype library!");
 	}
 
-	//Font rendering in GL
-	//http://blogs.agi.com/insight3d/index.php/2008/08/29/rendering-text-fast/
-	Graphics graphics("Ankh2D", 1366, 768, false);
-	Camera mainCamera;
+	graphics_create("Ankh2D C Conversion", 1366, 768, false);
+	shader* spriteShader = shader_create("assets/sprite");
+	shader_bindAttribLocation(spriteShader, 0, "model");
+	shader_bindAttribLocation(spriteShader, 1, "projection");
 
-	Shader spriteShader("assets/sprite");
-	spriteShader.bindAttribLocation(0, "model");
-	spriteShader.bindAttribLocation(1, "projection");
+	camera_create();
 
-	Shader textShader("assets/text");
-	textShader.bindAttribLocation(0, "colour");
+	shader* textShader = shader_create("assets/text");
+	shader_bindAttribLocation(textShader, 0, "colour");
 
-	Text* newText = new Text(ft_lib, "assets/arial.ttf", 24.0f, &textShader);
-	newText->setColour(glm::vec3(1.0f, 0.0f, 0.0f));
+	text* newText = text_create(ft_lib, "assets/arial.ttf", 24.0f, textShader);
+	text_setColour(newText, glm::vec3(1.0f, 0.0f, 0.0f));
 
-	//create our new sprite
-	Sprite darkel("assets/darkel.png", &spriteShader, 
-		new Transform(glm::vec2(0, 0), 0.0f, glm::vec2(300,300)));
-	 
-	//load our map in
-	TMX_Parser tmxParser("assets/test_1.tmx");
-	//convert map data to a sprite
-	TMX_Sprite tmxSprite(tmxParser.getMap(), &spriteShader, new Transform(glm::vec2(600, 300), 0.0f));
+	transform spriteTrans;
+	spriteTrans.position = glm::vec2(0.0f, 0.0f);
+	spriteTrans.rotation = 0.0f;
+	spriteTrans.scale = glm::vec2(40.0f, 40.0f);
+	sprite* newSprite = sprite_create("assets/darkel.png", spriteShader, &spriteTrans);
+	
+	tmx_map* map = tmx_parser_create("assets/test_1.tmx");
+	transform mapTrans;
+	mapTrans.position = glm::vec2(0.0f, 0.0f);
+	mapTrans.rotation = 0.0f;
+	mapTrans.scale = glm::vec2(40.0f, 40.0f);
+	tmx_sprite* tmx_sprite = tmx_sprite_create(map, spriteShader, &mapTrans);
 
-	while (!graphics.isClosed())
+	while (!mainGraphics->closed)
 	{
 		//clear the buffer
-		graphics.clear();
+		graphics_clear();
 
-		tmxSprite.draw(mainCamera.getProjection());
+		tmx_sprite_draw(tmx_sprite, mainCamera->projection);
+		text_draw(newText, "It Works in C!", glm::vec2(-1 + 8 * (2.0f / mainGraphics->width), 
+			1 - 50 * (2.0f / mainGraphics->height)));
 
-		//darkel.update();
-		//darkel.draw(mainCamera.getProjection());
+		sprite_update(newSprite);
+		sprite_draw(newSprite, mainCamera->projection);
 
-		newText->draw("It Works!", glm::vec2(-1 + 8 * (2.0f / graphics.getWidth()), 
-			1 - 50 * (2.0f / graphics.getHeight())));
-
-		//update and draw content here
-		//mainCamera.update(darkel);
+		camera_update(newSprite);
 
 		//swap the buffers
-		graphics.update();
+		graphics_update();
 	}
 
-	//needs to be called before destruction of freetype
-	delete newText;
+	camera_destroy();
+	
+	shader_destroy(spriteShader);
+	shader_destroy(textShader);
+	
+	sprite_destroy(newSprite);
+
+	text_destroy(newText);
+
+	tmx_sprite_destroy(tmx_sprite);
+	tmx_parser_destroy(map);
+	
+	graphics_destroy();
 
 	//remove freetype
 	FT_Done_FreeType(ft_lib);

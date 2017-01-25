@@ -18,28 +18,27 @@ enum CDir
 	CAM_DOWN
 };
 
-class Sprite;
-
-class Camera
+typedef struct 
 {
-	public:
-		Camera();
-		void update();
-		void movement();
-		void update(Sprite& _sprite);
-		void setFreeCamera(bool _free){m_freeCamera = _free;}
-		bool getFreeCamera(){return m_freeCamera;}
-		Transform* getTransform(){return &m_transform;}
-		glm::mat4 getProjection(){return m_projection;}
-		~Camera();
-	private:
-		bool m_freeCamera;
-		Transform m_transform;
-		CDir camState;
-		const uint8_t* m_keys;
-		float m_speed; //camera speed when free (not attached to player)
-		float m_screenWidth, m_screenHeight;
-		glm::mat4 m_projection;
-};
+	bool freeCamera;
+	transform* transform;
+	CDir camState;
+	const uint8_t* keys;
+	float speed; //camera speed when free (not attached to player)
+	float screenWidth, screenHeight;
+	glm::mat4 projection;
+} camera;
+
+extern camera* mainCamera;
+
+camera* camera_create(float _speed);
+void camera_create();
+void camera_update();
+void camera_update(camera* _camera);
+void camera_update(sprite* _sprite);
+void camera_update(camera* _camera, sprite* _sprite);
+void camera_movement(camera* _camera);
+void camera_destroy();
+void camera_destroy(camera* _camera);
 
 #endif

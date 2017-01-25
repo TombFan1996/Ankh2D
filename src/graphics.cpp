@@ -1,14 +1,16 @@
 #include "graphics.h"
 
-Graphics::Graphics(const char* _title, uint16_t _w, uint16_t _h, bool _fs)
+graphics* mainGraphics = new graphics;
+
+graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs)
 {
 	//clear previous logs
 	log_fclear();
 
-	m_title = _title;
-	m_width = _w;
-	m_height = _h;
-	log_fprint("Window Size: %i x %i", _w, _h);
+	mainGraphics->title = _title;
+	mainGraphics->width = _width;
+	mainGraphics->height = _height;
+	log_fprint("Window Size: %i x %i", _width, _height);
 
 	//setup SDL+GL windows and contexts
 	SDL_Init(SDL_INIT_VIDEO);
@@ -34,85 +36,89 @@ Graphics::Graphics(const char* _title, uint16_t _w, uint16_t _h, bool _fs)
 
 	if (_fs)
 	{
-		m_window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			_w, _h, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
+		mainGraphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			mainGraphics->width, mainGraphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
 		log_fprint("Fullscreen mode");
 	}
 
 	else
 	{
-		m_window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			_w, _h, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED |SDL_WINDOW_RESIZABLE);
+		mainGraphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			mainGraphics->width, mainGraphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED |SDL_WINDOW_RESIZABLE);
 		log_fprint("Windowed mode");
 	}
 
-	m_glContext = SDL_GL_CreateContext(m_window);
+	mainGraphics->glContext = SDL_GL_CreateContext(mainGraphics->window);
 
 	//get all GL functions for this OS/GPU
 	GLenum status = glewInit();
 	if (status != GLEW_OK)
 		log_fprint("Glew failed to init");
 
-	m_closed = false;
+	mainGraphics->closed = false;
 
-	m_numFrames = 0;
+	mainGraphics->numFrames = 0;
 	//get the starting time
-	m_startTime = SDL_GetTicks();
+	mainGraphics->startTime = SDL_GetTicks();
+
+	return mainGraphics;
 }
 
-void Graphics::clear()
+void graphics_clear()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Graphics::update()
+void graphics_update()
 {
-	SDL_GL_SwapWindow(m_window);
+	SDL_GL_SwapWindow(mainGraphics->window);
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
-			m_closed = true;
+			mainGraphics->closed = true;
 
 		if (event.key.keysym.sym == SDLK_ESCAPE)
-			m_closed = true;
+			mainGraphics->closed = true;
 	}
 
 	#ifdef ANKH2D_DEBUG
-		this->getFPS();
+		graphics_getFPS();
 	#endif
 }
 
-void Graphics::getFPS()
+void graphics_getFPS()
 {
-	m_endTime = SDL_GetTicks();
-	m_numFrames++;
+	mainGraphics->endTime = SDL_GetTicks();
+	mainGraphics->numFrames++;
 
 	//limit the drawing of fps
-	if ((m_endTime - m_startTime > 1000) && m_numFrames > 10)
+	if ((mainGraphics->endTime - mainGraphics->startTime > 1000) 
+		&& mainGraphics->numFrames > 10)
 	{
-		double fps = (double)m_numFrames / (m_endTime / m_startTime);
+		double fps = (double)mainGraphics->numFrames / (mainGraphics->endTime / mainGraphics->startTime);
 		//update our starting time again
-		m_startTime = m_endTime;
+		mainGraphics->startTime = mainGraphics->endTime;
 		//reset the frames
-		m_numFrames = 0;
+		mainGraphics->numFrames = 0;
 
 		std::stringstream ss;
-		ss << m_title;
+		ss << mainGraphics->title;
 		ss << " | ";
 		ss << fps;
 		ss << "fps";
-		SDL_SetWindowTitle(m_window, ss.str().c_str());
+		SDL_SetWindowTitle(mainGraphics->window, ss.str().c_str());
 	}
 }
 
-Graphics::~Graphics()
+void graphics_destroy()
 {
-	SDL_GL_DeleteContext(m_glContext);
+	SDL_GL_DeleteContext(mainGraphics->glContext);
 	log_fprint("Destroyed GL context");
-	SDL_DestroyWindow(m_window);
+	SDL_DestroyWindow(mainGraphics->window);
 	log_fprint("Destroyed Window");
+	delete mainGraphics;
 	SDL_Quit();
 }

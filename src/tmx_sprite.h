@@ -12,21 +12,19 @@
 //WARNING: tilemap of equal width and height only!
 //the offset vs tile size is not sorted yet
 
-class TMX_Sprite
+typedef struct
 {
-	public:
-		TMX_Sprite(TMX_MAP& _map, Shader* _shader, Transform* _trans);
-		void draw(glm::mat4 _projection);
-		~TMX_Sprite();
-	private:
-		GLuint m_model, m_projection;
-		Shader* m_shader;
-		Transform* m_transform;
-		uint32_t m_vboSize;
-		GLuint* m_VAO;
-		GLuint* m_VBO;
-		Texture2D* m_tilemap;
-		TMX_MAP* m_map;
-};
+	GLuint model, projection;
+	shader* shader;
+	transform* transform;
+	uint32_t vboSize;
+	GLuint* vao, *vbo;
+	texture2d* tilemap;
+	tmx_map* map;
+} tmx_sprite;
+
+tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans);
+void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection);
+void tmx_sprite_destroy(tmx_sprite* _sprite);
 
 #endif

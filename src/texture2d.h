@@ -9,18 +9,14 @@
 #include <cassert>
 #include "logger.h"
 
-class Texture2D
+typedef struct
 {
-	public:
-		Texture2D(const char* _filename);
-		void bind();
-		uint16_t getWidth(){return m_width;}
-		uint16_t getHeight(){return m_height;}
-		~Texture2D();
-	private:
-		uint16_t m_width, m_height;
-		GLuint m_texture;
+	uint16_t width, height;
+	GLuint texture;
+} texture2d;
 
-};
+texture2d* texture2d_create(const char* _filename);
+void texture2d_bind(texture2d* _tex);
+void texture2d_destroy(texture2d* _tex);
 
 #endif

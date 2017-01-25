@@ -1,49 +1,50 @@
 #include "tmx_sprite.h"
 
-TMX_Sprite::TMX_Sprite(TMX_MAP& _map, Shader* _shader, Transform* _trans)
+tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans)
 {
-	m_map = &_map;
-	m_shader = _shader;
-	m_transform = _trans;
+	tmx_sprite* newMapSprite = new tmx_sprite;
+	newMapSprite->map = _map;
+	newMapSprite->shader = _shader;
+	newMapSprite->transform = _trans;
 
-	m_model = m_shader->getUniformLocation("model");
-	m_projection = m_shader->getUniformLocation("projection");
+	newMapSprite->model = shader_getUniformLocation(newMapSprite->shader, "model");
+	newMapSprite->projection = shader_getUniformLocation(newMapSprite->shader, "projection");
 
 	//WARNING: havent factored in tilesets for now
 	//WARNING: filename is going to be ruined.
 	
 	std::string filename("assets/");
-	filename += m_map->tileset[0].filename;
-	m_tilemap = new Texture2D(filename.c_str());
+	filename += newMapSprite->map->tileset[0].filename;
+	newMapSprite->tilemap = texture2d_create(filename.c_str());
 	
-	m_vboSize = m_map->layer[0].data.size();
+	newMapSprite->vboSize = newMapSprite->map->layer[0].data.size();
 
-	uint16_t mapSizeX = m_map->layer[0].width;
-	uint16_t mapSizeY = m_map->layer[0].height;
+	uint16_t mapSizeX = newMapSprite->map->layer[0].width;
+	uint16_t mapSizeY = newMapSprite->map->layer[0].height;
 
-	uint8_t tileSizeX = m_map->tileset[0].tile_width;
-	uint8_t tileSizeY = m_map->tileset[0].tile_height;
+	uint8_t tileSizeX = newMapSprite->map->tileset[0].tile_width;
+	uint8_t tileSizeY = newMapSprite->map->tileset[0].tile_height;
 
 	//normalised coords for the whole textures
-	float image_normalX = (1.0f / m_tilemap->getWidth()) * tileSizeX;
-	float image_normalY = (1.0f / m_tilemap->getHeight()) * tileSizeY;
+	float image_normalX = (1.0f / newMapSprite->tilemap->width) * tileSizeX;
+	float image_normalY = (1.0f / newMapSprite->tilemap->height) * tileSizeY;
 
 	//number of tiles in the map
-	uint16_t numTilesX = m_tilemap->getWidth() / tileSizeX;
-	uint16_t numTilesY = m_tilemap->getHeight() / tileSizeY;
+	uint16_t numTilesX = newMapSprite->tilemap->width / tileSizeX;
+	uint16_t numTilesY = newMapSprite->tilemap->height / tileSizeY;
 
 	//create x amount of new vbos,vaos
-	m_VAO = new GLuint[m_vboSize];
-	m_VBO = new GLuint[m_vboSize];
+	newMapSprite->vao = new GLuint[newMapSprite->vboSize];
+	newMapSprite->vbo = new GLuint[newMapSprite->vboSize];
 	
 	uint16_t currentTileX = 0;
 	//starts on -1, 0 % tilesize = 0 
 	//(currentTileY becomes 1 on the 1st frame)
 	int16_t currentTileY = -1;
 
-	for (uint32_t i = 0; i < m_vboSize; i++)
+	for (uint32_t i = 0; i < newMapSprite->vboSize; i++)
 	{
-		uint16_t index = m_map->layer[0].data[i].tile_id - 1;
+		uint16_t index = newMapSprite->map->layer[0].data[i].tile_id - 1;
 		//get x and y coord via mod and div
 		uint16_t tileCoordX = index % numTilesX;
 		uint16_t tileCoordY = index / numTilesY;
@@ -66,12 +67,12 @@ TMX_Sprite::TMX_Sprite(TMX_MAP& _map, Shader* _shader, Transform* _trans)
 			1.0f + currentTileX, 0.0f + currentTileY, (image_normalX * tileCoordX) + image_normalX, (image_normalY * tileCoordY)
 		};
 
-		glGenVertexArrays(1, &m_VAO[i]);
-		glBindVertexArray(m_VAO[i]);
+		glGenVertexArrays(1, &newMapSprite->vao[i]);
+		glBindVertexArray(newMapSprite->vao[i]);
 
 		//quad is normalised for positional and tex coords
-		glGenBuffers(1, &m_VBO[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO[i]);
+		glGenBuffers(1, &newMapSprite->vbo[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, newMapSprite->vbo[i]);
 		//GL_STATIC_DRAW prevents 2d animations (look into GL_STREAM/GL_DYNAMIC)
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -82,41 +83,40 @@ TMX_Sprite::TMX_Sprite(TMX_MAP& _map, Shader* _shader, Transform* _trans)
 		glBindBuffer(GL_ARRAY_BUFFER, 0);  
 		glBindVertexArray(0);
 	}
+
+	return newMapSprite;
 }
 
-void TMX_Sprite::draw(glm::mat4 _projection)
+void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection)
 {
 	//bind our program
-	glUseProgram(m_shader->getProgram());
+	glUseProgram(_sprite->shader->program);
 
 	//communicate w/ uniforms
 	//send the model matrix off
-	m_shader->setUniformMat4(m_model, m_transform->getModelMatrix());
+	shader_setUniformMat4(_sprite->model, transform_getModelMatrix(_sprite->transform));
 
 	//send the projection matrix off
-	m_shader->setUniformMat4(m_projection, _projection);
+	shader_setUniformMat4(_sprite->projection, _projection);
 
 	//bind our texture
-	m_tilemap->bind();
+	texture2d_bind(_sprite->tilemap);
 
-	for (uint16_t i = 0; i < m_vboSize; i++)
+	for (uint16_t i = 0; i < _sprite->vboSize; i++)
 	{
-		glBindVertexArray(m_VAO[i]);
+		glBindVertexArray(_sprite->vao[i]);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 	}
 }
 
-TMX_Sprite::~TMX_Sprite()
+void tmx_sprite_destroy(tmx_sprite* _sprite)
 {
-	delete m_tilemap;
-	delete m_transform;
+	texture2d_destroy(_sprite->tilemap);
+	//delete _sprite->transform;
 
-	for (uint16_t i = 0; i < m_vboSize; i++)
-	{
-		glDeleteBuffers(1, &m_VBO[i]);
-		glDeleteBuffers(1, &m_VAO[i]);
-	}
-
-	m_map = nullptr;
+	glDeleteBuffers(_sprite->vboSize, _sprite->vbo);
+	glDeleteBuffers(_sprite->vboSize, _sprite->vao);
+	
+	_sprite->map = nullptr;
 }

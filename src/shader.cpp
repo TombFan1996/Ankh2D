@@ -1,6 +1,52 @@
 #include "shader.h"
 
-const char* loadShader(const char* _filename)
+shader* shader_create(const char* _filename)
+{
+	shader* newShader = new shader;
+	//create shader program
+	newShader->program = glCreateProgram();
+	std::string filename(_filename);
+
+	const char* vertBuf = shader_load((filename + ".vert").c_str());
+	newShader->shaders[VERTEX] = shader_get(vertBuf, GL_VERTEX_SHADER);
+
+	const char* fragBuf = shader_load((filename + ".frag").c_str());
+	newShader->shaders[FRAGMENT] = shader_get(fragBuf, GL_FRAGMENT_SHADER);
+
+	//attach shaders to the shader program
+	for (uint8_t i = 0; i < NUM_SHADERS; i++){
+		glAttachShader(newShader->program, newShader->shaders[i]);
+	}
+
+	glLinkProgram(newShader->program);
+	shader_check(newShader->program, GL_LINK_STATUS, true);
+
+	//check if valid (post link)
+	glValidateProgram(newShader->program);
+	shader_check(newShader->program, GL_VALIDATE_STATUS, true);
+
+	log_fprint("'%s' shader successfully loaded", _filename);
+
+	return newShader;
+}
+
+GLuint shader_get(const char* _buffer, GLenum _shaderType)
+{
+	GLuint shader = glCreateShader(_shaderType);
+	//GL out of mem
+	if (shader == 0)
+		log_fprint("Shader creation failed");
+
+	//push data into shader and compile
+	glShaderSource(shader, 1, &_buffer, 0);
+	glCompileShader(shader);
+
+	shader_check(shader, GL_COMPILE_STATUS, false);
+
+	return shader;
+}
+
+const char* shader_load(const char* _filename)
 {
 	FILE* file;
 	char* buffer;
@@ -29,7 +75,37 @@ const char* loadShader(const char* _filename)
 	return buffer;
 }
 
-void checkShader(GLuint _shader, GLuint _flag, bool _isProgram)
+void shader_bindAttribLocation(shader* _shader, uint8_t _index, char* _name)
+{
+	glBindAttribLocation(_shader->program, _index, _name);
+}
+
+void shader_setUniformMat4(GLuint _uniform, glm::mat4 _matrix4)
+{
+	glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4[0][0]);
+}
+
+void shader_setUniformFloat(GLuint _uniform, float _float)
+{
+	glUniform1f(_uniform, _float);
+}
+
+void shader_setUniformVec2(GLuint _uniform, glm::vec2 _vec2)
+{
+	glUniform2f(_uniform, _vec2.x, _vec2.y);
+}
+
+void shader_setUniformVec3(GLuint _uniform, glm::vec3 _vec3)
+{
+	glUniform3f(_uniform, _vec3.x, _vec3.y, _vec3.z);
+}
+
+GLuint shader_getUniformLocation(shader* _shader, char* _uniform)
+{
+	return glGetUniformLocation(_shader->program, _uniform);
+}
+
+void shader_check(GLuint _shader, GLuint _flag, bool _isProgram)
 {
 	GLint success = GL_FALSE;
 	GLchar error[1024] = {0};
@@ -50,91 +126,13 @@ void checkShader(GLuint _shader, GLuint _flag, bool _isProgram)
 	}
 }
 
-GLuint createShader(const char* _buffer, GLenum _shaderType)
+void shader_destroy(shader* _shader)
 {
-	GLuint shader = glCreateShader(_shaderType);
-	//GL out of mem
-	if (shader == 0)
-		log_fprint("Shader creation failed");
+	glDetachShader(_shader->program, _shader->shaders[VERTEX]);
+	glDeleteShader(_shader->shaders[VERTEX]);
 
-	//push data into shader and compile
-	glShaderSource(shader, 1, &_buffer, 0);
-	glCompileShader(shader);
+	glDetachShader(_shader->program, _shader->shaders[FRAGMENT]);
+	glDeleteShader(_shader->shaders[FRAGMENT]);
 
-	checkShader(shader, GL_COMPILE_STATUS, false);
-
-	return shader;
-}
-
-Shader::Shader(char* _filename)
-{
-	//create shader program
-	m_program = glCreateProgram();
-	std::string filename(_filename);
-
-	const char* vertBuf = loadShader((filename + ".vert").c_str());
-	m_shaders[VERTEX] = createShader(vertBuf, GL_VERTEX_SHADER);
-
-	const char* fragBuf = loadShader((filename + ".frag").c_str());
-	m_shaders[FRAGMENT] = createShader(fragBuf, GL_FRAGMENT_SHADER);
-
-	//attach shaders to the shader program
-	for (uint8_t i = 0; i < NUM_SHADERS; i++){
-		glAttachShader(m_program, m_shaders[i]);
-	}
-
-	//tells GL what part of data to read in shader
-	//glBindAttribLocation(m_program, 0, "model");
-	//glBindAttribLocation(m_program, 1, "projection");
-
-	glLinkProgram(m_program);
-	checkShader(m_program, GL_LINK_STATUS, true);
-
-	//check if valid (post link)
-	glValidateProgram(m_program);
-	checkShader(m_program, GL_VALIDATE_STATUS, true);
-
-	log_fprint("'%s' shader successfully loaded", _filename);
-}
-
-//bind a uniform to an index in the shader
-void Shader::bindAttribLocation(uint8_t _index, char* _name)
-{
-	glBindAttribLocation(m_program, _index, _name);
-}
-
-GLuint Shader::getUniformLocation(char* _uniform)
-{
-	return glGetUniformLocation(m_program, _uniform);
-}
-
-void Shader::setUniformVec2(GLuint _uniform, glm::vec2 _vec2)
-{
-	glUniform2f(_uniform, _vec2.x, _vec2.y);
-}
-
-void Shader::setUniformVec3(GLuint _uniform, glm::vec3 _vec3)
-{
-	glUniform3f(_uniform, _vec3.x, _vec3.y, _vec3.z);
-}
-
-void Shader::setUniformFloat(GLuint _uniform, float _float)
-{
-	glUniform1f(_uniform, _float);
-}
-
-void Shader::setUniformMat4(GLuint _uniform, glm::mat4 _matrix4)
-{
-	glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4[0][0]);
-}
-
-Shader::~Shader()
-{
-	glDetachShader(m_program, m_shaders[VERTEX]);
-	glDeleteShader(m_shaders[VERTEX]);
-
-	glDetachShader(m_program, m_shaders[FRAGMENT]);
-	glDeleteShader(m_shaders[FRAGMENT]);
-
-	glDeleteProgram(m_program);
+	glDeleteProgram(_shader->program);
 }

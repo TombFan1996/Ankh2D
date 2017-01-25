@@ -1,17 +1,18 @@
 #include "sprite.h"
 
-Sprite::Sprite(char* _texName, Shader* _shader, Transform* _trans)
+sprite* sprite_create(const char* _name, shader* _shader, transform* _trans)
 {
-	m_shader = _shader;
-	m_texture = new Texture2D(_texName);
-	m_transform = _trans;
+	sprite* newSprite = new sprite;
+	newSprite->shader = _shader;
+	newSprite->texture = texture2d_create(_name);
+	newSprite->transform = _trans;
 
-	m_model = m_shader->getUniformLocation("model");
-	m_projection = m_shader->getUniformLocation("projection");
+	newSprite->model = shader_getUniformLocation(newSprite->shader, "model");
+	newSprite->projection = shader_getUniformLocation(newSprite->shader, "projection");
 
-	m_speed = 0.25f;
-	spriteState = SDir::SPRITE_STILL;
-	m_keys = SDL_GetKeyboardState(NULL);
+	newSprite->speed = 0.25f;
+	newSprite->spriteState = SDir::SPRITE_STILL;
+	newSprite->keys = SDL_GetKeyboardState(NULL);
 
 	GLfloat vertices[] = {
 		// Pos      // Tex
@@ -25,10 +26,10 @@ Sprite::Sprite(char* _texName, Shader* _shader, Transform* _trans)
 	};
 
 	//quad is normalised for positional and tex coords
-	glGenVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
+	glGenVertexArrays(1, &newSprite->vao);
+	glBindVertexArray(newSprite->vao);
 	//allocate two vertex buffers (vert + texcoord)
-	glGenBuffers(1, &m_VBO);
+	glGenBuffers(1, &newSprite->vbo);
     
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -36,88 +37,92 @@ Sprite::Sprite(char* _texName, Shader* _shader, Transform* _trans)
 	//GLint size = (how many float elements per vertex)
 
 	//positional datas
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, newSprite->vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	return newSprite;
 }
 
-void Sprite::setTexture(Texture2D* _newTex)
-{
-	if (!m_texture)
-		delete m_texture;
-	else
-		m_texture = _newTex;
-}
-
-void Sprite::update()
+void sprite_update(sprite* _sprite)
 {
 	SDL_PumpEvents();
 
-	if (m_keys[SDL_SCANCODE_W])
-		spriteState = SDir::SPRITE_UP;
+	if (_sprite->keys[SDL_SCANCODE_W])
+		_sprite->spriteState = SDir::SPRITE_UP;
 
-	else if (m_keys[SDL_SCANCODE_A])
-		spriteState = SDir::SPRITE_LEFT;
+	else if (_sprite->keys[SDL_SCANCODE_A])
+		_sprite->spriteState = SDir::SPRITE_LEFT;
 
-	else if (m_keys[SDL_SCANCODE_S])
-		spriteState = SDir::SPRITE_DOWN;
+	else if (_sprite->keys[SDL_SCANCODE_S])
+		_sprite->spriteState = SDir::SPRITE_DOWN;
 
-	else if (m_keys[SDL_SCANCODE_D])
-		spriteState = SDir::SPRITE_RIGHT;
+	else if (_sprite->keys[SDL_SCANCODE_D])
+		_sprite->spriteState = SDir::SPRITE_RIGHT;
 
 	else
-		spriteState = SDir::SPRITE_STILL;
+		_sprite->spriteState = SDir::SPRITE_STILL;
 	
-	switch(spriteState)
+	switch(_sprite->spriteState)
 	{
 		case SDir::SPRITE_UP:
-			m_transform->setPosition(glm::vec2(m_transform->getPosition().x, 
-				m_transform->getPosition().y - m_speed));
+			_sprite->transform->position = glm::vec2(_sprite->transform->position.x, 
+				_sprite->transform->position.y - _sprite->speed);
 			break;
 		case SDir::SPRITE_LEFT:
-			m_transform->setPosition(glm::vec2(m_transform->getPosition().x - m_speed, 
-				m_transform->getPosition().y));
+			_sprite->transform->position = glm::vec2(_sprite->transform->position.x - _sprite->speed, 
+				_sprite->transform->position.y);
 			break;
 		case SDir::SPRITE_DOWN:
-			m_transform->setPosition(glm::vec2(m_transform->getPosition().x, 
-				m_transform->getPosition().y + m_speed));
+			_sprite->transform->position = glm::vec2(_sprite->transform->position.x, 
+				_sprite->transform->position.y + _sprite->speed);
 			break;
 		case SDir::SPRITE_RIGHT:
-			m_transform->setPosition(glm::vec2(m_transform->getPosition().x + m_speed, 
-				m_transform->getPosition().y));
+			_sprite->transform->position = glm::vec2(_sprite->transform->position.x + _sprite->speed, 
+				_sprite->transform->position.y);
 			break;
 	}
 }
 
-void Sprite::draw(glm::mat4 _projection)
+void sprite_draw(sprite* _sprite, glm::mat4 _projection)
 {
 	//bind our program
-	glUseProgram(m_shader->getProgram());
+	glUseProgram(_sprite->shader->program);
 
 	//communicate w/ uniforms
 	//send the model matrix off
-	m_shader->setUniformMat4(m_model, m_transform->getModelMatrix());
+	shader_setUniformMat4(_sprite->model, transform_getModelMatrix(_sprite->transform));
 
 	//send the projection matrix off
-	m_shader->setUniformMat4(m_projection, _projection);
+	shader_setUniformMat4(_sprite->projection, _projection);
 
 	//bind our texture
-	m_texture->bind();
+	texture2d_bind(_sprite->texture);
 
 	//bind and draw our object
-	glBindVertexArray(m_VAO);
+	glBindVertexArray(_sprite->vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
 
-Sprite::~Sprite()
+void sprite_setTexture(sprite* _sprite, texture2d* _tex)
 {
-	delete m_transform;
-	delete m_texture;
+	if (!_sprite->texture)
+		delete _sprite->texture;
+	else
+		_sprite->texture = _tex;
+}
 
-	glDeleteBuffers(1, &m_VBO);
-	glDeleteBuffers(1, &m_VAO);
+void sprite_destroy(sprite* _sprite)
+{
+	texture2d_destroy(_sprite->texture);
+	//delete _sprite->transform;
+
+	shader_destroy(_sprite->shader);
+
+	glDeleteBuffers(1, &_sprite->vao);
+	glDeleteBuffers(1, &_sprite->vbo);
 }

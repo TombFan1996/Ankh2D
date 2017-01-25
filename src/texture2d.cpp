@@ -1,11 +1,13 @@
 #include "texture2d.h"
 
-Texture2D::Texture2D(const char* _filename)
+texture2d* texture2d_create(const char* _filename)
 {
+	texture2d* newTex = new texture2d;
+	
 	int width, height, numComponents;
 	unsigned char* imageBuffer = stbi_load(_filename, &width, &height, &numComponents, 4);
-	m_width = width;
-	m_height = height;
+	newTex->width = width;
+	newTex->height = height;
 
 	if (imageBuffer == NULL)
 		log_fprint("%s loading has failed!", _filename);
@@ -13,8 +15,8 @@ Texture2D::Texture2D(const char* _filename)
 	else
 	{
 		//create and bind texture
-		glGenTextures(1, &m_texture);
-		glBindTexture(GL_TEXTURE_2D, m_texture);
+		glGenTextures(1, &newTex->texture);
+		glBindTexture(GL_TEXTURE_2D, newTex->texture);
 
 		//if we read outside the texture size, it will start again (wrap repeat)
 		//use GL_CLAMP for a default colour to be used outside bounds of tex
@@ -27,21 +29,22 @@ Texture2D::Texture2D(const char* _filename)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		//construct the texture image
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer); 
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newTex->width, newTex->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer); 
 	}
 
 	stbi_image_free(imageBuffer);
+
+	return newTex;
 }
 
-//can bind MAX of 32 texs
-void Texture2D::bind()
+void texture2d_bind(texture2d* _tex)
 {
 	//change which texture GL is working w/
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glBindTexture(GL_TEXTURE_2D, _tex->texture);
 }
 
-Texture2D::~Texture2D()
+void texture2d_destroy(texture2d* _tex)
 {
-	glDeleteTextures(1, &m_texture);
+	glDeleteTextures(1, &_tex->texture);
 }
