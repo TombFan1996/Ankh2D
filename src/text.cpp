@@ -133,6 +133,7 @@ void text_draw(text* _text, std::string _str, glm::vec2 _pos)
 		float x2 = _pos.x + _text->characters[id].bitmap_left * sx;
 		float y2 = -_pos.y - _text->characters[id].bitmap_top * sy;
 
+		//the width of each character
 		float w = _text->characters[id].bitmap_width * sx;
 		float h = _text->characters[id].bitmap_height * sy;
 

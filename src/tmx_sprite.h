@@ -17,14 +17,13 @@ typedef struct
 	GLuint model, projection;
 	shader* shader;
 	transform* transform;
-	uint32_t vboSize;
-	std::vector<GLuint> vao, vbo;
+	uint32_t numTiles;
+	GLuint vao, vbo;
 	texture2d* tilemap;
 	tmx_map* map;
 } tmx_sprite;
 
-
-tmx_sprite* tmx_sprite_create(tmx_map* _map, int16_t _emptytileid, shader* _shader, transform* _trans);
+tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans);
 void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection);
 void tmx_sprite_destroy(tmx_sprite* _sprite);
 

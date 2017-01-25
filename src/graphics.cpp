@@ -29,10 +29,10 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	SDL_GL_SetSwapInterval(0);
 	log_fprint("VSync: disabled");
 
-	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
-	log_fprint("Buffer size: 32 bits");
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	log_fprint("Double buffering is enabled");
+	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+	//log_fprint("Buffer size: 32 bits");
+	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	//log_fprint("Double buffering is enabled");
 
 	if (_fs)
 	{
@@ -44,7 +44,7 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	else
 	{
 		mainGraphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			mainGraphics->width, mainGraphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED |SDL_WINDOW_RESIZABLE);
+			mainGraphics->width, mainGraphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE);
 		log_fprint("Windowed mode");
 	}
 
