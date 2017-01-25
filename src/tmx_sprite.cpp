@@ -1,6 +1,6 @@
 #include "tmx_sprite.h"
 
-tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans)
+tmx_sprite* tmx_sprite_create(tmx_map* _map, int16_t _emptytileid, shader* _shader, transform* _trans)
 {
 	tmx_sprite* newMapSprite = new tmx_sprite;
 	newMapSprite->map = _map;
@@ -32,10 +32,6 @@ tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans)
 	//number of tiles in the map
 	uint16_t numTilesX = newMapSprite->tilemap->width / tileSizeX;
 	uint16_t numTilesY = newMapSprite->tilemap->height / tileSizeY;
-
-	//create x amount of new vbos,vaos
-	newMapSprite->vao = new GLuint[newMapSprite->vboSize];
-	newMapSprite->vbo = new GLuint[newMapSprite->vboSize];
 	
 	uint16_t currentTileX = 0;
 	//starts on -1, 0 % tilesize = 0 
@@ -45,9 +41,6 @@ tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans)
 	for (uint32_t i = 0; i < newMapSprite->vboSize; i++)
 	{
 		uint16_t index = newMapSprite->map->layer[0].data[i].tile_id - 1;
-		//get x and y coord via mod and div
-		uint16_t tileCoordX = index % numTilesX;
-		uint16_t tileCoordY = index / numTilesY;
 
 		//what tile are we traversing
 		currentTileX = i % mapSizeX;
@@ -56,32 +49,45 @@ tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans)
 		if ((currentTileX % numTilesX) == 0)
 			currentTileY++;
 
-		GLfloat vertices[] = {
-			// Pos									  // Tex
-			0.0f + currentTileX, 1.0f + currentTileY, (image_normalX * tileCoordX), (image_normalY * tileCoordY) + image_normalY,
-			1.0f + currentTileX, 0.0f + currentTileY, (image_normalX * tileCoordX) + image_normalX, (image_normalY * tileCoordY),
-			0.0f + currentTileX, 0.0f + currentTileY, (image_normalX * tileCoordX), (image_normalY * tileCoordY), 
+		//no point rendering if the tile is blank
+		if (index != _emptytileid)
+		{
+			GLuint vao, vbo;
+
+			//get x and y coord via mod and div
+			uint16_t tileCoordX = index % numTilesX;
+			uint16_t tileCoordY = index / numTilesY;
+
+			GLfloat vertices[] = {
+				// Pos									  // Tex
+				0.0f + currentTileX, 1.0f + currentTileY, (image_normalX * tileCoordX), (image_normalY * tileCoordY) + image_normalY,
+				1.0f + currentTileX, 0.0f + currentTileY, (image_normalX * tileCoordX) + image_normalX, (image_normalY * tileCoordY),
+				0.0f + currentTileX, 0.0f + currentTileY, (image_normalX * tileCoordX), (image_normalY * tileCoordY), 
    
-			0.0f + currentTileX, 1.0f + currentTileY, (image_normalX * tileCoordX), (image_normalY * tileCoordY) + image_normalY,
-			1.0f + currentTileX, 1.0f + currentTileY, (image_normalX * tileCoordX) + image_normalX, (image_normalY * tileCoordY) + image_normalY,
-			1.0f + currentTileX, 0.0f + currentTileY, (image_normalX * tileCoordX) + image_normalX, (image_normalY * tileCoordY)
-		};
+				0.0f + currentTileX, 1.0f + currentTileY, (image_normalX * tileCoordX), (image_normalY * tileCoordY) + image_normalY,
+				1.0f + currentTileX, 1.0f + currentTileY, (image_normalX * tileCoordX) + image_normalX, (image_normalY * tileCoordY) + image_normalY,
+				1.0f + currentTileX, 0.0f + currentTileY, (image_normalX * tileCoordX) + image_normalX, (image_normalY * tileCoordY)
+			};
 
-		glGenVertexArrays(1, &newMapSprite->vao[i]);
-		glBindVertexArray(newMapSprite->vao[i]);
+			glGenVertexArrays(1, &vao);
+			glBindVertexArray(vao);
 
-		//quad is normalised for positional and tex coords
-		glGenBuffers(1, &newMapSprite->vbo[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, newMapSprite->vbo[i]);
-		//GL_STATIC_DRAW prevents 2d animations (look into GL_STREAM/GL_DYNAMIC)
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+			//quad is normalised for positional and tex coords
+			glGenBuffers(1, &vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			//GL_STATIC_DRAW prevents 2d animations (look into GL_STREAM/GL_DYNAMIC)
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		//4 = pos x,y & tex_coord x,y
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
+			//4 = pos x,y & tex_coord x,y
+			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+			glEnableVertexAttribArray(0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);  
-		glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);  
+			glBindVertexArray(0);
+
+			newMapSprite->vao.push_back(vao);
+			newMapSprite->vbo.push_back(vbo);
+		}
 	}
 
 	return newMapSprite;
@@ -102,7 +108,7 @@ void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection)
 	//bind our texture
 	texture2d_bind(_sprite->tilemap);
 
-	for (uint16_t i = 0; i < _sprite->vboSize; i++)
+	for (uint16_t i = 0; i < _sprite->vao.size(); i++)
 	{
 		glBindVertexArray(_sprite->vao[i]);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -113,10 +119,9 @@ void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection)
 void tmx_sprite_destroy(tmx_sprite* _sprite)
 {
 	texture2d_destroy(_sprite->tilemap);
-	//delete _sprite->transform;
 
-	glDeleteBuffers(_sprite->vboSize, _sprite->vbo);
-	glDeleteBuffers(_sprite->vboSize, _sprite->vao);
+	glDeleteBuffers(_sprite->vbo.size(), &_sprite->vbo[0]);
+	glDeleteBuffers(_sprite->vao.size(), &_sprite->vao[0]);
 	
 	_sprite->map = nullptr;
 }

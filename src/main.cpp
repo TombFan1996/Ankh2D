@@ -16,12 +16,8 @@
 
 int main(int argc, char** argv)
 {
-	FT_Library ft_lib;
-
-	//setup the lib
-	if (FT_Init_FreeType(&ft_lib)){
-		log_fprint("Could not init freetype library!");
-	}
+	FT_Library ftLib;
+	freetype_init(&ftLib);
 
 	graphics_create("Ankh2D C Conversion", 1366, 768, false);
 	shader* spriteShader = shader_create("assets/sprite");
@@ -33,7 +29,7 @@ int main(int argc, char** argv)
 	shader* textShader = shader_create("assets/text");
 	shader_bindAttribLocation(textShader, 0, "colour");
 
-	text* newText = text_create(ft_lib, "assets/arial.ttf", 24.0f, textShader);
+	text* newText = text_create(ftLib, "assets/arial.ttf", 24.0f, textShader);
 	text_setColour(newText, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	transform spriteTrans;
@@ -47,7 +43,7 @@ int main(int argc, char** argv)
 	mapTrans.position = glm::vec2(0.0f, 0.0f);
 	mapTrans.rotation = 0.0f;
 	mapTrans.scale = glm::vec2(40.0f, 40.0f);
-	tmx_sprite* tmx_sprite = tmx_sprite_create(map, spriteShader, &mapTrans);
+	tmx_sprite* tmx_sprite = tmx_sprite_create(map, 0, spriteShader, &mapTrans);
 
 	while (!mainGraphics->closed)
 	{
@@ -55,7 +51,7 @@ int main(int argc, char** argv)
 		graphics_clear();
 
 		tmx_sprite_draw(tmx_sprite, mainCamera->projection);
-		text_draw(newText, "It Works in C!", glm::vec2(-1 + 8 * (2.0f / mainGraphics->width), 
+		text_draw(newText, "It Works!", glm::vec2(-1 + 8 * (2.0f / mainGraphics->width), 
 			1 - 50 * (2.0f / mainGraphics->height)));
 
 		sprite_update(newSprite);
@@ -68,21 +64,15 @@ int main(int argc, char** argv)
 	}
 
 	camera_destroy();
-	
 	shader_destroy(spriteShader);
 	shader_destroy(textShader);
-	
 	sprite_destroy(newSprite);
-
 	text_destroy(newText);
-
 	tmx_sprite_destroy(tmx_sprite);
 	tmx_parser_destroy(map);
-	
 	graphics_destroy();
 
-	//remove freetype
-	FT_Done_FreeType(ft_lib);
+	freetype_deinit(&ftLib);
 
 	return 0;
 }

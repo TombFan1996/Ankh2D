@@ -1,5 +1,19 @@
 #include "text.h"
 
+void freetype_init(FT_Library* _ftlib)
+{
+	//setup the lib
+	if (FT_Init_FreeType(_ftlib)){
+		log_fprint("Could not init freetype library!");
+	}
+}
+
+void freetype_deinit(FT_Library* _ftlib)
+{
+	//remove freetype
+	FT_Done_FreeType(*_ftlib);
+}
+
 text* text_create(FT_Library& m_ft, const char* _fontName, uint8_t _fontSize, shader* _shader)
 {
 	text* newText = new text;

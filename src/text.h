@@ -44,6 +44,9 @@ typedef struct
 	uint16_t numTextX, numTextY;
 } text;
 
+void freetype_init(FT_Library* _ftlib);
+void freetype_deinit(FT_Library* _ftlib);
+
 text* text_create(FT_Library& m_ft, const char* _fontName, uint8_t _fontSize, shader* _shader);
 void text_loadCharacters(text* _text);
 void text_setColour(text* _text, glm::vec3 _colour);
