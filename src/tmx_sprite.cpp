@@ -1,9 +1,11 @@
 #include "tmx_sprite.h"
 
-tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans)
+tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform* _trans)
 {
 	tmx_sprite* newMapSprite = new tmx_sprite;
-	newMapSprite->map = _map;
+	std::string mapName("assets/");
+	mapName += _mapName;
+	newMapSprite->map = tmx_parser_create(mapName.c_str());
 	newMapSprite->shader = _shader;
 	newMapSprite->transform = _trans;
 
@@ -58,7 +60,7 @@ tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans)
 		currentTileX = i % mapSizeX;
 		
 		//if we are mod 0, new line of sprites
-		if ((currentTileX % numTilesX) == 0)
+		if ((currentTileX % mapSizeX) == 0)
 			currentTileY++;
 
 		//get x and y coord via mod and div
@@ -111,10 +113,9 @@ void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection)
 
 void tmx_sprite_destroy(tmx_sprite* _sprite)
 {
+	tmx_parser_destroy(_sprite->map);
 	texture2d_destroy(_sprite->tilemap);
 
 	glDeleteBuffers(1, &_sprite->vbo);
 	glDeleteBuffers(1, &_sprite->vao);
-	
-	_sprite->map = nullptr;
 }

@@ -16,9 +16,6 @@
 
 int main(int argc, char** argv)
 {
-	FT_Library ftLib;
-	freetype_init(&ftLib);
-
 	graphics_create("Ankh2D C Conversion", 1366, 768, false);
 	shader* spriteShader = shader_create("assets/sprite");
 	shader_bindAttribLocation(spriteShader, 0, "model");
@@ -26,37 +23,39 @@ int main(int argc, char** argv)
 
 	camera_create();
 
-	//shader* textShader = shader_create("assets/text");
-	//shader_bindAttribLocation(textShader, 0, "colour");
-	//text* newText = text_create(ftLib, "assets/arial.ttf", 24.0f, textShader);
-	//text_setColour(newText, glm::vec3(1.0f, 0.0f, 0.0f));
+	shader* textShader = shader_create("assets/text");
+	shader_bindAttribLocation(textShader, 0, "colour");
+	shader_bindAttribLocation(textShader, 1, "model");
+	shader_bindAttribLocation(textShader, 2, "projection");
+	shader_bindAttribLocation(textShader, 3, "char_index");
 
-	transform spriteTrans;
-	spriteTrans.position = glm::vec2(0.0f, 0.0f);
-	spriteTrans.rotation = 0.0f;
-	spriteTrans.scale = glm::vec2(40.0f, 40.0f);
-	sprite* newSprite = sprite_create("assets/darkel.png", spriteShader, &spriteTrans);
+	text* newText = text_create("arial", textShader, transform_create(glm::vec2(50.0f, 10.0f), 0.0f, glm::vec2(15.0f, 15.0f)));
+	text_setColour(newText, glm::vec3(1.0f, 1.0f, 1.0f));
+
+	sprite* newSprite = sprite_create("assets/darkel.png", spriteShader, 
+		transform_create(glm::vec2(0.0f, 0.0f), 0.0f, glm::vec2(40.0f, 40.0f)));
 	
-	tmx_map* map = tmx_parser_create("assets/test_1.tmx");
-	transform mapTrans;
-	mapTrans.position = glm::vec2(0.0f, 0.0f);
-	mapTrans.rotation = 0.0f;
-	mapTrans.scale = glm::vec2(40.0f, 40.0f);
-	tmx_sprite* tmx_sprite = tmx_sprite_create(map, spriteShader, &mapTrans);
+	tmx_sprite* tmx_sprite_1 = tmx_sprite_create("test_1.tmx", spriteShader, 
+		transform_create(glm::vec2(0.0f, 0.0f)));
+
+	tmx_sprite* tmx_sprite_2 = tmx_sprite_create("test_2.tmx", spriteShader, 
+		transform_create(glm::vec2(300.0f, 0.0f)));
 
 	while (!mainGraphics->closed)
 	{
 		//clear the buffer
 		graphics_clear();
 
-		tmx_sprite_draw(tmx_sprite, mainCamera->projection);
-		//text_draw(newText, "test", glm::vec2(-1 + 8 * (2.0f / mainGraphics->width), 
-		///	1 - 50 * (2.0f / mainGraphics->height)));
+		tmx_sprite_draw(tmx_sprite_1, mainCamera->projection);
+		tmx_sprite_draw(tmx_sprite_2, mainCamera->projection);
+		
+		// 'r' = '$', 's' = '#'
+		text_draw(newText, "Hello YouTube!", glm::vec2(10.0f, 10.0f));
 
 		sprite_update(newSprite);
 		sprite_draw(newSprite, mainCamera->projection);
 
-		camera_update(mainCamera);
+		camera_update(mainCamera, newSprite);
 
 		//swap the buffers
 		graphics_update();
@@ -64,14 +63,12 @@ int main(int argc, char** argv)
 
 	camera_destroy();
 	shader_destroy(spriteShader);
-	//shader_destroy(textShader);
+	shader_destroy(textShader);
 	sprite_destroy(newSprite);
-	//text_destroy(newText);
-	tmx_sprite_destroy(tmx_sprite);
-	tmx_parser_destroy(map);
+	text_destroy(newText);
+	tmx_sprite_destroy(tmx_sprite_1);
+	tmx_sprite_destroy(tmx_sprite_2);
 	graphics_destroy();
-
-	freetype_deinit(&ftLib);
 
 	return 0;
 }

@@ -23,7 +23,7 @@ typedef struct
 	tmx_map* map;
 } tmx_sprite;
 
-tmx_sprite* tmx_sprite_create(tmx_map* _map, shader* _shader, transform* _trans);
+tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform* _trans);
 void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection);
 void tmx_sprite_destroy(tmx_sprite* _sprite);
 
