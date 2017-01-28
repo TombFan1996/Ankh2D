@@ -8,11 +8,10 @@ A 2D C/OpenGL framework
 * [GLM](http://glm.g-truc.net/0.9.8/index.html)
 * [stb_image](https://github.com/nothings/stb)
 * [tinyxml2](https://github.com/leethomason/tinyxml2)
-* [freetype2](https://sourceforge.net/projects/freetype/files/)
 
 ### What's being worked on now ###
 * Writing a basic 2D OpenGL 3.1 Rendersystem
-* Writing text renderer (w/ freetype)
+* Writing text renderer
 * TMX loader (XML format only)
 
 ### What will be worked on in the future ###

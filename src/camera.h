@@ -9,20 +9,10 @@
 
 #include "sprite.h"
 
-enum CDir
-{
-	CAM_STILL,
-	CAM_LEFT,
-	CAM_RIGHT,
-	CAM_UP,
-	CAM_DOWN
-};
-
 typedef struct 
 {
 	bool freeCamera;
 	transform* transform;
-	CDir camState;
 	const uint8_t* keys;
 	float speed; //camera speed when free (not attached to player)
 	float screenWidth, screenHeight;

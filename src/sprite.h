@@ -7,18 +7,8 @@
 #include "texture2d.h"
 #include "shader.h"
 
-enum SDir
-{
-	SPRITE_STILL,
-	SPRITE_LEFT,
-	SPRITE_RIGHT,
-	SPRITE_UP,
-	SPRITE_DOWN
-};
-
 typedef struct
 {
-	SDir spriteState;
 	float speed;
 	const uint8_t* keys;
 	GLuint model, projection;

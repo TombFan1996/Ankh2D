@@ -100,7 +100,7 @@ text* text_create(const char* _fontName, shader* _shader, transform* _trans);
 void text_loadFNT(text* _text, const char* _name);
 void text_loadBMP(text* _text, const char* _name);
 void text_setColour(text* _text, glm::vec3 _colour);
-void text_draw(text* _text, std::string _str, glm::vec2 _pos);
+void text_draw(text* _text, glm::vec2 _pos, std::string _str);
 void text_destroy(text* _text);
 
 #endif

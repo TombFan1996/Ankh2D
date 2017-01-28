@@ -17,7 +17,6 @@ void camera_create()
 	mainCamera->screenWidth = width;
 
 	mainCamera->speed = 0.25f;
-	mainCamera->camState = CDir::CAM_STILL;
 	mainCamera->keys = SDL_GetKeyboardState(NULL);
 	mainCamera->freeCamera = true;
 }
@@ -34,7 +33,6 @@ camera* camera_create(float _speed)
 	mainCamera->screenWidth = width;
 
 	mainCamera->speed = _speed;
-	mainCamera->camState = CDir::CAM_STILL;
 	mainCamera->keys = SDL_GetKeyboardState(NULL);
 	mainCamera->freeCamera = true;
 	return newCamera;
@@ -65,42 +63,21 @@ void camera_update(camera* _camera, sprite* _sprite)
 
 void camera_movement(camera* _camera)
 {
-	SDL_PumpEvents();
+	glm::vec2 pos(0.0f, 0.0f);
 
 	if (_camera->keys[SDL_SCANCODE_W])
-		_camera->camState = CDir::CAM_UP;
+		pos += glm::vec2(0.0f, -_camera->speed);
 
-	else if (_camera->keys[SDL_SCANCODE_A])
-		_camera->camState = CDir::CAM_LEFT;
+	if (_camera->keys[SDL_SCANCODE_A])
+		pos += glm::vec2(-_camera->speed, 0.0f);
 
-	else if (_camera->keys[SDL_SCANCODE_S])
-		_camera->camState = CDir::CAM_DOWN;
+	if (_camera->keys[SDL_SCANCODE_S])
+		pos += glm::vec2(0.0f, _camera->speed);
 
-	else if (_camera->keys[SDL_SCANCODE_D])
-		_camera->camState = CDir::CAM_RIGHT;
+	if (_camera->keys[SDL_SCANCODE_D])
+		pos += glm::vec2(_camera->speed, 0.0f);
 
-	else
-		_camera->camState = CDir::CAM_STILL;
-	
-	switch(_camera->camState)
-	{
-		case CDir::CAM_UP:
-			_camera->transform->position = glm::vec2(_camera->transform->position.x, 
-				_camera->transform->position.y - _camera->speed);
-			break;
-		case CDir::CAM_LEFT:
-			_camera->transform->position = glm::vec2(_camera->transform->position.x - _camera->speed,  
-				_camera->transform->position.y);
-			break;
-		case CDir::CAM_DOWN:
-			_camera->transform->position = glm::vec2(_camera->transform->position.x, 
-				_camera->transform->position.y + _camera->speed);
-			break;
-		case CDir::CAM_RIGHT:
-			_camera->transform->position = glm::vec2(_camera->transform->position.x + _camera->speed, 
-				_camera->transform->position.y);
-			break;
-	}
+	_camera->transform->position += pos;
 }
 
 void camera_destroy()

@@ -49,13 +49,12 @@ int main(int argc, char** argv)
 		tmx_sprite_draw(tmx_sprite_1, mainCamera->projection);
 		tmx_sprite_draw(tmx_sprite_2, mainCamera->projection);
 		
-		// 'r' = '$', 's' = '#'
-		text_draw(newText, "Hello YouTube!", glm::vec2(10.0f, 10.0f));
+		text_draw(newText, glm::vec2(10.0f, 10.0f), "11111");
 
-		sprite_update(newSprite);
+		//sprite_update(newSprite);
 		sprite_draw(newSprite, mainCamera->projection);
 
-		camera_update(mainCamera, newSprite);
+		camera_update(mainCamera);
 
 		//swap the buffers
 		graphics_update();

@@ -176,7 +176,7 @@ void text_setColour(text* _text, glm::vec3 _colour)
 
 //improve drawing by binding all textures onto 1 big quad (1 draw call)
 //position coords become uv coords and the quad is the size of all letters combined.
-void text_draw(text* _text, std::string _str, glm::vec2 _pos)
+void text_draw(text* _text, glm::vec2 _pos, std::string _str)
 {
 	//spacing between each char in the text for the shader
 	float char_index = 0.0f;

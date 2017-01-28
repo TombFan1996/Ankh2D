@@ -10,8 +10,7 @@ sprite* sprite_create(const char* _name, shader* _shader, transform* _trans)
 	newSprite->model = shader_getUniformLocation(newSprite->shader, "model");
 	newSprite->projection = shader_getUniformLocation(newSprite->shader, "projection");
 
-	newSprite->speed = 0.25f;
-	newSprite->spriteState = SDir::SPRITE_STILL;
+	newSprite->speed = 0.10f;
 	newSprite->keys = SDL_GetKeyboardState(NULL);
 
 	GLfloat vertices[] = {
@@ -50,41 +49,21 @@ sprite* sprite_create(const char* _name, shader* _shader, transform* _trans)
 void sprite_update(sprite* _sprite)
 {
 	SDL_PumpEvents();
+	glm::vec2 pos(0.0f, 0.0f);
 
 	if (_sprite->keys[SDL_SCANCODE_W])
-		_sprite->spriteState = SDir::SPRITE_UP;
+		pos += glm::vec2(0.0f, -_sprite->speed);
 
-	else if (_sprite->keys[SDL_SCANCODE_A])
-		_sprite->spriteState = SDir::SPRITE_LEFT;
+	if (_sprite->keys[SDL_SCANCODE_A])
+		pos += glm::vec2(-_sprite->speed, 0.0f);
 
-	else if (_sprite->keys[SDL_SCANCODE_S])
-		_sprite->spriteState = SDir::SPRITE_DOWN;
+	if (_sprite->keys[SDL_SCANCODE_S])
+		pos += glm::vec2(0.0f, _sprite->speed);
 
-	else if (_sprite->keys[SDL_SCANCODE_D])
-		_sprite->spriteState = SDir::SPRITE_RIGHT;
+	if (_sprite->keys[SDL_SCANCODE_D])
+		pos += glm::vec2(_sprite->speed, 0.0f);
 
-	else
-		_sprite->spriteState = SDir::SPRITE_STILL;
-	
-	switch(_sprite->spriteState)
-	{
-		case SDir::SPRITE_UP:
-			_sprite->transform->position = glm::vec2(_sprite->transform->position.x, 
-				_sprite->transform->position.y - _sprite->speed);
-			break;
-		case SDir::SPRITE_LEFT:
-			_sprite->transform->position = glm::vec2(_sprite->transform->position.x - _sprite->speed, 
-				_sprite->transform->position.y);
-			break;
-		case SDir::SPRITE_DOWN:
-			_sprite->transform->position = glm::vec2(_sprite->transform->position.x, 
-				_sprite->transform->position.y + _sprite->speed);
-			break;
-		case SDir::SPRITE_RIGHT:
-			_sprite->transform->position = glm::vec2(_sprite->transform->position.x + _sprite->speed, 
-				_sprite->transform->position.y);
-			break;
-	}
+	_sprite->transform->position += pos;
 }
 
 void sprite_draw(sprite* _sprite, glm::mat4 _projection)
