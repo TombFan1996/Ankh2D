@@ -19,8 +19,8 @@ text* text_create(const char* _fontName, shader* _shader, transform* _trans)
 	newText->fontColour = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	//transparency on the font
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	//load the fnt file in binary
 	text_loadFNT(newText, _fontName);
@@ -55,7 +55,6 @@ void text_loadBMP(text* _text, const char* _name)
 	//normalised uv coords now
 	float x_width = 1.0f / _text->common_block.scale_w;
 	float y_height = 1.0f / _text->common_block.scale_h;
-	float char_advance_x = 0.0f;
 
 	for (uint16_t i = 0; i < _text->num_char_block; i++)
 	{
@@ -64,7 +63,23 @@ void text_loadBMP(text* _text, const char* _name)
 		float y_tex = y_height * _text->char_block[i].y;
 		float y_tex2 = y_height * (_text->char_block[i].y + _text->char_block[i].height);
 
+		float x_pos = 0.0f;
+		float x_pos2 = 1.0f - (1.0f / _text->char_block[i].width);
+		float y_pos = 0.0f;
+		float y_pos2 = 1.0f - (1.0f / _text->char_block[i].height);
+
 		GLfloat vertices[] = {
+			// Pos      // Tex
+			x_pos, y_pos2, x_tex, y_tex2,
+			x_pos2, y_pos, x_tex2, y_tex,
+			x_pos, y_pos, x_tex, y_tex, 
+    
+			x_pos, y_pos2, x_tex, y_tex2,
+			x_pos2, y_pos2, x_tex2, y_tex2,
+			x_pos2, y_pos, x_tex2, y_tex
+		};
+
+		/*GLfloat vertices[] = {
 			// Pos      // Tex
 			0.0f, 1.0f, x_tex, y_tex2,
 			1.0f, 0.0f, x_tex2, y_tex,
@@ -73,10 +88,7 @@ void text_loadBMP(text* _text, const char* _name)
 			0.0f, 1.0f, x_tex, y_tex2,
 			1.0f, 1.0f, x_tex2, y_tex2,
 			1.0f, 0.0f, x_tex2, y_tex
-		};
-
-		//increment spacing for the next char
-		char_advance_x += _text->char_block[i].advantage_x;
+		};*/
 
 		glGenVertexArrays(1, &_text->vao[i]);
 		glBindVertexArray(_text->vao[i]);
@@ -176,7 +188,7 @@ void text_setColour(text* _text, glm::vec3 _colour)
 
 //improve drawing by binding all textures onto 1 big quad (1 draw call)
 //position coords become uv coords and the quad is the size of all letters combined.
-void text_draw(text* _text, glm::vec2 _pos, std::string _str)
+void text_draw(std::string _str, text* _text, glm::vec2 _pos)
 {
 	//spacing between each char in the text for the shader
 	float char_index = 0.0f;
@@ -205,7 +217,7 @@ void text_draw(text* _text, glm::vec2 _pos, std::string _str)
 		shader_setUniformFloat(_text->char_index, char_index);
 		char_index += 1.0f;
 
-		uint8_t index = (uint8_t)_str[i];
+		uint8_t index = (uint8_t)_str[i] - 32;
 		glBindVertexArray(_text->vao[index]);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
