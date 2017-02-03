@@ -18,5 +18,5 @@ A 2D C/OpenGL framework
 * Removing stb_image and using my own bmp loader
 * Implementing OpenAL w/ wav loader
 
-### What's to do ###
+### What's do we want in the future ###
 * Writing an alternate rendersystem
