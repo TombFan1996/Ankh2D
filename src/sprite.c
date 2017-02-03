@@ -1,8 +1,8 @@
 #include "sprite.h"
 
-sprite* sprite_create(const char* _name, shader* _shader, transform* _trans)
+sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
 {
-	sprite* newSprite = new sprite;
+	sprite* newSprite = (sprite*)malloc(sizeof(sprite));
 	newSprite->shader = _shader;
 	newSprite->texture = texture2d_create(_name);
 	newSprite->transform = _trans;
@@ -49,24 +49,25 @@ sprite* sprite_create(const char* _name, shader* _shader, transform* _trans)
 void sprite_update(sprite* _sprite)
 {
 	SDL_PumpEvents();
-	glm::vec2 pos(0.0f, 0.0f);
+	vec2 pos = vec2_create(0.0f, 0.0f);
 
 	if (_sprite->keys[SDL_SCANCODE_W])
-		pos += glm::vec2(0.0f, -_sprite->speed);
+		pos = vec2_create(pos.x + 0.0f, pos.y + -_sprite->speed);
 
 	if (_sprite->keys[SDL_SCANCODE_A])
-		pos += glm::vec2(-_sprite->speed, 0.0f);
+		pos = vec2_create(pos.x + -_sprite->speed, pos.y + 0.0f);
 
 	if (_sprite->keys[SDL_SCANCODE_S])
-		pos += glm::vec2(0.0f, _sprite->speed);
+		pos = vec2_create(pos.x + 0.0f, pos.y + _sprite->speed);
 
 	if (_sprite->keys[SDL_SCANCODE_D])
-		pos += glm::vec2(_sprite->speed, 0.0f);
+		pos = vec2_create(pos.x + _sprite->speed, pos.y + 0.0f);
 
-	_sprite->transform->position += pos;
+	_sprite->transform.position = vec2_create(_sprite->transform.position.x + pos.x, 
+		_sprite->transform.position.y + pos.y);
 }
 
-void sprite_draw(sprite* _sprite, glm::mat4 _projection)
+void sprite_draw(sprite* _sprite, mat4 _projection)
 {
 	//bind our program
 	glUseProgram(_sprite->shader->program);

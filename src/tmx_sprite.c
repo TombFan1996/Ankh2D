@@ -1,8 +1,9 @@
 #include "tmx_sprite.h"
 
-tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform* _trans)
+tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _trans)
 {
-	tmx_sprite* newMapSprite = new tmx_sprite;
+	tmx_sprite* newMapSprite = (tmx_sprite*)malloc(sizeof(tmx_sprite));
+
 	std::string mapName("assets/");
 	mapName += _mapName;
 	newMapSprite->map = tmx_parser_create(mapName.c_str());
@@ -91,7 +92,7 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform* 
 	return newMapSprite;
 }
 
-void tmx_sprite_draw(tmx_sprite* _sprite, glm::mat4 _projection)
+void tmx_sprite_draw(tmx_sprite* _sprite, mat4 _projection)
 {
 	//bind our program
 	glUseProgram(_sprite->shader->program);

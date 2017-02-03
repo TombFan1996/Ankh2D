@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-graphics* mainGraphics = new graphics;
+graphics* mainGraphics = (graphics*)malloc(sizeof(graphics));
 
 graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs)
 {

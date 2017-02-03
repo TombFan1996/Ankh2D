@@ -2,7 +2,7 @@
 
 texture2d* texture2d_create(const char* _filename)
 {
-	texture2d* newTex = new texture2d;
+	texture2d* newTex = (texture2d*)malloc(sizeof(texture2d));
 	
 	int width, height, numComponents;
 	unsigned char* imageBuffer = stbi_load(_filename, &width, &height, &numComponents, 4);

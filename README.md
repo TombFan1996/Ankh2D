@@ -5,7 +5,6 @@ A 2D C/OpenGL framework
 ### Dependencies ###
 * [SDL2](https://www.libsdl.org/download-2.0.php)
 * [GLEW](http://glew.sourceforge.net/)
-* [GLM](http://glm.g-truc.net/0.9.8/index.html)
 * [stb_image](https://github.com/nothings/stb)
 * [tinyxml2](https://github.com/leethomason/tinyxml2)
 
@@ -14,8 +13,10 @@ A 2D C/OpenGL framework
 * Writing text renderer
 * TMX loader (XML format only)
 
-### What will be worked on in the future ###
-* Optimising the TMX and font renderer
-* Removing stb_image and using my own BMP loader
-* Implementing OpenAL using my own WAV loader
+### What's to do ###
+* tmx2bin - remove the need for tinyxml2
+* Removing stb_image and using my own bmp loader
+* Implementing OpenAL w/ wav loader
+
+### What's to do ###
 * Writing an alternate rendersystem

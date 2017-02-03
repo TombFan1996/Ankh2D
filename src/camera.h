@@ -1,9 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <glm\mat4x4.hpp>
-#include <glm\vec2.hpp>
-#include <glm\gtx\transform.hpp>
+#include "math.h"
 #include "transform.h"
 #include <SDL.h>
 
@@ -12,11 +10,11 @@
 typedef struct 
 {
 	bool freeCamera;
-	transform* transform;
+	transform transform;
 	const uint8_t* keys;
 	float speed; //camera speed when free (not attached to player)
 	float screenWidth, screenHeight;
-	glm::mat4 projection;
+	mat4 projection;
 } camera;
 
 extern camera* mainCamera;

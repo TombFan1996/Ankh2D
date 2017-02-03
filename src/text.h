@@ -4,9 +4,7 @@
 #include <stdint.h>
 #include <vector>
 #include <SDL.h>
-#include <glm\mat4x4.hpp>
-#include <glm\vec2.hpp>
-#include <glm\gtx\transform.hpp>
+#include "math.h"
 
 #include "logger.h"
 #include "shader.h"
@@ -81,7 +79,7 @@ typedef struct
 	GLuint *vao, *vbo;
 	GLuint colour, model, projection, char_index;
 	shader* shader;
-	glm::vec3 fontColour;
+	vec3 fontColour;
 
 	texture2d* texture;
 
@@ -92,15 +90,15 @@ typedef struct
 	FNT_COMMON_BLOCK common_block;
 	FNT_KERNING_PAIR_BLOCK kerning_pair_block;
 
-	transform* transform;
-	glm::mat4 defaultProj;
+	transform transform;
+	mat4 defaultProj;
 } text;
 
-text* text_create(const char* _fontName, shader* _shader, transform* _trans);
+text* text_create(const char* _fontName, shader* _shader, transform _trans);
 void text_loadFNT(text* _text, const char* _name);
 void text_loadBMP(text* _text, const char* _name);
-void text_setColour(text* _text, glm::vec3 _colour);
-void text_draw(std::string _str, text* _text, glm::vec2 _pos);
+void text_setColour(text* _text, vec3 _colour);
+void text_draw(std::string _str, text* _text, vec2 _pos);
 void text_destroy(text* _text);
 
 #endif

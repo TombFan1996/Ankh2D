@@ -2,7 +2,7 @@
 
 tmx_map* tmx_parser_create(const char* _filename)
 {
-	tmx_map* newMap = new tmx_map;
+	tmx_map* newMap = (tmx_map*)malloc(sizeof(tmx_map));
 	tinyxml2::XMLDocument m_xmlMap;
 	m_xmlMap.LoadFile(_filename);
 

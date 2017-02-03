@@ -28,8 +28,10 @@ distribution.
 #   include <stddef.h>
 #   include <stdarg.h>
 #else
-#   include <cstddef>
-#   include <cstdarg>
+#include <stddef.h>
+#include <stdarg.h>
+//#include <cstddef>
+//#include <cstdarg>
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE)

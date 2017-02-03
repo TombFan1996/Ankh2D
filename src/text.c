@@ -1,8 +1,8 @@
 #include "text.h"
 
-text* text_create(const char* _fontName, shader* _shader, transform* _trans)
+text* text_create(const char* _fontName, shader* _shader, transform _trans)
 {
-	text* newText = new text;
+	text* newText = (text*)malloc(sizeof(text));
 
 	newText->shader = _shader;
 	newText->colour = shader_getUniformLocation(newText->shader, "colour");
@@ -13,10 +13,10 @@ text* text_create(const char* _fontName, shader* _shader, transform* _trans)
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
-	newText->defaultProj = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	newText->defaultProj = mat4_getOrthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	//setup default font colour
-	newText->fontColour = glm::vec3(1.0f, 1.0f, 1.0f);
+	newText->fontColour = vec3_create(1.0f, 1.0f, 1.0f);
 
 	//transparency on the font
 	glEnable(GL_BLEND);
@@ -24,7 +24,7 @@ text* text_create(const char* _fontName, shader* _shader, transform* _trans)
 
 	//load the fnt file in binary
 	text_loadFNT(newText, _fontName);
-	text_loadBMP(newText, _fontName);
+	text_loadBMP(newText, newText->page_names);
 
 	return newText;
 }
@@ -33,13 +33,12 @@ void text_loadBMP(text* _text, const char* _name)
 {
 	std::string name("assets/");
 	name += _name;
-	name += ".png";
 
 	_text->texture = texture2d_create(name.c_str());
 	texture2d_bind(_text->texture);
 
-	_text->vao = new GLuint[_text->num_char_block];
-	_text->vbo = new GLuint[_text->num_char_block];
+	_text->vao = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
+	_text->vbo = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
 
 	/*GLfloat vertices[] = {
 			// Pos      // Tex
@@ -64,9 +63,9 @@ void text_loadBMP(text* _text, const char* _name)
 		float y_tex2 = y_height * (_text->char_block[i].y + _text->char_block[i].height);
 
 		float x_pos = 0.0f;
-		float x_pos2 = 1.0f - (1.0f / _text->char_block[i].width);
+		float x_pos2 = 1.0f;
 		float y_pos = 0.0f;
-		float y_pos2 = 1.0f - (1.0f / _text->char_block[i].height);
+		float y_pos2 = 1.0f;
 
 		GLfloat vertices[] = {
 			// Pos      // Tex
@@ -181,19 +180,19 @@ void text_loadFNT(text* _text, const char* _name)
 	fclose(file);
 }
 
-void text_setColour(text* _text, glm::vec3 _colour)
+void text_setColour(text* _text, vec3 _colour)
 {
 	_text->fontColour = _colour;
 }
 
 //improve drawing by binding all textures onto 1 big quad (1 draw call)
 //position coords become uv coords and the quad is the size of all letters combined.
-void text_draw(std::string _str, text* _text, glm::vec2 _pos)
+void text_draw(std::string _str, text* _text, vec2 _pos)
 {
 	//spacing between each char in the text for the shader
 	float char_index = 0.0f;
 
-	_text->transform->position = _pos;
+	_text->transform.position = _pos;
 
 	//bind our program
 	glUseProgram(_text->shader->program);

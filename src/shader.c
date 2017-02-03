@@ -2,7 +2,7 @@
 
 shader* shader_create(const char* _filename)
 {
-	shader* newShader = new shader;
+	shader* newShader = (shader*)malloc(sizeof(shader));
 	//create shader program
 	newShader->program = glCreateProgram();
 	std::string filename(_filename);
@@ -80,9 +80,9 @@ void shader_bindAttribLocation(shader* _shader, uint8_t _index, char* _name)
 	glBindAttribLocation(_shader->program, _index, _name);
 }
 
-void shader_setUniformMat4(GLuint _uniform, glm::mat4 _matrix4)
+void shader_setUniformMat4(GLuint _uniform, mat4 _matrix4)
 {
-	glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4[0][0]);
+	glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4.element[0][0]);
 }
 
 void shader_setUniformFloat(GLuint _uniform, float _float)
@@ -90,12 +90,12 @@ void shader_setUniformFloat(GLuint _uniform, float _float)
 	glUniform1f(_uniform, _float);
 }
 
-void shader_setUniformVec2(GLuint _uniform, glm::vec2 _vec2)
+void shader_setUniformVec2(GLuint _uniform, vec2 _vec2)
 {
 	glUniform2f(_uniform, _vec2.x, _vec2.y);
 }
 
-void shader_setUniformVec3(GLuint _uniform, glm::vec3 _vec3)
+void shader_setUniformVec3(GLuint _uniform, vec3 _vec3)
 {
 	glUniform3f(_uniform, _vec3.x, _vec3.y, _vec3.z);
 }
