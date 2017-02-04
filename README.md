@@ -8,15 +8,6 @@ A 2D C/OpenGL framework
 * [stb_image](https://github.com/nothings/stb)
 * [tinyxml2](https://github.com/leethomason/tinyxml2)
 
-### What's being worked on now ###
-* Writing a basic 2D OpenGL 3.1 Rendersystem
-* Writing text renderer
-* TMX loader (XML format only)
+### Progress ###
 
-### What's to do ###
-* tmx2bin - remove the need for tinyxml2
-* Removing stb_image and using my own bmp loader
-* Implementing OpenAL w/ wav loader
-
-### What's do we want in the future ###
-* Writing an alternate rendersystem
+* [Ankh2D Trello](https://trello.com/b/WxGJc0lU/ankh2d)
