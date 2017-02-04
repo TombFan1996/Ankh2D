@@ -90,8 +90,11 @@ void sprite_draw(sprite* _sprite, mat4 _projection)
 
 void sprite_setTexture(sprite* _sprite, texture2d* _tex)
 {
-	if (!_sprite->texture)
-		delete _sprite->texture;
+	if (!_sprite->texture){
+		free(_sprite->texture);
+		_sprite->texture = NULL;
+	}
+
 	else
 		_sprite->texture = _tex;
 }
@@ -99,7 +102,6 @@ void sprite_setTexture(sprite* _sprite, texture2d* _tex)
 void sprite_destroy(sprite* _sprite)
 {
 	texture2d_destroy(_sprite->texture);
-	//delete _sprite->transform;
 
 	shader_destroy(_sprite->shader);
 

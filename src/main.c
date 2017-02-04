@@ -23,14 +23,14 @@ int main(int argc, char** argv)
 
 	camera_create();
 
-	//shader* textShader = shader_create("assets/text");
-	//shader_bindAttribLocation(textShader, 0, "colour");
-	//shader_bindAttribLocation(textShader, 1, "model");
-	//shader_bindAttribLocation(textShader, 2, "projection");
-	//shader_bindAttribLocation(textShader, 3, "char_index");
+	shader* textShader = shader_create("assets/text");
+	shader_bindAttribLocation(textShader, 0, "colour");
+	shader_bindAttribLocation(textShader, 1, "model");
+	shader_bindAttribLocation(textShader, 2, "projection");
+	shader_bindAttribLocation(textShader, 3, "char_index");
 
-	//text* newText = text_create("arial", textShader, transform_create(vec2_create(50.0f, 10.0f), 0.0f, vec2_create(15.0f, 15.0f)));
-	//text_setColour(newText, vec3_create(1.0f, 0.0f, 0.0f));
+	text* newText = text_create("arial", textShader, transform_create(vec2_create(50.0f, 10.0f), 0.0f, vec2_create(15.0f, 15.0f)));
+	text_setColour(newText, vec3_create(1.0f, 0.0f, 0.0f));
 
 	sprite* newSprite = sprite_create("assets/darkel.png", spriteShader, 
 		transform_create(vec2_create(0.0f, 0.0f), 0.0f, vec2_create(40.0f, 40.0f)));
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 		//tmx_sprite_draw(tmx_sprite_2, mainCamera->projection);
 		sprite_draw(newSprite, mainCamera->projection);
 
-		//text_draw("cheeky test", newText, vec2_create(10.0f, 10.0f));
+		text_draw("cheeky test", newText, vec2_create(20.0f, 20.0f));
 
 		//swap the buffers
 		graphics_update();
@@ -61,9 +61,9 @@ int main(int argc, char** argv)
 
 	camera_destroy();
 	shader_destroy(spriteShader);
-	//shader_destroy(textShader);
+	shader_destroy(textShader);
 	sprite_destroy(newSprite);
-	//text_destroy(newText);
+	text_destroy(newText);
 	//tmx_sprite_destroy(tmx_sprite_1);
 	//tmx_sprite_destroy(tmx_sprite_2);
 	graphics_destroy();

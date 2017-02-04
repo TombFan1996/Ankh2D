@@ -82,5 +82,6 @@ tmx_map* tmx_parser_create(const char* _filename)
 
 void tmx_parser_destroy(tmx_map* _tmxm)
 {
-	delete _tmxm;
+	free(_tmxm);
+	_tmxm = NULL;
 }

@@ -119,6 +119,7 @@ void graphics_destroy()
 	log_fprint("Destroyed GL context");
 	SDL_DestroyWindow(mainGraphics->window);
 	log_fprint("Destroyed Window");
-	delete mainGraphics;
+	free(mainGraphics);
+	mainGraphics = NULL;
 	SDL_Quit();
 }

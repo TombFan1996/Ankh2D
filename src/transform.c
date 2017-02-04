@@ -11,15 +11,12 @@ transform transform_create(vec2 _pos, float _rotation, vec2 _scale)
 
 mat4 transform_getModelMatrix(transform _trans)
 {
-	mat4 model;
-
-	//TODO - get the model matrix for 2d transformation
-	//https://robertcspencer.files.wordpress.com/2013/08/computer-graphics-7.png
-
-	//model = glm::translate(model, vec3_create(_trans->position.x, _trans->position.y, 0.0f)); 
-	//model = glm::translate(model, vec3_create(0.5f * _trans->scale.x, 0.5f * _trans->scale.y, 0.0f)); 
-	//model = glm::rotate(model, _trans->rotation, vec3_create(0.0f, 0.0f, 1.0f)); 
-	//model = glm::translate(model, vec3_create(-0.5f * _trans->scale.x, -0.5f * _trans->scale.y, 0.0f));
-	//model = glm::scale(model, vec3_create(_trans->scale.x, _trans->scale.y, 1.0f));
+	mat4 model, trans, scale, rot;
+	//get each individual matrix for the transform
+	trans = mat4_getTranslate(_trans.position);
+	scale = mat4_getScale(_trans.scale);
+	rot = mat4_getRotate(_trans.rotation);
+	//model = trans * rotation * scale
+	model = mat4_getModelMatrix(trans, rot, scale);
 	return model;
 }

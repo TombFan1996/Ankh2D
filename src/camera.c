@@ -83,10 +83,12 @@ void camera_movement(camera* _camera)
 
 void camera_destroy()
 {
-	delete mainCamera;
+	free(mainCamera);
+	mainCamera = NULL;	
 }
 
 void camera_destroy(camera* _camera)
 {
-	delete _camera;
+	free(_camera);
+	mainCamera = NULL;	
 }

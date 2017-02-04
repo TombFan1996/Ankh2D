@@ -1,7 +1,10 @@
 #ifndef MATH_H
 #define MATH_H
 
+#include <math.h>
 #include <stdint.h>
+
+//matrices: http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 
 typedef struct
 {
@@ -33,5 +36,11 @@ mat4 mat4_create(float _matElem1, float _matElem2, float _matElem3, float _matEl
 							float _matElem13, float _matElem14, float _matElem15, float _matElem16);
 
 mat4 mat4_getOrthographic(float _left, float _right, float _bottom, float _top, float _zNear, float _zFar);
+
+mat4 mat4_createIdentity();
+mat4 mat4_getTranslate(vec2 _pos);
+mat4 mat4_getScale(vec2 _scale);
+mat4 mat4_getRotate(float _rotation);
+mat4 mat4_getModelMatrix(mat4 _trans, mat4 _rot, mat4 _sca);
 
 #endif
