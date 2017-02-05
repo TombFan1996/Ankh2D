@@ -28,20 +28,16 @@ tmx_map* tmx_parser_create(const char* _filename)
 		{
 			tinyxml2::XMLElement* tilesetElement = childTileset->ToElement();
 
-			TILESET newSet;
-			newSet.firstGid = tilesetElement->IntAttribute("firstgid");
+			newMap->tileset.firstGid = tilesetElement->IntAttribute("firstgid");
 			
 			char* name = const_cast<char*>(tilesetElement->Attribute("name"));
-			memcpy(newSet.name, name, sizeof(newSet.name));
+			memcpy(newMap->tileset.name, name, sizeof(newMap->tileset.name));
 			
-			newSet.tile_width = tilesetElement->IntAttribute("tilewidth");
-			newSet.tile_height = tilesetElement->IntAttribute("tileheight");
+			newMap->tileset.tile_width = tilesetElement->IntAttribute("tilewidth");
+			newMap->tileset.tile_height = tilesetElement->IntAttribute("tileheight");
 
 			char* filename = const_cast<char*>(tilesetElement->FirstChildElement("image")->Attribute("source"));
-			memcpy(newSet.filename, filename, sizeof(newSet.filename));
-
-			//enter our new tileset data
-			newMap->tileset.push_back(newSet);
+			memcpy(newMap->tileset.filename, filename, sizeof(newMap->tileset.filename));
 		}
 
 		//get all the layers in the map
@@ -49,13 +45,16 @@ tmx_map* tmx_parser_create(const char* _filename)
 			childLayer = childLayer->NextSiblingElement("layer"))
 		{
 			tinyxml2::XMLElement* layerElement = childLayer->ToElement();
-			LAYER newLayer;
 
 			char* name = const_cast<char*>(layerElement->Attribute("name"));
-			memcpy(newLayer.name, name, sizeof(newLayer.name));
+			memcpy(newMap->layer.name, name, sizeof(newMap->layer.name));
 
-			newLayer.width = layerElement->IntAttribute("width");
-			newLayer.height = layerElement->IntAttribute("height");
+			newMap->layer.width = layerElement->IntAttribute("width");
+			newMap->layer.height = layerElement->IntAttribute("height");
+
+			//create the new set of data
+			newMap->layer.data = (TILE*)malloc(newMap->layer.width * newMap->layer.height);
+			uint16_t tile_iter = 0;
 
 			//get all the data from this layer
 			tinyxml2::XMLNode* data = childLayer->FirstChildElement("data");
@@ -64,16 +63,15 @@ tmx_map* tmx_parser_create(const char* _filename)
 			{
 				TILE newTile;
 				newTile.tile_id = child->IntAttribute("gid");
-				newLayer.data.push_back(newTile);
+				newMap->layer.data[tile_iter] = newTile;
+				tile_iter++;
 
-				//Add all of the rotation tile code here...
+				//TODO.. Add all of the rotation tile code here...
 			}
 
 			//check if the data in the layer is in XML format
-			if (newLayer.data.size() == 0)
+			if (tile_iter == 0)
 				log_fprint("Export the TMX file as XML layer format");
-
-			newMap->layer.push_back(newLayer);
 		}
 	}
 

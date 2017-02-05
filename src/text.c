@@ -13,7 +13,7 @@ text* text_create(const char* _fontName, shader* _shader, transform _trans)
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
-	newText->defaultProj = mat4_getOrthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	newText->defaultProj = mat4_orthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	//setup default font colour
 	newText->fontColour = vec3_create(1.0f, 1.0f, 1.0f);
@@ -199,10 +199,10 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_setUniformMat4(_text->model, transform_getModelMatrix(_text->transform));
+	shader_setUniformMat4(_text->model, transform_getModelMatrix(_text->transform), false);
 
 	//send the projection matrix off
-	shader_setUniformMat4(_text->projection, _text->defaultProj);
+	shader_setUniformMat4(_text->projection, _text->defaultProj, false);
 
 	//set the font colour
 	shader_setUniformVec3(_text->colour, _text->fontColour);

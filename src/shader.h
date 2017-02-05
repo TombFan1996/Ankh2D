@@ -25,7 +25,7 @@ void shader_check(GLuint _shader, GLuint _flag, bool _isProgram);
 GLuint shader_get(const char* _buffer, GLenum _shaderType);
 
 void shader_bindAttribLocation(shader* _shader, uint8_t _index, char* _name);
-void shader_setUniformMat4(GLuint _uniform, mat4 _matrix4);
+void shader_setUniformMat4(GLuint _uniform, mat4 _matrix4, bool _transpose);
 void shader_setUniformFloat(GLuint _uniform, float _float);
 void shader_setUniformVec2(GLuint _uniform, vec2 _vec2);
 void shader_setUniformVec3(GLuint _uniform, vec3 _vec3);

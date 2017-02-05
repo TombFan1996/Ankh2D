@@ -36,7 +36,7 @@ typedef struct
 	char name[128];
 	uint16_t width;
 	uint16_t height;
-	std::vector<TILE> data;
+	TILE* data;
 } LAYER;
 
 typedef struct
@@ -45,8 +45,8 @@ typedef struct
 	uint16_t map_height;
 	uint8_t tile_width;
 	uint8_t tile_height;
-	std::vector<TILESET> tileset;
-	std::vector<LAYER> layer;
+	TILESET tileset;
+	LAYER layer;
 } tmx_map;
 
 tmx_map* tmx_parser_create(const char* _filename);

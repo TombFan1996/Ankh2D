@@ -29,11 +29,6 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	SDL_GL_SetSwapInterval(0);
 	log_fprint("VSync: disabled");
 
-	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
-	//log_fprint("Buffer size: 32 bits");
-	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	//log_fprint("Double buffering is enabled");
-
 	if (_fs)
 	{
 		mainGraphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

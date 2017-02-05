@@ -80,9 +80,12 @@ void shader_bindAttribLocation(shader* _shader, uint8_t _index, char* _name)
 	glBindAttribLocation(_shader->program, _index, _name);
 }
 
-void shader_setUniformMat4(GLuint _uniform, mat4 _matrix4)
+void shader_setUniformMat4(GLuint _uniform, mat4 _matrix4, bool _transpose)
 {
-	glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4.element[0][0]);
+	if (_transpose)
+		glUniformMatrix4fv(_uniform, 1, GL_TRUE, &_matrix4.element[0][0]);
+	else
+		glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4.element[0][0]);
 }
 
 void shader_setUniformFloat(GLuint _uniform, float _float)

@@ -6,7 +6,7 @@ void camera_create()
 {
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
-	mainCamera->projection = mat4_getOrthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	mainCamera->projection = mat4_orthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	mainCamera->transform;
 	mainCamera->transform.position = vec2_create(0.0f, 0.0f);
@@ -27,7 +27,7 @@ camera* camera_create(float _speed)
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
-	mainCamera->projection = mat4_getOrthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	mainCamera->projection = mat4_orthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 	
 	mainCamera->screenHeight = height;
 	mainCamera->screenWidth = width;
@@ -44,7 +44,7 @@ void camera_update(camera* _camera)
 
 	//update orthographic camera normally
 	vec2 position = _camera->transform.position;
-	_camera->projection = mat4_getOrthographic(position.x, position.x + _camera->screenWidth, 
+	_camera->projection = mat4_orthographic(position.x, position.x + _camera->screenWidth, 
 		position.y + _camera->screenHeight, position.y, -1.0f, 1.0f);
 }
 
@@ -57,7 +57,7 @@ void camera_update(camera* _camera, sprite* _sprite)
 	_camera->transform.position = vec2_create(targetPos.x - (_camera->screenWidth/2), targetPos.y - (_camera->screenHeight/2));
 	
 	vec2 position = _camera->transform.position;
-	_camera->projection = mat4_getOrthographic(position.x, position.x + _camera->screenWidth, 
+	_camera->projection = mat4_orthographic(position.x, position.x + _camera->screenWidth, 
 		position.y + _camera->screenHeight, position.y, -1.0f, 1.0f);
 }
 
