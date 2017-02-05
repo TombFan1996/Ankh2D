@@ -107,7 +107,7 @@ tmx_map* tmx_parse_xml(const char* _filename)
 	}
 
 	char* sig = "TMX.";
-	strcpy(newMap->signiture, sig);
+	memcpy(&newMap->signiture, sig, 4);
 	newMap->num_tilesets = newMap->tileset.size();
 	newMap->num_layers = newMap->layer.size();
 	return newMap;

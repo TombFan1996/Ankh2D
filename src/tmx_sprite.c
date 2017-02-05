@@ -13,6 +13,10 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 	newMapSprite->model = shader_getUniformLocation(newMapSprite->shader, "model");
 	newMapSprite->projection = shader_getUniformLocation(newMapSprite->shader, "projection");
 	
+	//transparency on the font
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
 	std::string filename("assets/");
 	filename += newMapSprite->map->tileset[0].filename;
 	newMapSprite->tilemap = texture2d_create(filename.c_str());
@@ -76,7 +80,6 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 			//no point creating a tile if it hasnt been assigned a tile id
 			if (index != 0)
 			{
-				//get x and y coord via mod and div
 				uint16_t tileCoordX = (index - 1) % numTilesX;
 				uint16_t tileCoordY = (index - 1) / numTilesY;
 
@@ -115,7 +118,7 @@ void tmx_sprite_draw(tmx_sprite* _sprite, mat4 _projection)
 
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_setUniformMat4(_sprite->model, transform_getModelMatrix(_sprite->transform), false);
+	shader_setUniformMat4(_sprite->model, transform_getModelMatrix(_sprite->transform), true);
 
 	//send the projection matrix off
 	shader_setUniformMat4(_sprite->projection, _projection, false);
