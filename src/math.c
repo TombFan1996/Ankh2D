@@ -29,9 +29,21 @@ vec3 vec3_create(float _x, float _y, float _z)
 
 void mat4_translate(mat4& _model, vec2 _pos)
 {
-	_model.element[3][0] = _pos.x;
-	_model.element[3][1] = _pos.y;
-	_model.element[3][2] = 0.0f;
+	_model.element[0][0] += _model.element[3][0] * _pos.x;
+	_model.element[1][1] += _model.element[3][0] * _pos.y;
+	_model.element[2][0] += _model.element[3][0] * 0.0f;
+
+	_model.element[0][1] += _model.element[3][1] * _pos.x;
+	_model.element[1][1] += _model.element[3][1] * _pos.y;
+	_model.element[2][1] += _model.element[3][1] * 0.0f;
+
+	_model.element[0][2] += _model.element[3][2] * _pos.x;
+	_model.element[1][2] += _model.element[3][2] * _pos.y;
+	_model.element[2][2] += _model.element[3][2] * 0.0f;
+
+	_model.element[0][3] += _model.element[3][3] * _pos.x;
+	_model.element[1][3] += _model.element[3][3] * _pos.y;
+	_model.element[2][3] += _model.element[3][3] * 0.0f;
 }
 
 void mat4_scale(mat4& _model, vec2 _scale)
@@ -41,16 +53,17 @@ void mat4_scale(mat4& _model, vec2 _scale)
 	_model.element[2][2] = 0.0f;
 }
 
-//rotate around the z-axis, allows manipulation of the x and y axis.
+
+//http://www.songho.ca/opengl/gl_matrix.html#transform
 void mat4_rotate(mat4& _model, float _degree)
 {
-	//TODO!
-
-	/*float radians = degToRad(_degree);
-	_model.element[0][0] = cos(radians);
-	_model.element[1][0] = -sin(radians);
-	_model.element[0][1] = sin(radians);
-	_model.element[1][1] = cos(radians);*/
+	//degree was rotating wrong way
+	float radians = -degToRad(_degree);
+	//z-axis rotation, allows manipulation of the x and y axis.
+    _model.element[0][0] = _model.element[0][0] * cosf(radians) + _model.element[0][1] * -sinf(radians);
+    _model.element[0][1] = _model.element[0][0] * sinf(radians) + _model.element[0][1] * cosf(radians);
+    _model.element[1][0] = _model.element[1][0] * cosf(radians) + _model.element[1][1] * -sinf(radians);
+    _model.element[1][1] = _model.element[1][0] * sinf(radians) + _model.element[1][1] * cosf(radians);
 }
 
 mat4 mat4_create()
@@ -61,39 +74,39 @@ mat4 mat4_create()
 //http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho
 mat4 mat4_orthographic(float _left, float _right, float _bottom, float _top, float _zNear, float _zFar)
 {
-	mat4 tempMat4 = mat4_identity();
-	tempMat4.element[0][0] = 2.0f / (_right - _left);
-	tempMat4.element[1][1] = 2.0f / (_top - _bottom);
-	tempMat4.element[2][2] = -2.0f / (_zFar - _zNear);
-	tempMat4.element[3][0] = -((_right + _left) / (_right - _left)); 
-	tempMat4.element[3][1] = -((_top + _bottom) / (_top - _bottom));
-	tempMat4.element[3][2] = -((_zFar + _zNear) / (_zFar - _zNear));
-	return tempMat4;
+	mat4 mat_ortho = mat4_identity();
+	mat_ortho.element[0][0] = 2.0f / (_right - _left);
+	mat_ortho.element[1][1] = 2.0f / (_top - _bottom);
+	mat_ortho.element[2][2] = -2.0f / (_zFar - _zNear);
+	mat_ortho.element[3][0] = -((_right + _left) / (_right - _left)); 
+	mat_ortho.element[3][1] = -((_top + _bottom) / (_top - _bottom));
+	mat_ortho.element[3][2] = -((_zFar + _zNear) / (_zFar - _zNear));
+	return mat_ortho;
 }
 
 mat4 mat4_identity()
 {
-	mat4 tempMat4;
+	mat4 mat_iden;
 
-	tempMat4.element[0][0] = 1.0f;
-	tempMat4.element[1][0] = 0.0f;
-	tempMat4.element[2][0] = 0.0f;
-	tempMat4.element[3][0] = 0.0f;
+	mat_iden.element[0][0] = 1.0f;
+	mat_iden.element[1][0] = 0.0f;
+	mat_iden.element[2][0] = 0.0f;
+	mat_iden.element[3][0] = 0.0f;
 
-	tempMat4.element[0][1] = 0.0f;
-	tempMat4.element[1][1] = 1.0f;
-	tempMat4.element[2][1] = 0.0f;
-	tempMat4.element[3][1] = 0.0f;
+	mat_iden.element[0][1] = 0.0f;
+	mat_iden.element[1][1] = 1.0f;
+	mat_iden.element[2][1] = 0.0f;
+	mat_iden.element[3][1] = 0.0f;
 
-	tempMat4.element[0][2] = 0.0f;
-	tempMat4.element[1][2] = 0.0f;
-	tempMat4.element[2][2] = 1.0f;
-	tempMat4.element[3][2] = 0.0f;
+	mat_iden.element[0][2] = 0.0f;
+	mat_iden.element[1][2] = 0.0f;
+	mat_iden.element[2][2] = 1.0f;
+	mat_iden.element[3][2] = 0.0f;
 
-	tempMat4.element[0][3] = 0.0f;
-	tempMat4.element[1][3] = 0.0f;
-	tempMat4.element[2][3] = 0.0f;
-	tempMat4.element[3][3] = 1.0f;
+	mat_iden.element[0][3] = 0.0f;
+	mat_iden.element[1][3] = 0.0f;
+	mat_iden.element[2][3] = 0.0f;
+	mat_iden.element[3][3] = 1.0f;
 
-	return tempMat4;
+	return mat_iden;
 }

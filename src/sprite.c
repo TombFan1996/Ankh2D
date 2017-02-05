@@ -74,7 +74,7 @@ void sprite_draw(sprite* _sprite, mat4 _projection)
 
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_setUniformMat4(_sprite->model, transform_getModelMatrix(_sprite->transform), false);
+	shader_setUniformMat4(_sprite->model, transform_getModelMatrix(_sprite->transform), true);
 
 	//send the projection matrix off
 	shader_setUniformMat4(_sprite->projection, _projection, false);

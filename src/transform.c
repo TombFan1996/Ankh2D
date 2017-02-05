@@ -15,7 +15,7 @@ mat4 transform_getModelMatrix(transform _trans)
 {
 	mat4 model = mat4_identity();
 	mat4_scale(model, _trans.scale);
-	//mat4_rotate(model, _trans.rotation);
+	mat4_rotate(model, _trans.rotation);
 	mat4_translate(model, _trans.position);
 	return model;
 }

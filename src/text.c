@@ -199,7 +199,7 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_setUniformMat4(_text->model, transform_getModelMatrix(_text->transform), false);
+	shader_setUniformMat4(_text->model, transform_getModelMatrix(_text->transform), true);
 
 	//send the projection matrix off
 	shader_setUniformMat4(_text->projection, _text->defaultProj, false);
