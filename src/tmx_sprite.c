@@ -17,17 +17,16 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 	//WARNING: filename is going to be ruined.
 	
 	std::string filename("assets/");
-	filename += newMapSprite->map->tileset.filename;
+	filename += newMapSprite->map->tileset[0].filename;
 	newMapSprite->tilemap = texture2d_create(filename.c_str());
 	
-	newMapSprite->numTiles = newMapSprite->map->layer.width * 
-		newMapSprite->map->layer.height;
+	newMapSprite->numTiles = newMapSprite->map->layer[0].width * newMapSprite->map->layer[0].height;
 
-	uint16_t mapSizeX = newMapSprite->map->layer.width;
-	uint16_t mapSizeY = newMapSprite->map->layer.height;
+	uint16_t mapSizeX = newMapSprite->map->layer[0].width;
+	uint16_t mapSizeY = newMapSprite->map->layer[0].height;
 
-	uint8_t tileSizeX = newMapSprite->map->tileset.tile_width;
-	uint8_t tileSizeY = newMapSprite->map->tileset.tile_height;
+	uint8_t tileSizeX = newMapSprite->map->tileset[0].tile_width;
+	uint8_t tileSizeY = newMapSprite->map->tileset[0].tile_height;
 
 	//normalised coords for the whole textures
 	float image_normalX = (1.0f / newMapSprite->tilemap->width) * tileSizeX;
@@ -56,7 +55,7 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 
 	for (uint32_t i = 0; i < newMapSprite->numTiles; i++)
 	{
-		uint16_t index = newMapSprite->map->layer.data[i].tile_id - 1;
+		uint16_t index = newMapSprite->map->layer[0].data[i] - 1;
 
 		//what tile are we traversing
 		currentTileX = i % mapSizeX;

@@ -1,0 +1,156 @@
+<html>
+	<head>
+		<title>tmx2bin</title>
+	</head>
+	<body>
+	
+		<h1>tmx2bin</h1>
+		<p>This tool converts the XML-based TMX file format from the Tiled Map Editor into a binary format, 
+		this is the only file format that is dependant on tinyxml2. Binary format also future proofs any lower-end
+		platforms that would be slowed down by parsing an XML file.<p>
+		
+		<p><b>Note: This tool only converts the data that is required, this is not a full featured TMX to binary converter.</b></p>
+		
+		<p><b>MAP</b></p>
+		
+		<table border="2">
+		
+			<tr>
+			<td>Name</td>
+			<td>Datatype</td>
+			<td>Description</td>
+			</tr>
+			
+			<tr>
+			<td>signiture</td>
+			<td>char[4]</td>
+			<td>The signiture for this file format "TMX."</td>
+			</tr>
+			
+			<tr>
+			<td>map width</td>
+			<td>uint16</td>
+			<td>The map width in tiles</td>
+			</tr>
+			
+			<tr>
+			<td>map height</td>
+			<td>uint16</td>
+			<td>The map height in tiles</td>
+			</tr>
+			
+			<tr>
+			<td>tile width</td>
+			<td>uint8</td>
+			<td>The width of a tile (px)</td>
+			</tr>
+			
+			<tr>
+			<td>tile height</td>
+			<td>uint8</td>
+			<td>The height of a tile (px)</td>
+			</tr>
+			
+			<tr>
+			<td>num tilesets</td>
+			<td>uint8</td>
+			<td>The number of tilesets present in this tmx map</td>
+			</tr>
+			
+			<tr>
+			<td>num layers</td>
+			<td>uint8</td>
+			<td>The number of layers present in this tmx map</td>
+			</tr>
+			
+			<tr>
+			<td>tilesets</td>
+			<td>TILESET[num tilesets]</td>
+			<td>Information about the tileset you're using to tile the map</td>
+			</tr>
+			
+			<tr>
+			<td>layers</td>
+			<td>LAYER[num layers]</td>
+			<td>Information about the different layers the tmx map uses</td>
+			</tr>
+		
+		</table>
+		
+		<p><b>TILESET - 40 bytes</b></p>
+		
+		<table border="2">
+		
+			<tr>
+			<td>Name</td>
+			<td>Datatype</td>
+			<td>Description</td>
+			</tr>
+			
+			<tr>
+			<td>first Gid</td>
+			<td>uint8</td>
+			<td>The first global tile ID of this tileset</td>
+			
+			<tr>
+			<td>name</td>
+			<td>char[10]</td>
+			<td>The name of the tileset in use</td>
+			
+			<tr>
+			<td>tile width</td>
+			<td>uint16</td>
+			<td>The width of the tiles (px)</td>
+			
+			<tr>
+			<td>tile height</td>
+			<td>uint16</td>
+			<td>The height of the tiles (px)</td>
+			
+			<tr>
+			<td>filename</td>
+			<td>char[25]</td>
+			<td>The absolute path to the texture file used in this tileset</td>
+			
+			</tr>
+		
+		</table>
+		
+		<p><b>LAYER - 16 bytes</b></p>
+		
+		<table border="2">
+		
+			<tr>
+			<td>Name</td>
+			<td>Datatype</td>
+			<td>Description</td>
+			</tr>
+			
+			<tr>
+			<td>name</td>
+			<td>char[10]</td>
+			<td>The name assigned to this layer</td>
+			</tr>
+			
+			<tr>
+			<td>layer width</td>
+			<td>uint16</td>
+			<td>The width of the layer in tiles </td>
+			</tr>
+			
+			<tr>
+			<td>layer height</td>
+			<td>uint16</td>
+			<td>The height of the layer in tiles</td>
+			</tr>
+			
+			<tr>
+			<td>tile id</td>
+			<td>uint16</td>
+			<td>The tile index from the tileset</td>
+			</tr>
+		
+		</table>
+
+	</body>
+</html>

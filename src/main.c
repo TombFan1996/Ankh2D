@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 	sprite* newSprite = sprite_create("assets/darkel.png", spriteShader, 
 		transform_create(vec2_create(10.0f, 10.0f), 0.0f, vec2_create(40.0f, 40.0f)));
 	
-	tmx_sprite* tmx_sprite_1 = tmx_sprite_create("test_1.tmx", spriteShader, 
+	tmx_sprite* tmx_sprite_1 = tmx_sprite_create("test_1.bin", spriteShader, 
 		transform_create(vec2_create(0.0f, 0.0f), 0.0f, vec2_create(50.0f, 50.0f)));
 
 	//tmx_sprite* tmx_sprite_2 = tmx_sprite_create("test_2.tmx", spriteShader, 
