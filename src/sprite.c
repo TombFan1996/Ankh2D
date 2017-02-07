@@ -5,10 +5,15 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
 	sprite* newSprite = (sprite*)malloc(sizeof(sprite));
 	newSprite->shader = _shader;
 	newSprite->texture = texture2d_create(_name);
-	newSprite->transform = _trans;
 
+	newSprite->transform = _trans;
+	
 	newSprite->model = shader_getUniformLocation(newSprite->shader, "model");
 	newSprite->projection = shader_getUniformLocation(newSprite->shader, "projection");
+
+	//transparency on the font
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	newSprite->speed = 0.10f;
 	newSprite->keys = SDL_GetKeyboardState(NULL);

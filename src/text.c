@@ -9,7 +9,10 @@ text* text_create(const char* _fontName, shader* _shader, transform _trans)
 	newText->model = shader_getUniformLocation(newText->shader, "model");
 	newText->projection = shader_getUniformLocation(newText->shader, "projection");
 	newText->char_index = shader_getUniformLocation(newText->shader, "char_index");
+	
 	newText->transform = _trans;
+	//inverse the y scale as we now use BMP
+	//newText->transform.scale.y = 1.0f - newText->transform.scale.y;
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);

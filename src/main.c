@@ -11,6 +11,8 @@
 #include "tmx_parser.h"
 #include "tmx_sprite.h"
 
+#include "bmp.h"
+
 //grapics handler = mainGraphics
 //camera handler = mainCamera;
 
@@ -32,11 +34,11 @@ int main(int argc, char** argv)
 	text* newText = text_create("arial", textShader, transform_create(vec2_create(0.0f, 0.0f), 0.0f, vec2_create(60.0f, 60.0f)));
 	text_setColour(newText, vec3_create(1.0f, 0.0f, 0.0f));
 
-	sprite* newSprite = sprite_create("assets/darkel.png", spriteShader, 
-		transform_create(vec2_create(10.0f, 10.0f), 0.0f, vec2_create(40.0f, 40.0f)));
+	sprite* newSprite = sprite_create("assets/darkel.bmp", spriteShader, 
+		transform_create(vec2_create(0.0f, 0.0f), 0.0f, vec2_create(50.0f, 50.0f)));
 	
 	tmx_sprite* tmx_sprite_1 = tmx_sprite_create("test_2.bin", spriteShader, 
-		transform_create(vec2_create(40.0f, 0.0f), 0.0f, vec2_create(50.0f, 50.0f)));
+		transform_create(vec2_create(0.0f, 0.0f), 0.0f, vec2_create(50.0f, 50.0f)));
 
 	while (!mainGraphics->closed)
 	{

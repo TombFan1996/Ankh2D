@@ -8,7 +8,10 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 	mapName += _mapName;
 	newMapSprite->map = tmx_parser_create(mapName.c_str());
 	newMapSprite->shader = _shader;
+
 	newMapSprite->transform = _trans;
+	//inverse the y scale as we now use BMP
+	//newMapSprite->transform.scale.y = 1.0f - newMapSprite->transform.scale.y;
 
 	newMapSprite->model = shader_getUniformLocation(newMapSprite->shader, "model");
 	newMapSprite->projection = shader_getUniformLocation(newMapSprite->shader, "projection");

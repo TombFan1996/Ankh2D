@@ -7,7 +7,7 @@
 
 #include <GL\glew.h>
 
-#include "stb_image.h"
+#include "bmp.h"
 
 #include <cassert>
 #include "logger.h"
