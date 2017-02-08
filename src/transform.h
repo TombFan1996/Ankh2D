@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include "math.h"
+#include "bmath.h"
 
 typedef struct
 {

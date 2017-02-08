@@ -2,7 +2,7 @@
 #define SPRITE_H
 
 #include <SDL.h>
-#include "math.h"
+#include "bmath.h"
 #include "transform.h"
 #include "texture2d.h"
 #include "shader.h"

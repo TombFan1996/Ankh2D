@@ -2,7 +2,7 @@
 #define TMX_RENDERER_H
 
 #include <GL\glew.h>
-#include "math.h"
+#include "bmath.h"
 #include "texture2d.h"
 #include "transform.h"
 #include "tmx_parser.h"

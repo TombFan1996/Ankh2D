@@ -79,9 +79,7 @@ void graphics_update(graphics* _graphics)
 			_graphics->closed = true;
 	}
 
-	#ifdef ANKH2D_DEBUG
-		graphics_get_fps(_graphics);
-	#endif
+	graphics_get_fps(_graphics);
 }
 
 void graphics_get_fps(graphics* _graphics)

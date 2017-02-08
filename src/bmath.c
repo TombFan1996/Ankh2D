@@ -1,4 +1,4 @@
-#include "math.h"
+#include "bmath.h"
 
 float deg_to_rad(float _deg)
 {
@@ -27,42 +27,42 @@ vec3 vec3_create(float _x, float _y, float _z)
 	return temp_vec3;
 }
 
-void mat4_translate(mat4& _model, vec2 _pos)
+void mat4_translate(mat4* _model, vec2 _pos)
 {
-	_model.element[0][0] += _model.element[3][0] * _pos.x;
-	_model.element[1][1] += _model.element[3][0] * _pos.y;
-	_model.element[2][0] += _model.element[3][0] * 0.0f;
+	_model->element[0][0] += _model->element[3][0] * _pos.x;
+	_model->element[1][1] += _model->element[3][0] * _pos.y;
+	_model->element[2][0] += _model->element[3][0] * 0.0f;
 
-	_model.element[0][1] += _model.element[3][1] * _pos.x;
-	_model.element[1][1] += _model.element[3][1] * _pos.y;
-	_model.element[2][1] += _model.element[3][1] * 0.0f;
+	_model->element[0][1] += _model->element[3][1] * _pos.x;
+	_model->element[1][1] += _model->element[3][1] * _pos.y;
+	_model->element[2][1] += _model->element[3][1] * 0.0f;
 
-	_model.element[0][2] += _model.element[3][2] * _pos.x;
-	_model.element[1][2] += _model.element[3][2] * _pos.y;
-	_model.element[2][2] += _model.element[3][2] * 0.0f;
+	_model->element[0][2] += _model->element[3][2] * _pos.x;
+	_model->element[1][2] += _model->element[3][2] * _pos.y;
+	_model->element[2][2] += _model->element[3][2] * 0.0f;
 
-	_model.element[0][3] += _model.element[3][3] * _pos.x;
-	_model.element[1][3] += _model.element[3][3] * _pos.y;
-	_model.element[2][3] += _model.element[3][3] * 0.0f;
+	_model->element[0][3] += _model->element[3][3] * _pos.x;
+	_model->element[1][3] += _model->element[3][3] * _pos.y;
+	_model->element[2][3] += _model->element[3][3] * 0.0f;
 }
 
-void mat4_scale(mat4& _model, vec2 _scale)
+void mat4_scale(mat4* _model, vec2 _scale)
 {
-	_model.element[0][0] = _scale.x;
-	_model.element[1][1] = _scale.y;
-	_model.element[2][2] = 0.0f;
+	_model->element[0][0] = _scale.x;
+	_model->element[1][1] = _scale.y;
+	_model->element[2][2] = 0.0f;
 }
 
 //http://www.songho.ca/opengl/gl_matrix.html#transform
-void mat4_rotate(mat4& _model, float _degree)
+void mat4_rotate(mat4* _model, float _degree)
 {
 	//degree was rotating wrong way
 	float radians = -deg_to_rad(_degree);
 	//z-axis rotation, allows manipulation of the x and y axis.
-    _model.element[0][0] = _model.element[0][0] * cosf(radians) + _model.element[0][1] * -sinf(radians);
-    _model.element[0][1] = _model.element[0][0] * sinf(radians) + _model.element[0][1] * cosf(radians);
-    _model.element[1][0] = _model.element[1][0] * cosf(radians) + _model.element[1][1] * -sinf(radians);
-    _model.element[1][1] = _model.element[1][0] * sinf(radians) + _model.element[1][1] * cosf(radians);
+    _model->element[0][0] = _model->element[0][0] * cosf(radians) + _model->element[0][1] * -sinf(radians);
+    _model->element[0][1] = _model->element[0][0] * sinf(radians) + _model->element[0][1] * cosf(radians);
+    _model->element[1][0] = _model->element[1][0] * cosf(radians) + _model->element[1][1] * -sinf(radians);
+    _model->element[1][1] = _model->element[1][0] * sinf(radians) + _model->element[1][1] * cosf(radians);
 }
 
 mat4 mat4_create()

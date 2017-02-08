@@ -7,7 +7,7 @@
 
 #include <GL\glew.h>
 
-#include "math.h"
+#include "bmath.h"
 #include "bmp.h"
 
 #include <cassert>

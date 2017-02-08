@@ -7,7 +7,7 @@
 #include <string>
 #include "logger.h"
 
-#include "math.h"
+#include "bmath.h"
 
 #define VERTEX 0
 #define FRAGMENT 1

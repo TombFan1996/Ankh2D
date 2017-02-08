@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "math.h"
+#include "bmath.h"
 #include "transform.h"
 #include <SDL.h>
 

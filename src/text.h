@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <vector>
 #include <SDL.h>
-#include "math.h"
+#include "bmath.h"
 
 #include "logger.h"
 #include "shader.h"
@@ -14,9 +14,6 @@
 #define ASCII_SET_SIZE 128
 
 //http://www.angelcode.com/products/bmfont/doc/file_format.html
-
-//arial.bmp
-#define FONT_SIZE_PLUS_TERMINATOR 10
 
 typedef struct
 {

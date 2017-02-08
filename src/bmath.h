@@ -1,5 +1,5 @@
-#ifndef MATH_H
-#define MATH_H
+#ifndef BASIC_MATH_H
+#define BASIC_MATH_H
 
 #include <math.h>
 #include <stdint.h>
@@ -41,8 +41,8 @@ typedef struct
 mat4 mat4_create();
 mat4 mat4_identity();
 mat4 mat4_orthographic(float _left, float _right, float _bottom, float _top, float _zNear, float _zFar);
-void mat4_translate(mat4& _model, vec2 _pos);
-void mat4_scale(mat4& _model, vec2 _scale);
-void mat4_rotate(mat4& _model, float _degree);
+void mat4_translate(mat4* _model, vec2 _pos);
+void mat4_scale(mat4* _model, vec2 _scale);
+void mat4_rotate(mat4* _model, float _degree);
 
 #endif

@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include "logger.h"
 
-#include "math.h"
+#include "bmath.h"
 
 static vec3 alpha_colour_key;
 
