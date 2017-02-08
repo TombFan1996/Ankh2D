@@ -2,37 +2,37 @@
 
 text* text_create(const char* _fontName, shader* _shader, transform _trans)
 {
-	text* newText = (text*)malloc(sizeof(text));
+	text* new_text = (text*)malloc(sizeof(text));
 
-	newText->shader = _shader;
-	newText->colour = shader_getUniformLocation(newText->shader, "colour");
-	newText->model = shader_getUniformLocation(newText->shader, "model");
-	newText->projection = shader_getUniformLocation(newText->shader, "projection");
-	newText->char_index = shader_getUniformLocation(newText->shader, "char_index");
+	new_text->shader = _shader;
+	new_text->colour = shader_get_uniform_location(new_text->shader, "colour");
+	new_text->model = shader_get_uniform_location(new_text->shader, "model");
+	new_text->projection = shader_get_uniform_location(new_text->shader, "projection");
+	new_text->char_index = shader_get_uniform_location(new_text->shader, "char_index");
 	
-	newText->transform = _trans;
+	new_text->transform = _trans;
 	//inverse the y scale as we now use BMP
 	//newText->transform.scale.y = 1.0f - newText->transform.scale.y;
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
-	newText->defaultProj = mat4_orthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	new_text->default_proj = mat4_orthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	//setup default font colour
-	newText->fontColour = vec3_create(1.0f, 1.0f, 1.0f);
+	new_text->font_colour = vec3_create(1.0f, 1.0f, 1.0f);
 
 	//transparency on the font
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	//load the fnt file in binary
-	text_loadFNT(newText, _fontName);
-	text_loadBMP(newText, newText->page_names);
+	text_load_fnt(new_text, _fontName);
+	text_load_bmp(new_text, new_text->page_names);
 
-	return newText;
+	return new_text;
 }
 
-void text_loadBMP(text* _text, const char* _name)
+void text_load_bmp(text* _text, const char* _name)
 {
 	std::string name("assets/");
 	name += _name;
@@ -107,7 +107,7 @@ void text_loadBMP(text* _text, const char* _name)
 	}
 }
 
-void text_loadFNT(text* _text, const char* _name)
+void text_load_fnt(text* _text, const char* _name)
 {
 	std::string name("assets/");
 	name += _name;
@@ -183,9 +183,9 @@ void text_loadFNT(text* _text, const char* _name)
 	fclose(file);
 }
 
-void text_setColour(text* _text, vec3 _colour)
+void text_set_colour(text* _text, vec3 _colour)
 {
-	_text->fontColour = _colour;
+	_text->font_colour = _colour;
 }
 
 //improve drawing by binding all textures onto 1 big quad (1 draw call)
@@ -202,13 +202,13 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_setUniformMat4(_text->model, transform_getModelMatrix(_text->transform), true);
+	shader_set_uniform_mat4(_text->model, transform_get_model_matrix(_text->transform), true);
 
 	//send the projection matrix off
-	shader_setUniformMat4(_text->projection, _text->defaultProj, false);
+	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
 
 	//set the font colour
-	shader_setUniformVec3(_text->colour, _text->fontColour);
+	shader_set_uniform_vec3(_text->colour, _text->font_colour);
 
 	//bind our font texture
 	texture2d_bind(_text->texture);
@@ -216,7 +216,7 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	//debug the first character '@'
 	for (uint8_t i = 0; i < _str.size(); i++)
 	{
-		shader_setUniformFloat(_text->char_index, char_index);
+		shader_set_uniform_float(_text->char_index, char_index);
 		char_index += 1.0f;
 
 		uint8_t index = (uint8_t)_str[i] - 32;

@@ -59,13 +59,28 @@ BMP_24* bmp_24_load(const char* _filename)
 	return NULL;
 }
 
-RGB_DATA* bmp_24_bgr_rgb(BMP_24* _bmp)
+RGBA_DATA* bmp_24_bgr_rgba(BMP_24* _bmp)
 {
-	uint32_t size = sizeof(RGB_DATA) * (_bmp->ih.height * _bmp->ih.width);
-	RGB_DATA* rgb_data = (RGB_DATA*)malloc(sizeof(RGB_DATA) * size);
-	for (uint32_t i = 0; i < (_bmp->ih.height * _bmp->ih.width); i++){
-		memcpy(&rgb_data[i], &_bmp->pd[i], 4);
+	uint32_t size = sizeof(RGBA_DATA) * (_bmp->ih.height * _bmp->ih.width);
+	RGBA_DATA* rgba_data = (RGBA_DATA*)malloc(sizeof(RGBA_DATA) * size);
+	for (uint32_t i = 0; i < (_bmp->ih.height * _bmp->ih.width); i++)
+	{
+		rgba_data[i].red = _bmp->pd[i].red;
+		rgba_data[i].green = _bmp->pd[i].green;
+		rgba_data[i].blue = _bmp->pd[i].blue;
+
+		//use black as the alpha colour for now
+		//get this data from elsewhere
+		if (rgba_data[i].red == alpha_colour_key.x && rgba_data[i].green == alpha_colour_key.y && rgba_data[i].blue == alpha_colour_key.z)
+			rgba_data[i].alpha = 0;
+		else
+			rgba_data[i].alpha = 255;
 	}
 
-	return rgb_data;
+	return rgba_data;
+}
+
+void bmp_set_alpha_color(vec3 _colour)
+{
+	alpha_colour_key = _colour;
 }

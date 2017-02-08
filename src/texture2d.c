@@ -2,15 +2,17 @@
 
 texture2d* texture2d_create(const char* _filename)
 {
-	texture2d* newTex = (texture2d*)malloc(sizeof(texture2d));
+	texture2d* new_tex = (texture2d*)malloc(sizeof(texture2d));
 
 	BMP_24* texture = bmp_24_load(_filename);
-	newTex->width = texture->ih.width;
-	newTex->height = texture->ih.height;
+	RGBA_DATA* texture_rgba = bmp_24_bgr_rgba(texture);
+
+	new_tex->width = texture->ih.width;
+	new_tex->height = texture->ih.height;
 
 	//create and bind texture
-	glGenTextures(1, &newTex->texture);
-	glBindTexture(GL_TEXTURE_2D, newTex->texture);
+	glGenTextures(1, &new_tex->texture);
+	glBindTexture(GL_TEXTURE_2D, new_tex->texture);
 
 	//if we read outside the texture size, it will start again (wrap repeat)
 	//use GL_CLAMP for a default colour to be used outside bounds of tex
@@ -23,11 +25,12 @@ texture2d* texture2d_create(const char* _filename)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	//construct the texture image
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newTex->width, newTex->height, 0, GL_BGR, GL_UNSIGNED_BYTE, texture->pd); 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, new_tex->width, new_tex->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_rgba); 
 
+	free(texture_rgba);
 	free(texture);
 
-	return newTex;
+	return new_tex;
 }
 
 void texture2d_bind(texture2d* _tex)

@@ -2,16 +2,16 @@
 
 transform transform_create(vec2 _pos, float _rotation, vec2 _scale)
 {
-	transform newTrans;
-	newTrans.position = _pos;
-	newTrans.rotation = _rotation;
-	newTrans.scale = _scale;
-	return newTrans;
+	transform new_transform;
+	new_transform.position = _pos;
+	new_transform.rotation = _rotation;
+	new_transform.scale = _scale;
+	return new_transform;
 }
 
 //get each individual matrix for the transform
 //model = scale * trans * rotation
-mat4 transform_getModelMatrix(transform _trans)
+mat4 transform_get_model_matrix(transform _trans)
 {
 	mat4 model = mat4_identity();
 	mat4_scale(model, _trans.scale);

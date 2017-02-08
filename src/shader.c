@@ -2,32 +2,32 @@
 
 shader* shader_create(const char* _filename)
 {
-	shader* newShader = (shader*)malloc(sizeof(shader));
+	shader* new_shader = (shader*)malloc(sizeof(shader));
 	//create shader program
-	newShader->program = glCreateProgram();
+	new_shader->program = glCreateProgram();
 	std::string filename(_filename);
 
-	const char* vertBuf = shader_load((filename + ".vert").c_str());
-	newShader->shaders[VERTEX] = shader_get(vertBuf, GL_VERTEX_SHADER);
+	const char* vert_buf = shader_load((filename + ".vert").c_str());
+	new_shader->shaders[VERTEX] = shader_get(vert_buf, GL_VERTEX_SHADER);
 
-	const char* fragBuf = shader_load((filename + ".frag").c_str());
-	newShader->shaders[FRAGMENT] = shader_get(fragBuf, GL_FRAGMENT_SHADER);
+	const char* frag_buf = shader_load((filename + ".frag").c_str());
+	new_shader->shaders[FRAGMENT] = shader_get(frag_buf, GL_FRAGMENT_SHADER);
 
 	//attach shaders to the shader program
 	for (uint8_t i = 0; i < NUM_SHADERS; i++){
-		glAttachShader(newShader->program, newShader->shaders[i]);
+		glAttachShader(new_shader->program, new_shader->shaders[i]);
 	}
 
-	glLinkProgram(newShader->program);
-	shader_check(newShader->program, GL_LINK_STATUS, true);
+	glLinkProgram(new_shader->program);
+	shader_check(new_shader->program, GL_LINK_STATUS, true);
 
 	//check if valid (post link)
-	glValidateProgram(newShader->program);
-	shader_check(newShader->program, GL_VALIDATE_STATUS, true);
+	glValidateProgram(new_shader->program);
+	shader_check(new_shader->program, GL_VALIDATE_STATUS, true);
 
 	log_fprint("'%s' shader successfully loaded", _filename);
 
-	return newShader;
+	return new_shader;
 }
 
 GLuint shader_get(const char* _buffer, GLenum _shaderType)
@@ -75,12 +75,12 @@ const char* shader_load(const char* _filename)
 	return buffer;
 }
 
-void shader_bindAttribLocation(shader* _shader, uint8_t _index, char* _name)
+void shader_bind_attrib_location(shader* _shader, uint8_t _index, char* _name)
 {
 	glBindAttribLocation(_shader->program, _index, _name);
 }
 
-void shader_setUniformMat4(GLuint _uniform, mat4 _matrix4, bool _transpose)
+void shader_set_uniform_mat4(GLuint _uniform, mat4 _matrix4, bool _transpose)
 {
 	if (_transpose)
 		glUniformMatrix4fv(_uniform, 1, GL_TRUE, &_matrix4.element[0][0]);
@@ -88,22 +88,22 @@ void shader_setUniformMat4(GLuint _uniform, mat4 _matrix4, bool _transpose)
 		glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4.element[0][0]);
 }
 
-void shader_setUniformFloat(GLuint _uniform, float _float)
+void shader_set_uniform_float(GLuint _uniform, float _float)
 {
 	glUniform1f(_uniform, _float);
 }
 
-void shader_setUniformVec2(GLuint _uniform, vec2 _vec2)
+void shader_set_uniform_vec2(GLuint _uniform, vec2 _vec2)
 {
 	glUniform2f(_uniform, _vec2.x, _vec2.y);
 }
 
-void shader_setUniformVec3(GLuint _uniform, vec3 _vec3)
+void shader_set_uniform_vec3(GLuint _uniform, vec3 _vec3)
 {
 	glUniform3f(_uniform, _vec3.x, _vec3.y, _vec3.z);
 }
 
-GLuint shader_getUniformLocation(shader* _shader, char* _uniform)
+GLuint shader_get_uniform_location(shader* _shader, char* _uniform)
 {
 	return glGetUniformLocation(_shader->program, _uniform);
 }

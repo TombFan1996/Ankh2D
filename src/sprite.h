@@ -21,7 +21,7 @@ typedef struct
 sprite* sprite_create(const char* _name, shader* _shader, transform _trans);
 void sprite_update(sprite* _sprite);
 void sprite_draw(sprite* _sprite, mat4 _projection);
-void sprite_setTexture(sprite* _sprite, texture2d* _tex);
+void sprite_set_texture(sprite* _sprite, texture2d* _tex);
 void sprite_destroy(sprite* _sprite);
 
 #endif

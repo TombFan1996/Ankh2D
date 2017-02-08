@@ -12,19 +12,17 @@ typedef struct
 {
 	bool closed;
 	const char* title;
-	uint32_t startTime, endTime;
-	uint32_t numFrames;
+	uint32_t start_time, end_time;
+	uint32_t num_frames;
 	uint16_t width, height;
 	SDL_Window* window;
-	SDL_GLContext glContext;
+	SDL_GLContext gl_context;
 } graphics;
 
-extern graphics* mainGraphics;
-
-graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs);
+graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs);
 void graphics_clear();
-void graphics_update();
-void graphics_getFPS();
-void graphics_destroy();
+void graphics_update(graphics* _graphics);
+void graphics_get_fps(graphics* _graphics);
+void graphics_destroy(graphics* _graphics);
 
 #endif

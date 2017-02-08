@@ -7,6 +7,10 @@
 #include <stdint.h>
 #include "logger.h"
 
+#include "math.h"
+
+static vec3 alpha_colour_key;
+
 //http://www.dragonwins.com/domains/getteched/bmp/bmpfileformat.htm
 
 //note: for bmp file format, set current packing alignment value to 1
@@ -66,11 +70,16 @@ typedef struct
 	uint8_t red;
 	uint8_t green;
 	uint8_t blue;
-} RGB_DATA;
+	uint8_t alpha;
+} RGBA_DATA;
 #pragma pack(pop)
 
 //helper functions
 //convert the bgr format to the preferred rgb format
-RGB_DATA* bmp_24_bgr_rgb(BMP_24* _bmp);
+RGBA_DATA* bmp_24_bgr_rgba(BMP_24* _bmp);
+
+//this sets the alpha colour (we loads 24 bit BMP w/
+//no alpha component, so we make it via this colour
+void bmp_set_alpha_color(vec3 _colour);
 
 #endif

@@ -79,7 +79,7 @@ typedef struct
 	GLuint *vao, *vbo;
 	GLuint colour, model, projection, char_index;
 	shader* shader;
-	vec3 fontColour;
+	vec3 font_colour;
 
 	texture2d* texture;
 
@@ -91,13 +91,13 @@ typedef struct
 	FNT_KERNING_PAIR_BLOCK kerning_pair_block;
 
 	transform transform;
-	mat4 defaultProj;
+	mat4 default_proj;
 } text;
 
 text* text_create(const char* _fontName, shader* _shader, transform _trans);
-void text_loadFNT(text* _text, const char* _name);
-void text_loadBMP(text* _text, const char* _name);
-void text_setColour(text* _text, vec3 _colour);
+void text_load_fnt(text* _text, const char* _name);
+void text_load_bmp(text* _text, const char* _name);
+void text_set_colour(text* _text, vec3 _colour);
 void text_draw(std::string _str, text* _text, vec2 _pos);
 void text_destroy(text* _text);
 

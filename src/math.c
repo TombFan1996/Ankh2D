@@ -1,30 +1,30 @@
 #include "math.h"
 
-float degToRad(float _deg)
+float deg_to_rad(float _deg)
 {
 	return _deg * (PI / 180);
 }
 
-float radToDeg(float _rad)
+float rad_to_deg(float _rad)
 {
 	return _rad * (180 / PI);
 }
 
 vec2 vec2_create(float _x, float _y)
 {
-	vec2 tempVec2;
-	tempVec2.x = _x;
-	tempVec2.y = _y;
-	return tempVec2;
+	vec2 temp_vec2;
+	temp_vec2.x = _x;
+	temp_vec2.y = _y;
+	return temp_vec2;
 }
 
 vec3 vec3_create(float _x, float _y, float _z)
 {
-	vec3 tempVec3;
-	tempVec3.x = _x;
-	tempVec3.y = _y;
-	tempVec3.z = _z;
-	return tempVec3;
+	vec3 temp_vec3;
+	temp_vec3.x = _x;
+	temp_vec3.y = _y;
+	temp_vec3.z = _z;
+	return temp_vec3;
 }
 
 void mat4_translate(mat4& _model, vec2 _pos)
@@ -53,12 +53,11 @@ void mat4_scale(mat4& _model, vec2 _scale)
 	_model.element[2][2] = 0.0f;
 }
 
-
 //http://www.songho.ca/opengl/gl_matrix.html#transform
 void mat4_rotate(mat4& _model, float _degree)
 {
 	//degree was rotating wrong way
-	float radians = -degToRad(_degree);
+	float radians = -deg_to_rad(_degree);
 	//z-axis rotation, allows manipulation of the x and y axis.
     _model.element[0][0] = _model.element[0][0] * cosf(radians) + _model.element[0][1] * -sinf(radians);
     _model.element[0][1] = _model.element[0][0] * sinf(radians) + _model.element[0][1] * cosf(radians);

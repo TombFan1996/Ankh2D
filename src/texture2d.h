@@ -7,6 +7,7 @@
 
 #include <GL\glew.h>
 
+#include "math.h"
 #include "bmp.h"
 
 #include <cassert>
@@ -18,6 +19,7 @@ typedef struct
 	GLuint texture;
 } texture2d;
 
+void texture2d_alpha_colour(vec3 _alphaCol);
 texture2d* texture2d_create(const char* _filename);
 void texture2d_bind(texture2d* _tex);
 void texture2d_destroy(texture2d* _tex);

@@ -6,8 +6,8 @@
 
 #define PI 3.14159265359f
 
-float degToRad(float _deg);
-float radToDeg(float _rad);
+float deg_to_rad(float _deg);
+float rad_to_deg(float _rad);
 
 //matrices: http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 

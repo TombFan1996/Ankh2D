@@ -11,6 +11,6 @@ typedef struct
 } transform;
 
 transform transform_create(vec2 _pos, float _rotation, vec2 _scale);
-mat4 transform_getModelMatrix(transform _trans);
+mat4 transform_get_model_matrix(transform _trans);
 
 #endif

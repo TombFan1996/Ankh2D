@@ -14,8 +14,8 @@ typedef struct
 	GLuint model, projection;
 	shader* shader;
 	transform transform;
-	uint8_t numLayers;
-	uint32_t numTiles;
+	uint8_t num_layers;
+	uint32_t num_tiles;
 	GLuint vao, vbo;
 	texture2d* tilemap;
 	tmx_map* map;
