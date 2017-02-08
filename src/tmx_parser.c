@@ -18,6 +18,7 @@ tmx_map* tmx_parser_create(const char* _filename)
 		fread(&tmxm->tile_width, 1, 1, file);
 		fread(&tmxm->tile_height, 1, 1, file);
 
+		fread(&tmxm->num_collisions, 1, 1, file);
 		fread(&tmxm->num_tilesets, 1, 1, file);
 		fread(&tmxm->num_layers, 1, 1, file);
 
@@ -44,6 +45,14 @@ tmx_map* tmx_parser_create(const char* _filename)
 			tmxm->layer[i].data = (uint16_t*)malloc(data_size);
 			fread(&tmxm->layer[i].data[0], data_size, 1, file);
 		}
+
+		if (tmxm->num_collisions != 0)
+		{
+			uint32_t data_size = sizeof(uint8_t) * (tmxm->layer[0].width * tmxm->layer[0].height);
+			tmxm->collision_data = (uint8_t*)malloc(data_size);
+			fread(&tmxm->collision_data[0], data_size, 1, file);
+		}
+		
 
 		fclose(file);
 		return tmxm;

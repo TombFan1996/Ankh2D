@@ -11,6 +11,9 @@
 		
 		<p><b>Note: This tool only converts the data that is required, this is not a full featured TMX to binary converter.</b></p>
 		
+		<p><b>Note: In order to use collisions built in Tiled Map Editor, create a layer named "collisions" (lowercase) and use any tile to populate
+		If there are no collisions (MAP::num collisions = 0) then you do not need to parse the final collision layer when using the map file.</b></p>
+		
 		<p><b>MAP</b></p>
 		
 		<table border="2">
@@ -52,6 +55,12 @@
 			</tr>
 			
 			<tr>
+			<td>num collisions</td>
+			<td>uint8</td>
+			<td>The number of tilesets that have collisions on them</td>
+			</tr>
+			
+			<tr>
 			<td>num tilesets</td>
 			<td>uint8</td>
 			<td>The number of tilesets present in this tmx map</td>
@@ -73,6 +82,12 @@
 			<td>layers</td>
 			<td>LAYER[num layers]</td>
 			<td>Information about the different layers the tmx map uses</td>
+			</tr>
+			
+			<tr>
+			<td>collision data</td>
+			<td>uint8[num collisions]</td>
+			<td>Information about the collision that are present in the map (1/0)</td>
 			</tr>
 		
 		</table>

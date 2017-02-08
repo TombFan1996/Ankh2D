@@ -72,6 +72,42 @@ void sprite_update(sprite* _sprite)
 		_sprite->transform.position.y + pos.y);
 }
 
+bool sprite_check_map_collision(tmx_map* _tmx_map, vec2 _sprite_pos)
+{
+	//use the current map we're in, this makes it less intensive
+	//if we use more maps than just one massive map
+	uint8_t tile_size_x = _tmx_map->tile_width;
+	uint8_t tile_size_y = _tmx_map->tile_height;
+	uint8_t current_x = 0, current_y = 0;
+	for (uint8_t i = 0; i < (_tmx_map->map_height * _tmx_map->map_width); i++)
+	{
+		//if this tile has a collision on it
+		if (_tmx_map->collision_data[i] == 1)
+		{
+			//translate to tile space and get
+			//all 4 pos of the quad tile
+			vec2 tile_pos_min, tile_pos_max;
+			tile_pos_min.x = current_x * tile_size_x;
+			tile_pos_min.y = current_y * tile_size_y;
+
+			tile_pos_max.x = tile_pos_min.x + tile_size_x;
+			tile_pos_max.y = tile_pos_min.y + tile_size_y;
+
+			if (_sprite_pos.x > tile_pos_min.x && _sprite_pos.x < tile_pos_max.x && 
+					_sprite_pos.y > tile_pos_min.y && _sprite_pos.y < tile_pos_max.y)
+				return true;
+		}
+
+		current_x++;
+		if (current_x == _tmx_map->map_width){
+			current_x = 0;
+			current_y++;
+		}
+	}
+
+	return false;
+}
+
 void sprite_draw(sprite* _sprite, mat4 _projection)
 {
 	//bind our program

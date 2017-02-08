@@ -40,10 +40,12 @@ typedef struct
 	uint16_t map_height;
 	uint8_t tile_width;
 	uint8_t tile_height;
+	uint8_t num_collisions;
 	uint8_t num_tilesets;
 	uint8_t num_layers;
 	TILESET* tileset;
 	LAYER* layer;
+	uint8_t* collision_data;
 } tmx_map;
 
 tmx_map* tmx_parser_create(const char* _filename);

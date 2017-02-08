@@ -26,15 +26,17 @@ typedef struct
 	uint16_t map_height;
 	uint8_t tile_width;
 	uint8_t tile_height;
+	uint8_t num_collisions;
 	uint8_t num_tilesets;
 	uint8_t num_layers;
 	std::vector<TILESET> tileset;
 	std::vector<LAYER> layer;
+	uint8_t* collision_data;
 } tmx_map;
 
 tmx_map* tmx_parse_xml(const char* _filename)
 {
-	tmx_map* newMap = new tmx_map;
+	tmx_map* new_map = new tmx_map;
 	tinyxml2::XMLDocument m_xmlMap;
 	m_xmlMap.LoadFile(_filename);
 
@@ -42,10 +44,10 @@ tmx_map* tmx_parse_xml(const char* _filename)
 	tinyxml2::XMLNode* map = m_xmlMap.FirstChildElement("map");
 	tinyxml2::XMLElement* mapElem = map->ToElement();
 
-	newMap->map_height = mapElem->IntAttribute("height");
-	newMap->map_width = mapElem->IntAttribute("width");
-	newMap->tile_width = mapElem->IntAttribute("tilewidth");
-	newMap->tile_height = mapElem->IntAttribute("tileheight");
+	new_map->map_height = mapElem->IntAttribute("height");
+	new_map->map_width = mapElem->IntAttribute("width");
+	new_map->tile_width = mapElem->IntAttribute("tilewidth");
+	new_map->tile_height = mapElem->IntAttribute("tileheight");
 
 	//get the tilesets used in the map
 	for (tinyxml2::XMLElement* childTileset = map->FirstChildElement("tileset"); childTileset != NULL; 
@@ -65,7 +67,7 @@ tmx_map* tmx_parse_xml(const char* _filename)
 		char* filename = const_cast<char*>(tilesetElement->FirstChildElement("image")->Attribute("source"));
 		memcpy(tileset.filename, filename, sizeof(tileset.filename));
 
-		newMap->tileset.push_back(tileset);
+		new_map->tileset.push_back(tileset);
 	}
 
 	//get all the layers in the map
@@ -76,41 +78,81 @@ tmx_map* tmx_parse_xml(const char* _filename)
 		tinyxml2::XMLElement* layerElement = childLayer->ToElement();
 
 		char* name = const_cast<char*>(layerElement->Attribute("name"));
-		memcpy(layer.name, name, 10);
-
-		layer.width = layerElement->IntAttribute("width");
-		layer.height = layerElement->IntAttribute("height");
-
-		//create the new set of data
-		layer.data = new uint16_t[layer.width * layer.height];
-		uint16_t tile_iter = 0;
-
-		//get all the data from this layer
-		tinyxml2::XMLNode* data = childLayer->FirstChildElement("data");
-		for (tinyxml2::XMLElement* child = data->FirstChildElement("tile"); child != NULL; 
-			child = child->NextSiblingElement("tile"))
+		
+		//if this isnt a collision layer and a normal layer
+		//continue parsing the data
+		if (std::strcmp(name, "collisions"))
 		{
-			uint16_t newTile;
-			newTile = child->IntAttribute("gid");
-			layer.data[tile_iter] = newTile;
-			tile_iter++;
+			memcpy(layer.name, name, 10);
 
-			//TODO.. Add all of the rotation tile code here...
+			layer.width = layerElement->IntAttribute("width");
+			layer.height = layerElement->IntAttribute("height");
+
+			//create the new set of data
+			layer.data = new uint16_t[layer.width * layer.height];
+			uint16_t tile_iter = 0;
+
+			//get all the data from this layer
+			tinyxml2::XMLNode* data = childLayer->FirstChildElement("data");
+			for (tinyxml2::XMLElement* child = data->FirstChildElement("tile"); child != NULL; 
+				child = child->NextSiblingElement("tile"))
+			{
+				uint16_t newTile;
+				newTile = child->IntAttribute("gid");
+				layer.data[tile_iter] = newTile;
+				tile_iter++;
+
+				//TODO.. Add all of the rotation tile code here...
+			}
+
+			//this means that the XML format isn't in use
+			//therefore we return nothing and quit the conversion
+			if (tile_iter == 0)
+				return NULL;
+
+			new_map->layer.push_back(layer);
 		}
 
-		//this means that the XML format isn't in use
-		//therefore we return nothing and quit the conversion
-		if (tile_iter == 0)
-			return NULL;
+		else
+		{
+			uint16_t width = layerElement->IntAttribute("width");
+			uint16_t height = layerElement->IntAttribute("height");
 
-		newMap->layer.push_back(layer);
+			//create the new set of data
+			new_map->collision_data = new uint8_t[width * height];
+
+			uint16_t col_iter = 0;
+			uint16_t col_counter = 0;
+			//get all the data from this layer
+			tinyxml2::XMLNode* data = childLayer->FirstChildElement("data");
+			for (tinyxml2::XMLElement* child = data->FirstChildElement("tile"); child != NULL; 
+				child = child->NextSiblingElement("tile"))
+			{
+				uint8_t new_tile;
+				uint16_t temp_tile = child->IntAttribute("gid");
+				//make it binary 0 or 1 to pack it in to 1 byte datatype
+				if (temp_tile != 0)
+				{
+					col_counter++;
+					new_tile = 1;
+				}
+
+				else
+					new_tile = 0;
+
+				new_map->collision_data[col_iter] = new_tile;
+				col_iter++;
+			}
+
+			new_map->num_collisions = col_counter;
+		}
 	}
 
 	char* sig = "TMX.";
-	memcpy(&newMap->signiture, sig, 4);
-	newMap->num_tilesets = newMap->tileset.size();
-	newMap->num_layers = newMap->layer.size();
-	return newMap;
+	memcpy(&new_map->signiture, sig, 4);
+	new_map->num_tilesets = new_map->tileset.size();
+	new_map->num_layers = new_map->layer.size();
+	return new_map;
 }
 
 void tmx_write_binary(const char* _filename, tmx_map* _tmxm)
@@ -133,6 +175,7 @@ void tmx_write_binary(const char* _filename, tmx_map* _tmxm)
 	fwrite(&_tmxm->tile_width, 1, 1, file);
 	fwrite(&_tmxm->tile_height, 1, 1, file);
 
+	fwrite(&_tmxm->num_collisions, 1, 1, file);
 	fwrite(&_tmxm->num_tilesets, 1, 1, file);
 	fwrite(&_tmxm->num_layers, 1, 1, file);
 
@@ -154,6 +197,13 @@ void tmx_write_binary(const char* _filename, tmx_map* _tmxm)
 		fwrite(&_tmxm->layer[i].data[0], data_size, 1, file);
 	}
 
+	//used the layers width and height to calculate all the tiles
+	//optimisation would be to no process all of the tiles!
+	if (_tmxm->num_collisions != 0){
+		uint32_t data_size = sizeof(uint8_t) * (_tmxm->layer[0].width * _tmxm->layer[0].height);
+		fwrite(&_tmxm->collision_data[0], data_size, 1, file);
+	}
+
 	fclose(file);
 }
 
@@ -164,10 +214,12 @@ int main(int argc, char** argv)
 		return 0;
 
 	tmx_map* map = tmx_parse_xml(argv[1]);
+	//tmx_map* map = tmx_parse_xml("test_2.tmx");
 	
 	if (map != NULL)
 	{
 		tmx_write_binary(argv[1], map);
+		//tmx_write_binary("test_2.tmx", map);
 		delete map;
 		map = nullptr;
 	}
