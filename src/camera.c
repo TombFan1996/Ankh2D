@@ -13,8 +13,8 @@ camera camera_create()
 	main_camera.transform.rotation = 0.0f;
 	main_camera.transform.scale = vec2_create(40.0f, 40.0f);
 	
-	main_camera.screen_height = height;
-	main_camera.screen_width = width;
+	main_camera.screen_height = (float)height;
+	main_camera.screen_width = (float)width;
 
 	main_camera.speed = 0.25f;
 	main_camera.keys = SDL_GetKeyboardState(NULL);
@@ -31,8 +31,8 @@ camera camera_create(float _speed)
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
 	main_camera.projection = mat4_orthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 	
-	main_camera.screen_height = height;
-	main_camera.screen_width = width;
+	main_camera.screen_height = (float)height;
+	main_camera.screen_width = (float)width;
 
 	main_camera.speed = _speed;
 	main_camera.keys = SDL_GetKeyboardState(NULL);

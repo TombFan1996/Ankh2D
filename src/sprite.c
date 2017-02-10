@@ -5,7 +5,6 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
 	sprite* new_sprite = (sprite*)malloc(sizeof(sprite));
 	new_sprite->shader = _shader;
 	new_sprite->texture = texture2d_create(_name);
-
 	new_sprite->transform = _trans;
 	
 	new_sprite->model = shader_get_uniform_location(new_sprite->shader, "model");
@@ -72,34 +71,40 @@ void sprite_update(sprite* _sprite)
 		_sprite->transform.position.y + pos.y);
 }
 
-bool sprite_check_map_collision(tmx_map* _tmx_map, vec2 _sprite_pos)
+bool sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite)
 {
-	//use the current map we're in, this makes it less intensive
-	//if we use more maps than just one massive map
-	uint8_t tile_size_x = _tmx_map->tile_width;
-	uint8_t tile_size_y = _tmx_map->tile_height;
 	uint8_t current_x = 0, current_y = 0;
-	for (uint8_t i = 0; i < (_tmx_map->map_height * _tmx_map->map_width); i++)
+	float sprite_size_x = _sprite->texture->width;
+	float sprite_size_y = _sprite->texture->height;
+
+	float tile_size_x = _tmx_map->map->tile_width;
+	float tile_size_y = _tmx_map->map->tile_height;
+
+	float sprite_scale_x = _sprite->transform.scale.x / 2;
+	float sprite_scale_y = _sprite->transform.scale.y / 2;
+
+	float tile_scale_x = _tmx_map->transform.scale.x / 2;
+	float tile_scale_y = _tmx_map->transform.scale.y / 2;
+
+	for (uint8_t i = 0; i < (_tmx_map->map->map_height * _tmx_map->map->map_width); i++)
 	{
 		//if this tile has a collision on it
-		if (_tmx_map->collision_data[i] == 1)
+		if (_tmx_map->map->collision_data[i] == 1)
 		{
-			//translate to tile space and get
-			//all 4 pos of the quad tile
-			vec2 tile_pos_min, tile_pos_max;
-			tile_pos_min.x = current_x * tile_size_x;
-			tile_pos_min.y = current_y * tile_size_y;
+			float tile_pos_x = (current_x * tile_size_x);
+			float tile_pos_y = (current_y * tile_size_y);
 
-			tile_pos_max.x = tile_pos_min.x + tile_size_x;
-			tile_pos_max.y = tile_pos_min.y + tile_size_y;
+			float sprite_pos_x = _sprite->transform.position.x;
+			float sprite_pos_y = _sprite->transform.position.y;
 
-			if (_sprite_pos.x > tile_pos_min.x && _sprite_pos.x < tile_pos_max.x && 
-					_sprite_pos.y > tile_pos_min.y && _sprite_pos.y < tile_pos_max.y)
-				return true;
+			if (sprite_pos_x <= (tile_scale_x + tile_pos_x) && sprite_pos_x >= -(tile_scale_x + tile_pos_x))
+					if (sprite_pos_y <= (tile_scale_y + tile_pos_y) && sprite_pos_y >= -(tile_scale_y + tile_pos_y))
+						return true;
+				
 		}
 
 		current_x++;
-		if (current_x == _tmx_map->map_width){
+		if (current_x == _tmx_map->map->map_width){
 			current_x = 0;
 			current_y++;
 		}
@@ -113,11 +118,7 @@ void sprite_draw(sprite* _sprite, mat4 _projection)
 	//bind our program
 	glUseProgram(_sprite->shader->program);
 
-	//communicate w/ uniforms
-	//send the model matrix off
 	shader_set_uniform_mat4(_sprite->model, transform_get_model_matrix(_sprite->transform), true);
-
-	//send the projection matrix off
 	shader_set_uniform_mat4(_sprite->projection, _projection, false);
 
 	//bind our texture
@@ -143,7 +144,6 @@ void sprite_set_texture(sprite* _sprite, texture2d* _tex)
 void sprite_destroy(sprite* _sprite)
 {
 	texture2d_destroy(_sprite->texture);
-
 	shader_destroy(_sprite->shader);
 
 	glDeleteBuffers(1, &_sprite->vao);

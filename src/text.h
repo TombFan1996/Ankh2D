@@ -95,6 +95,7 @@ text* text_create(const char* _fontName, shader* _shader, transform _trans);
 void text_load_fnt(text* _text, const char* _name);
 void text_load_bmp(text* _text, const char* _name);
 void text_set_colour(text* _text, vec3 _colour);
+void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, ...);
 void text_draw(std::string _str, text* _text, vec2 _pos);
 void text_destroy(text* _text);
 

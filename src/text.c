@@ -11,8 +11,6 @@ text* text_create(const char* _fontName, shader* _shader, transform _trans)
 	new_text->char_index = shader_get_uniform_location(new_text->shader, "char_index");
 	
 	new_text->transform = _trans;
-	//inverse the y scale as we now use BMP
-	//newText->transform.scale.y = 1.0f - newText->transform.scale.y;
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
@@ -220,6 +218,49 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 		char_index += 1.0f;
 
 		uint8_t index = (uint8_t)_str[i] - 32;
+		glBindVertexArray(_text->vao[index]);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
+}
+
+void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, ...)
+{
+	//spacing between each char in the text for the shader
+	float char_index = 0.0f;
+
+	_text->transform.position = _pos;
+
+	//bind our program
+	glUseProgram(_text->shader->program);
+	
+	//communicate w/ uniforms
+	//send the model matrix off
+	shader_set_uniform_mat4(_text->model, transform_get_model_matrix(_text->transform), true);
+
+	//send the projection matrix off
+	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
+
+	//set the font colour
+	shader_set_uniform_vec3(_text->colour, _text->font_colour);
+
+	//bind our font texture
+	texture2d_bind(_text->texture);
+
+	char text[50];
+	va_list ap;
+
+	va_start(ap, fmt);
+	vsprintf(text, fmt, ap);
+	va_end(ap);
+
+	//debug the first character '@'
+	for (uint8_t i = 0; i < _text_bytes; i++)
+	{
+		shader_set_uniform_float(_text->char_index, char_index);
+		char_index += 1.0f;
+
+		uint8_t index = (uint8_t)text[i] - 32;
 		glBindVertexArray(_text->vao[index]);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
