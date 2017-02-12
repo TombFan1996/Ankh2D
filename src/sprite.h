@@ -15,15 +15,16 @@ typedef struct
 	GLuint model, projection;
 	shader* shader;
 	transform transform;
+	vec2 old_pos;
 	texture2d* texture;
 	GLuint vao, vbo;
 } sprite;
 
 sprite* sprite_create(const char* _name, shader* _shader, transform _trans);
-void sprite_update(sprite* _sprite);
+bool sprite_update(sprite* _sprite);
 void sprite_draw(sprite* _sprite, mat4 _projection);
 void sprite_set_texture(sprite* _sprite, texture2d* _tex);
-bool sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite);
+void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update);
 void sprite_destroy(sprite* _sprite);
 
 #endif

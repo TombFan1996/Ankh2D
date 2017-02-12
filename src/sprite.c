@@ -50,72 +50,88 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
 	return new_sprite;
 }
 
-void sprite_update(sprite* _sprite)
+bool sprite_update(sprite* _sprite)
 {
 	SDL_PumpEvents();
 	vec2 pos = vec2_create(0.0f, 0.0f);
+	bool sprite_update = false;
 
 	if (_sprite->keys[SDL_SCANCODE_W])
+	{
 		pos = vec2_create(pos.x + 0.0f, pos.y + -_sprite->speed);
+		sprite_update = true;
+	}
 
 	if (_sprite->keys[SDL_SCANCODE_A])
+	{
 		pos = vec2_create(pos.x + -_sprite->speed, pos.y + 0.0f);
+		sprite_update = true;
+	}
 
 	if (_sprite->keys[SDL_SCANCODE_S])
+	{
 		pos = vec2_create(pos.x + 0.0f, pos.y + _sprite->speed);
+		sprite_update = true;
+	}
 
 	if (_sprite->keys[SDL_SCANCODE_D])
+	{
 		pos = vec2_create(pos.x + _sprite->speed, pos.y + 0.0f);
+		sprite_update = true;
+	}
 
 	_sprite->transform.position = vec2_create(_sprite->transform.position.x + pos.x, 
 		_sprite->transform.position.y + pos.y);
+
+	return sprite_update;
 }
 
-bool sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite)
+void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update)
 {
-	if (_tmx_map->map->num_collisions != 0)
+	//dont waste cycles if we havent moved the sprite
+	if (_sprite_update)
 	{
-		uint8_t current_x = 0, current_y = 0;
-
-		float current_tile_x = _tmx_map->transform.scale.x / 2;
-
-		for (uint8_t i = 0; i < (_tmx_map->map->map_height * _tmx_map->map->map_width); i++)
+		if (_tmx_map->map->num_collisions != 0)
 		{
-			//if this tile has a collision on it
-			if (_tmx_map->map->collision_data[i] == 1)
+			uint8_t current_x = 0, current_y = 0;
+			for (uint8_t i = 0; i < (_tmx_map->map->map_height * _tmx_map->map->map_width); i++)
 			{
-				// - (_tmx_map->transform.scale.x / 2) is equal to how far we're into a tile in the coords 
-				// if 1 tile is 50 px wide and the map is 5 tiles wide and you place it at vec2(0,0), this would mean
-				// you're 25 pixels into the middle tile. (This is a prob, need to work it out realtime based off position)
-				float x1 = (current_x * _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
-				if (_sprite->transform.position.x >= x1)
+				//if this tile has a collision on it
+				if (_tmx_map->map->collision_data[i] == 1)
 				{
-					float x2 = ((current_x * _tmx_map->transform.scale.x) + _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
-					if (_sprite->transform.position.x <= x2)
+					// - (_tmx_map->transform.scale.x / 2) is equal to how far we're into a tile in the coords 
+					// if 1 tile is 50 px wide and the map is 5 tiles wide and you place it at vec2(0,0), this would mean
+					// you're 25 pixels into the middle tile. (This is a prob, need to work it out realtime based off position)
+					float x1 = (current_x * _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
+					if (_sprite->transform.position.x >= x1)
 					{
-						float y1 = (current_y * _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
-						if (_sprite->transform.position.y >= y1)
+						float x2 = ((current_x * _tmx_map->transform.scale.x) + _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
+						if (_sprite->transform.position.x <= x2)
 						{
-							float y2 = ((current_y * _tmx_map->transform.scale.y) + _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
-							if (_sprite->transform.position.y <= y2)
+							float y1 = (current_y * _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
+							if (_sprite->transform.position.y >= y1)
 							{
-								return true;
+								float y2 = ((current_y * _tmx_map->transform.scale.y) + _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
+								if (_sprite->transform.position.y <= y2)
+								{
+									//revert back the pre-collision position
+									_sprite->transform.position = _sprite->old_pos;
+									break;
+								}
 							}
 						}
-					}
-				}				
-			}
+					}				
+				}
 
-			current_x++;
-			if (current_x == _tmx_map->map->map_width)
-			{
-				current_x = 0;
-				current_y++;
+				current_x++;
+				if (current_x == _tmx_map->map->map_width)
+				{
+					current_x = 0;
+					current_y++;
+				}
 			}
 		}
 	}
-
-	return false;
 }
 
 void sprite_draw(sprite* _sprite, mat4 _projection)
