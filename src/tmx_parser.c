@@ -7,6 +7,9 @@ tmx_map* tmx_parser_create(const char* _filename)
 	FILE* file;
 	file = fopen(_filename, "rb");
 
+	if (file == NULL)
+		log_fprint("ERROR: Failed to open %s", _filename);
+
 	fread(&tmxm->signiture, 4, 1, file);
 
 	if (tmxm->signiture[0] == 'T' && tmxm->signiture[1] == 'M' &&

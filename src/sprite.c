@@ -73,40 +73,45 @@ void sprite_update(sprite* _sprite)
 
 bool sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite)
 {
-	uint8_t current_x = 0, current_y = 0;
-	float sprite_size_x = _sprite->texture->width;
-	float sprite_size_y = _sprite->texture->height;
-
-	float tile_size_x = _tmx_map->map->tile_width;
-	float tile_size_y = _tmx_map->map->tile_height;
-
-	float sprite_scale_x = _sprite->transform.scale.x / 2;
-	float sprite_scale_y = _sprite->transform.scale.y / 2;
-
-	float tile_scale_x = _tmx_map->transform.scale.x / 2;
-	float tile_scale_y = _tmx_map->transform.scale.y / 2;
-
-	for (uint8_t i = 0; i < (_tmx_map->map->map_height * _tmx_map->map->map_width); i++)
+	if (_tmx_map->map->num_collisions != 0)
 	{
-		//if this tile has a collision on it
-		if (_tmx_map->map->collision_data[i] == 1)
+		uint8_t current_x = 0, current_y = 0;
+
+		float current_tile_x = _tmx_map->transform.scale.x / 2;
+
+		for (uint8_t i = 0; i < (_tmx_map->map->map_height * _tmx_map->map->map_width); i++)
 		{
-			float tile_pos_x = (current_x * tile_size_x);
-			float tile_pos_y = (current_y * tile_size_y);
+			//if this tile has a collision on it
+			if (_tmx_map->map->collision_data[i] == 1)
+			{
+				// - (_tmx_map->transform.scale.x / 2) is equal to how far we're into a tile in the coords 
+				// if 1 tile is 50 px wide and the map is 5 tiles wide and you place it at vec2(0,0), this would mean
+				// you're 25 pixels into the middle tile. (This is a prob, need to work it out realtime based off position)
+				float x1 = (current_x * _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
+				if (_sprite->transform.position.x >= x1)
+				{
+					float x2 = ((current_x * _tmx_map->transform.scale.x) + _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
+					if (_sprite->transform.position.x <= x2)
+					{
+						float y1 = (current_y * _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
+						if (_sprite->transform.position.y >= y1)
+						{
+							float y2 = ((current_y * _tmx_map->transform.scale.y) + _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
+							if (_sprite->transform.position.y <= y2)
+							{
+								return true;
+							}
+						}
+					}
+				}				
+			}
 
-			float sprite_pos_x = _sprite->transform.position.x;
-			float sprite_pos_y = _sprite->transform.position.y;
-
-			if (sprite_pos_x <= (tile_scale_x + tile_pos_x) && sprite_pos_x >= -(tile_scale_x + tile_pos_x))
-					if (sprite_pos_y <= (tile_scale_y + tile_pos_y) && sprite_pos_y >= -(tile_scale_y + tile_pos_y))
-						return true;
-				
-		}
-
-		current_x++;
-		if (current_x == _tmx_map->map->map_width){
-			current_x = 0;
-			current_y++;
+			current_x++;
+			if (current_x == _tmx_map->map->map_width)
+			{
+				current_x = 0;
+				current_y++;
+			}
 		}
 	}
 

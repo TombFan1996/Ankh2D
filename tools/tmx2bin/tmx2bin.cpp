@@ -40,6 +40,9 @@ tmx_map* tmx_parse_xml(const char* _filename)
 	tinyxml2::XMLDocument m_xmlMap;
 	m_xmlMap.LoadFile(_filename);
 
+	//track how many collisions are present in the map
+	uint8_t col_counter = 0;
+
 	//get the generic map data
 	tinyxml2::XMLNode* map = m_xmlMap.FirstChildElement("map");
 	tinyxml2::XMLElement* mapElem = map->ToElement();
@@ -79,9 +82,40 @@ tmx_map* tmx_parse_xml(const char* _filename)
 
 		char* name = const_cast<char*>(layerElement->Attribute("name"));
 		
+		if (strcmp(name, "collisions") == 0)
+		{
+			uint16_t width = layerElement->IntAttribute("width");
+			uint16_t height = layerElement->IntAttribute("height");
+
+			//create the new set of data
+			new_map->collision_data = new uint8_t[width * height];
+
+			uint16_t col_iter = 0;
+			//get all the data from this layer
+			tinyxml2::XMLNode* data = childLayer->FirstChildElement("data");
+			for (tinyxml2::XMLElement* child = data->FirstChildElement("tile"); child != NULL; 
+				child = child->NextSiblingElement("tile"))
+			{
+				uint8_t new_tile;
+				uint16_t temp_tile = child->IntAttribute("gid");
+				//make it binary 0 or 1 to pack it in to 1 byte datatype
+				if (temp_tile != 0)
+				{
+					col_counter++;
+					new_tile = 1;
+				}
+
+				else
+					new_tile = 0;
+
+				new_map->collision_data[col_iter] = new_tile;
+				col_iter++;
+			}
+		}
+
 		//if this isnt a collision layer and a normal layer
 		//continue parsing the data
-		if (std::strcmp(name, "collisions"))
+		else
 		{
 			memcpy(layer.name, name, 10);
 
@@ -112,44 +146,11 @@ tmx_map* tmx_parse_xml(const char* _filename)
 
 			new_map->layer.push_back(layer);
 		}
-
-		else
-		{
-			uint16_t width = layerElement->IntAttribute("width");
-			uint16_t height = layerElement->IntAttribute("height");
-
-			//create the new set of data
-			new_map->collision_data = new uint8_t[width * height];
-
-			uint16_t col_iter = 0;
-			uint16_t col_counter = 0;
-			//get all the data from this layer
-			tinyxml2::XMLNode* data = childLayer->FirstChildElement("data");
-			for (tinyxml2::XMLElement* child = data->FirstChildElement("tile"); child != NULL; 
-				child = child->NextSiblingElement("tile"))
-			{
-				uint8_t new_tile;
-				uint16_t temp_tile = child->IntAttribute("gid");
-				//make it binary 0 or 1 to pack it in to 1 byte datatype
-				if (temp_tile != 0)
-				{
-					col_counter++;
-					new_tile = 1;
-				}
-
-				else
-					new_tile = 0;
-
-				new_map->collision_data[col_iter] = new_tile;
-				col_iter++;
-			}
-
-			new_map->num_collisions = col_counter;
-		}
 	}
 
 	char* sig = "TMX.";
 	memcpy(&new_map->signiture, sig, 4);
+	new_map->num_collisions = col_counter;
 	new_map->num_tilesets = new_map->tileset.size();
 	new_map->num_layers = new_map->layer.size();
 	return new_map;

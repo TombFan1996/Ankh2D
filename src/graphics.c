@@ -10,37 +10,31 @@ graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, 
 	main_graphics.title = _title;
 	main_graphics.width = _width;
 	main_graphics.height = _height;
-	log_fprint("Window Size: %i x %i", _width, _height);
 
 	//setup SDL+GL windows and contexts
 	SDL_Init(SDL_INIT_VIDEO);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	log_fprint("OpenGL 3.1");
 
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-	log_fprint("RGBA: 32 bits");
 
 	//disable vsync
 	SDL_GL_SetSwapInterval(0);
-	log_fprint("VSync: disabled");
 
 	if (_fs)
 	{
 		main_graphics.window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 			main_graphics.width, main_graphics.height, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
-		log_fprint("Fullscreen mode");
 	}
 
 	else
 	{
 		main_graphics.window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 			main_graphics.width, main_graphics.height, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE);
-		log_fprint("Windowed mode");
 	}
 
 	main_graphics.gl_context = SDL_GL_CreateContext(main_graphics.window);
@@ -49,6 +43,15 @@ graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, 
 	GLenum status = glewInit();
 	if (status != GLEW_OK)
 		log_fprint("Glew failed to init");
+
+	//identify the version of GL
+	log_fprint((char*)glGetString(GL_VERSION));
+
+	//identify the shading lang version
+	log_fprint((char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+	//identify the name of the renderer used
+	log_fprint((char*)glGetString(GL_RENDERER));
 
 	main_graphics.closed = false;
 
