@@ -35,8 +35,8 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 	uint16_t map_size_y = new_map_sprite->map->layer[0].height;
 
 	//get the size of each tile in px
-	uint8_t tile_size_x = new_map_sprite->map->tileset[0].tile_width;
-	uint8_t tile_size_y = new_map_sprite->map->tileset[0].tile_height;
+	uint16_t tile_size_x = new_map_sprite->map->tileset[0].tile_width;
+	uint16_t tile_size_y = new_map_sprite->map->tileset[0].tile_height;
 
 	//normalised coords for the whole textures
 	float image_normal_x = (1.0f / new_map_sprite->tilemap->width) * tile_size_x;
@@ -114,14 +114,14 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 	return new_map_sprite;
 }
 
-void tmx_sprite_draw(tmx_sprite* _sprite, mat4 _projection)
+void tmx_sprite_draw(tmx_sprite* _sprite, mat4* _projection)
 {
 	//bind our program
 	glUseProgram(_sprite->shader->program);
 
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_set_uniform_mat4(_sprite->model, transform_get_model_matrix(_sprite->transform), true);
+	shader_set_uniform_mat4(_sprite->model, &transform_get_model_matrix(_sprite->transform), true);
 
 	//send the projection matrix off
 	shader_set_uniform_mat4(_sprite->projection, _projection, false);

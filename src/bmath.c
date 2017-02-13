@@ -27,42 +27,94 @@ vec3 vec3_create(float _x, float _y, float _z)
 	return temp_vec3;
 }
 
+//when using SSE, the calculations on the mat4 are performed in reverse
+//which is terrible for GL, this reverses back for us
+void mat4_reverse(mat4* _old_mat4)
+{
+	#if USE_SSE
+		_old_mat4->element[0] = _mm_set_ps(_old_mat4->element[0].m128_f32[0], _old_mat4->element[0].m128_f32[1],
+			_old_mat4->element[0].m128_f32[2], _old_mat4->element[0].m128_f32[3]);
+
+		_old_mat4->element[1] = _mm_set_ps(_old_mat4->element[1].m128_f32[0], _old_mat4->element[1].m128_f32[1],
+			_old_mat4->element[1].m128_f32[2], _old_mat4->element[1].m128_f32[3]);
+
+		_old_mat4->element[2] = _mm_set_ps(_old_mat4->element[2].m128_f32[0], _old_mat4->element[2].m128_f32[1],
+			_old_mat4->element[2].m128_f32[2], _old_mat4->element[2].m128_f32[3]);
+
+		_old_mat4->element[3] = _mm_set_ps(_old_mat4->element[3].m128_f32[0], _old_mat4->element[3].m128_f32[1],
+			_old_mat4->element[3].m128_f32[2], _old_mat4->element[3].m128_f32[3]);
+	#endif
+}
+
 void mat4_translate(mat4* _model, vec2 _pos)
 {
-	_model->element[0][0] += _model->element[3][0] * _pos.x;
-	_model->element[1][1] += _model->element[3][0] * _pos.y;
-	_model->element[2][0] += _model->element[3][0] * 0.0f;
+	#if USE_SSE
+		//we have to reverse these position to prevent conflict with the rotation
+		__m128 new_pos_0 = _mm_set_ps(_model->element[3].m128_f32[3] * _pos.x,
+			_model->element[3].m128_f32[2] * _pos.x, _model->element[3].m128_f32[1] * _pos.x, 
+				_model->element[3].m128_f32[0] * _pos.x);
+		_model->element[0] = _mm_add_ps(_model->element[0], new_pos_0);
 
-	_model->element[0][1] += _model->element[3][1] * _pos.x;
-	_model->element[1][1] += _model->element[3][1] * _pos.y;
-	_model->element[2][1] += _model->element[3][1] * 0.0f;
+		__m128 new_pos_1 = _mm_set_ps(_model->element[3].m128_f32[3] * _pos.y,
+			_model->element[3].m128_f32[2] * _pos.y, _model->element[3].m128_f32[1] * _pos.y, 
+				_model->element[3].m128_f32[0] * _pos.y);
+		_model->element[1] = _mm_add_ps(_model->element[1], new_pos_1);
 
-	_model->element[0][2] += _model->element[3][2] * _pos.x;
-	_model->element[1][2] += _model->element[3][2] * _pos.y;
-	_model->element[2][2] += _model->element[3][2] * 0.0f;
+		__m128 new_pos_2 = _mm_set_ps(0.0f, 0.0f, 0.0f, 0.0f);
+		_model->element[2] = _mm_add_ps(_model->element[2], new_pos_2);
+	#else
+		_model->element[0][0] += _model->element[3][0] * _pos.x;
+		_model->element[1][0] += _model->element[3][0] * _pos.y;
+		_model->element[2][0] += _model->element[3][0] * 0.0f;
 
-	_model->element[0][3] += _model->element[3][3] * _pos.x;
-	_model->element[1][3] += _model->element[3][3] * _pos.y;
-	_model->element[2][3] += _model->element[3][3] * 0.0f;
+		_model->element[0][1] += _model->element[3][1] * _pos.x;
+		_model->element[1][1] += _model->element[3][1] * _pos.y;
+		_model->element[2][1] += _model->element[3][1] * 0.0f;
+
+		_model->element[0][2] += _model->element[3][2] * _pos.x;
+		_model->element[1][2] += _model->element[3][2] * _pos.y;
+		_model->element[2][2] += _model->element[3][2] * 0.0f;
+
+		_model->element[0][3] += _model->element[3][3] * _pos.x;
+		_model->element[1][3] += _model->element[3][3] * _pos.y;
+		_model->element[2][3] += _model->element[3][3] * 0.0f;
+	#endif
 }
 
 void mat4_scale(mat4* _model, vec2 _scale)
 {
-	_model->element[0][0] = _scale.x;
-	_model->element[1][1] = _scale.y;
-	_model->element[2][2] = 0.0f;
+	#if USE_SSE
+		_model->element[0] = _mm_set_ps(_scale.x, 0.0f, 0.0f, 0.0f);
+		_model->element[1] = _mm_set_ps(0.0f, _scale.y, 0.0f, 0.0f);
+		_model->element[2] = _mm_set_ps(0.0f, 0.0f, 0.0f, 0.0f);
+	#else
+		_model->element[0][0] = _scale.x;
+		_model->element[1][1] = _scale.y;
+		_model->element[2][2] = 0.0f;
+	#endif
 }
 
 //http://www.songho.ca/opengl/gl_matrix.html#transform
+//z-axis rotation, allows manipulation of the x and y axis.
 void mat4_rotate(mat4* _model, float _degree)
 {
 	//degree was rotating wrong way
 	float radians = -deg_to_rad(_degree);
-	//z-axis rotation, allows manipulation of the x and y axis.
-    _model->element[0][0] = _model->element[0][0] * cosf(radians) + _model->element[0][1] * -sinf(radians);
-    _model->element[0][1] = _model->element[0][0] * sinf(radians) + _model->element[0][1] * cosf(radians);
-    _model->element[1][0] = _model->element[1][0] * cosf(radians) + _model->element[1][1] * -sinf(radians);
-    _model->element[1][1] = _model->element[1][0] * sinf(radians) + _model->element[1][1] * cosf(radians);
+
+	#if USE_SSE
+		__m128 new_elem_0 = _mm_set_ps(_model->element[0].m128_f32[0] * cosf(radians) + _model->element[0].m128_f32[1] * -sinf(radians),
+			_model->element[0].m128_f32[0] * sinf(radians) + _model->element[0].m128_f32[1] * cosf(radians), 0.0f, 0.0f);
+		_model->element[0] = _mm_add_ps(_model->element[0], new_elem_0);
+		
+		__m128 new_elem_1 = _mm_set_ps(_model->element[1].m128_f32[0] * cosf(radians) + _model->element[1].m128_f32[1] * -sinf(radians),
+			_model->element[1].m128_f32[0] * sinf(radians) + _model->element[1].m128_f32[1] * cosf(radians), 0.0f, 0.0f);
+		_model->element[1] = _mm_add_ps(_model->element[1], new_elem_1);
+	#else
+		_model->element[0][0] = _model->element[0][0] * cosf(radians) + _model->element[0][1] * -sinf(radians);
+		_model->element[0][1] = _model->element[0][0] * sinf(radians) + _model->element[0][1] * cosf(radians);
+		_model->element[1][0] = _model->element[1][0] * cosf(radians) + _model->element[1][1] * -sinf(radians);
+		_model->element[1][1] = _model->element[1][0] * sinf(radians) + _model->element[1][1] * cosf(radians);
+	#endif
 }
 
 mat4 mat4_create()
@@ -73,13 +125,28 @@ mat4 mat4_create()
 //http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho
 mat4 mat4_orthographic(float _left, float _right, float _bottom, float _top, float _zNear, float _zFar)
 {
-	mat4 mat_ortho = mat4_identity();
-	mat_ortho.element[0][0] = 2.0f / (_right - _left);
-	mat_ortho.element[1][1] = 2.0f / (_top - _bottom);
-	mat_ortho.element[2][2] = -2.0f / (_zFar - _zNear);
-	mat_ortho.element[3][0] = -((_right + _left) / (_right - _left)); 
-	mat_ortho.element[3][1] = -((_top + _bottom) / (_top - _bottom));
-	mat_ortho.element[3][2] = -((_zFar + _zNear) / (_zFar - _zNear));
+	mat4 mat_ortho;
+
+	#if USE_SSE
+		mat_ortho.element[0] = _mm_set_ps(2.0f / (_right - _left), 0.0f, 0.0f, 0.0f);
+		mat_ortho.element[1] = _mm_set_ps(0.0f, 2.0f / (_top - _bottom), 0.0f, 0.0f);
+		mat_ortho.element[2] = _mm_set_ps(0.0f, 0.0f, -2.0f / (_zFar - _zNear), 0.0f);
+		mat_ortho.element[3] = _mm_set_ps(
+			-((_right + _left) / (_right - _left)),
+			-((_top + _bottom) / (_top - _bottom)),
+			-((_zFar + _zNear) / (_zFar - _zNear)),
+			0.0f);
+
+		mat4_reverse(&mat_ortho);
+	#else
+		mat_ortho.element[0][0] = 2.0f / (_right - _left);
+		mat_ortho.element[1][1] = 2.0f / (_top - _bottom);
+		mat_ortho.element[2][2] = -2.0f / (_zFar - _zNear);
+		mat_ortho.element[3][0] = -((_right + _left) / (_right - _left)); 
+		mat_ortho.element[3][1] = -((_top + _bottom) / (_top - _bottom));
+		mat_ortho.element[3][2] = -((_zFar + _zNear) / (_zFar - _zNear));
+	#endif
+
 	return mat_ortho;
 }
 
@@ -87,25 +154,32 @@ mat4 mat4_identity()
 {
 	mat4 mat_iden;
 
-	mat_iden.element[0][0] = 1.0f;
-	mat_iden.element[1][0] = 0.0f;
-	mat_iden.element[2][0] = 0.0f;
-	mat_iden.element[3][0] = 0.0f;
+	#if USE_SSE
+		mat_iden.element[0] = _mm_set_ps(1.0f, 0.0f, 0.0f, 0.0f);
+		mat_iden.element[1] = _mm_set_ps(0.0f, 1.0f, 0.0f, 0.0f);
+		mat_iden.element[2] = _mm_set_ps(0.0f, 0.0f, 1.0f, 0.0f);
+		mat_iden.element[3] = _mm_set_ps(0.0f, 0.0f, 0.0f, 1.0f);
+	#else
+		mat_iden.element[0][0] = 1.0f;
+		mat_iden.element[1][0] = 0.0f;
+		mat_iden.element[2][0] = 0.0f;
+		mat_iden.element[3][0] = 0.0f;
 
-	mat_iden.element[0][1] = 0.0f;
-	mat_iden.element[1][1] = 1.0f;
-	mat_iden.element[2][1] = 0.0f;
-	mat_iden.element[3][1] = 0.0f;
+		mat_iden.element[0][1] = 0.0f;
+		mat_iden.element[1][1] = 1.0f;
+		mat_iden.element[2][1] = 0.0f;
+		mat_iden.element[3][1] = 0.0f;
 
-	mat_iden.element[0][2] = 0.0f;
-	mat_iden.element[1][2] = 0.0f;
-	mat_iden.element[2][2] = 1.0f;
-	mat_iden.element[3][2] = 0.0f;
+		mat_iden.element[0][2] = 0.0f;
+		mat_iden.element[1][2] = 0.0f;
+		mat_iden.element[2][2] = 1.0f;
+		mat_iden.element[3][2] = 0.0f;
 
-	mat_iden.element[0][3] = 0.0f;
-	mat_iden.element[1][3] = 0.0f;
-	mat_iden.element[2][3] = 0.0f;
-	mat_iden.element[3][3] = 1.0f;
+		mat_iden.element[0][3] = 0.0f;
+		mat_iden.element[1][3] = 0.0f;
+		mat_iden.element[2][3] = 0.0f;
+		mat_iden.element[3][3] = 1.0f;
+	#endif
 
 	return mat_iden;
 }

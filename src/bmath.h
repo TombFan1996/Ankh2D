@@ -1,8 +1,11 @@
 #ifndef BASIC_MATH_H
 #define BASIC_MATH_H
 
+#if USE_SSE
+	#include <xmmintrin.h>
+#endif
+
 #include <math.h>
-#include <stdint.h>
 
 #define PI 3.14159265359f
 
@@ -33,11 +36,19 @@ vec3 vec3_create(float _x, float _y, float _z);
 
 //[COLUMN] [ROW]
 
-typedef struct
-{
-	float element[4][4];
-} mat4;
+#if USE_SSE
+	typedef struct
+	{
+		__m128 element[4];
+	} mat4;
+#else
+	typedef struct
+	{
+		float element[4][4];
+	} mat4;
+#endif
 
+void mat4_reverse(mat4* _old_mat4);
 mat4 mat4_create();
 mat4 mat4_identity();
 mat4 mat4_orthographic(float _left, float _right, float _bottom, float _top, float _zNear, float _zFar);

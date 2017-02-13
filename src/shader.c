@@ -58,7 +58,7 @@ const char* shader_load(const char* _filename)
 
 	//move file pointer to eof and back
 	fseek(file, 0, SEEK_END);
-	uint16_t filesize = ftell(file);
+	int32_t filesize = ftell(file);
 	fseek(file, 0, SEEK_SET);
 
 	//void* to char*, +1 for null terminator
@@ -80,12 +80,19 @@ void shader_bind_attrib_location(shader* _shader, uint8_t _index, char* _name)
 	glBindAttribLocation(_shader->program, _index, _name);
 }
 
-void shader_set_uniform_mat4(GLuint _uniform, mat4 _matrix4, bool _transpose)
+void shader_set_uniform_mat4(GLuint _uniform, mat4* _matrix4, bool _transpose)
 {
-	if (_transpose)
-		glUniformMatrix4fv(_uniform, 1, GL_TRUE, &_matrix4.element[0][0]);
-	else
-		glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4.element[0][0]);
+	#if USE_SSE
+		if (_transpose)
+			glUniformMatrix4fv(_uniform, 1, GL_TRUE, &_matrix4->element[0].m128_f32[0]);
+		else
+			glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4->element[0].m128_f32[0]);
+	#else
+		if (_transpose)
+			glUniformMatrix4fv(_uniform, 1, GL_TRUE, &_matrix4->element[0][0]);
+		else
+			glUniformMatrix4fv(_uniform, 1, GL_FALSE, &_matrix4->element[0][0]);
+	#endif
 }
 
 void shader_set_uniform_float(GLuint _uniform, float _float)

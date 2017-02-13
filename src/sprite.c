@@ -134,12 +134,12 @@ void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_up
 	}
 }
 
-void sprite_draw(sprite* _sprite, mat4 _projection)
+void sprite_draw(sprite* _sprite, mat4* _projection)
 {
 	//bind our program
 	glUseProgram(_sprite->shader->program);
 
-	shader_set_uniform_mat4(_sprite->model, transform_get_model_matrix(_sprite->transform), true);
+	shader_set_uniform_mat4(_sprite->model, &transform_get_model_matrix(_sprite->transform), true);
 	shader_set_uniform_mat4(_sprite->projection, _projection, false);
 
 	//bind our texture

@@ -200,10 +200,10 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_set_uniform_mat4(_text->model, transform_get_model_matrix(_text->transform), true);
+	shader_set_uniform_mat4(_text->model, &transform_get_model_matrix(_text->transform), true);
 
 	//send the projection matrix off
-	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
+	shader_set_uniform_mat4(_text->projection, &_text->default_proj, false);
 
 	//set the font colour
 	shader_set_uniform_vec3(_text->colour, _text->font_colour);
@@ -236,10 +236,10 @@ void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, 
 	
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_set_uniform_mat4(_text->model, transform_get_model_matrix(_text->transform), true);
+	shader_set_uniform_mat4(_text->model, &transform_get_model_matrix(_text->transform), true);
 
 	//send the projection matrix off
-	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
+	shader_set_uniform_mat4(_text->projection, &_text->default_proj, false);
 
 	//set the font colour
 	shader_set_uniform_vec3(_text->colour, _text->font_colour);
