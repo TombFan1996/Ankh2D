@@ -80,8 +80,12 @@ bool sprite_update(sprite* _sprite)
 		sprite_update = true;
 	}
 
-	_sprite->transform.position = vec2_create(_sprite->transform.position.x + pos.x, 
-		_sprite->transform.position.y + pos.y);
+	//only update if we move
+	if (sprite_update)
+	{
+		_sprite->transform.position = vec2_create(_sprite->transform.position.x + pos.x, 
+			_sprite->transform.position.y + pos.y);
+	}
 
 	return sprite_update;
 }
@@ -116,6 +120,7 @@ void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_up
 								{
 									//revert back the pre-collision position
 									_sprite->transform.position = _sprite->old_pos;
+
 									break;
 								}
 							}
@@ -132,6 +137,9 @@ void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_up
 			}
 		}
 	}
+
+	//update the old position (used for collisions)
+	_sprite->old_pos = _sprite->transform.position;
 }
 
 void sprite_draw(sprite* _sprite, mat4* _projection)
@@ -139,7 +147,8 @@ void sprite_draw(sprite* _sprite, mat4* _projection)
 	//bind our program
 	glUseProgram(_sprite->shader->program);
 
-	shader_set_uniform_mat4(_sprite->model, &transform_get_model_matrix(_sprite->transform), true);
+	transform_get_model_matrix(_sprite->transform);
+	shader_set_uniform_mat4(_sprite->model, _sprite->transform.model_matrix, true);
 	shader_set_uniform_mat4(_sprite->projection, _projection, false);
 
 	//bind our texture

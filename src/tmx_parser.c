@@ -8,7 +8,7 @@ tmx_map* tmx_parser_create(const char* _filename)
 	file = fopen(_filename, "rb");
 
 	if (file == NULL)
-		log_fprint("ERROR: Failed to open %s", _filename);
+		log_fprint("ERROR: %s doesn't exist", _filename);
 
 	fread(&tmxm->signiture, 4, 1, file);
 

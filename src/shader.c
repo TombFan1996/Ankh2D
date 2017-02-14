@@ -80,9 +80,9 @@ void shader_bind_attrib_location(shader* _shader, uint8_t _index, char* _name)
 	glBindAttribLocation(_shader->program, _index, _name);
 }
 
-void shader_set_uniform_mat4(GLuint _uniform, mat4* _matrix4, bool _transpose)
+void shader_set_uniform_mat4(GLuint _uniform, const mat4* _matrix4, bool _transpose)
 {
-	#if USE_SSE
+	#if ANKH2D_SSE
 		if (_transpose)
 			glUniformMatrix4fv(_uniform, 1, GL_TRUE, &_matrix4->element[0].m128_f32[0]);
 		else

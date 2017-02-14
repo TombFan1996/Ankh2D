@@ -1,6 +1,6 @@
 #include "text.h"
 
-text* text_create(const char* _fontName, shader* _shader, transform _trans)
+text* text_create(const char* _fontPath, shader* _shader, transform _trans)
 {
 	text* new_text = (text*)malloc(sizeof(text));
 
@@ -14,7 +14,9 @@ text* text_create(const char* _fontName, shader* _shader, transform _trans)
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
-	new_text->default_proj = mat4_orthographic(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
+	new_text->default_proj = (mat4*)malloc(sizeof(mat4));
+	mat4_orthographic(new_text->default_proj, 0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	//setup default font colour
 	new_text->font_colour = vec3_create(1.0f, 1.0f, 1.0f);
@@ -24,7 +26,7 @@ text* text_create(const char* _fontName, shader* _shader, transform _trans)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	//load the fnt file in binary
-	text_load_fnt(new_text, _fontName);
+	text_load_fnt(new_text, _fontPath);
 	text_load_bmp(new_text, new_text->page_names);
 
 	return new_text;
@@ -32,9 +34,9 @@ text* text_create(const char* _fontName, shader* _shader, transform _trans)
 
 void text_load_bmp(text* _text, const char* _name)
 {
-	std::string name("assets/");
+	std::string name;
+	name += "./assets/";
 	name += _name;
-
 	_text->texture = texture2d_create(name.c_str());
 	texture2d_bind(_text->texture);
 
@@ -107,75 +109,81 @@ void text_load_bmp(text* _text, const char* _name)
 
 void text_load_fnt(text* _text, const char* _name)
 {
-	std::string name("assets/");
+	std::string name;
 	name += _name;
 	name += ".fnt";
 
 	FILE* file;
 	file = fopen(name.c_str(), "rb");
 
-	char file_header[3];
-	fread(file_header, 3, 1, file);
-	
-	//if the header of the file has the correct signiture
-	if (file_header[0] == 'B' && file_header[1] == 'M'
-		&& file_header[2] == 'F')
-	{
-		//start at the 4th byte (v3)
-		fseek(file, 1, SEEK_CUR);
-
-		//read in the block id
-		uint8_t block_type_id;
-		fread(&block_type_id, 1, 1, file);
-
-		//get the size of this block
-		uint32_t size_this_block;
-		fread(&size_this_block, 4, 1, file);
-		
-		//get the size of the font in bytes (minus the font name in bytes)
-		fread(&_text->info_block, sizeof(FNT_INFO_BLOCK), 1, file);
-
-		//get the font name
-		int16_t name_size = size_this_block - sizeof(FNT_INFO_BLOCK);
-		_text->filename = (char*)malloc(name_size);
-		fread(_text->filename, name_size, 1, file);
-
-		//Each block starts with a one byte block type identifier, 
-		//followed by a 4 byte integer that gives the size of the block
-		fread(&block_type_id, 1, 1, file);
-		fread(&size_this_block, 4, 1, file);
-
-		fread(&_text->common_block, sizeof(FNT_COMMON_BLOCK), 1, file);
-
-		fseek(file, -1, SEEK_CUR);
-
-		//Each block starts with a one byte block type identifier, 
-		//followed by a 4 byte integer that gives the size of the block
-		fread(&block_type_id, 1, 1, file);
-		fread(&size_this_block, 4, 1, file);
-
-		_text->page_names = (char*)malloc(size_this_block);
-		fread(_text->page_names, size_this_block, 1, file);
-
-		//Each block starts with a one byte block type identifier, 
-		//followed by a 4 byte integer that gives the size of the block
-		fread(&block_type_id, 1, 1, file);
-		fread(&size_this_block, 4, 1, file);
-		
-		_text->num_char_block = size_this_block / sizeof(FNT_CHAR_BLOCK);
-		_text->char_block = (FNT_CHAR_BLOCK*)malloc(_text->num_char_block * sizeof(FNT_CHAR_BLOCK));
-		fread(&_text->char_block[0], size_this_block, 1, file);
-
-		//Each block starts with a one byte block type identifier, 
-		//followed by a 4 byte integer that gives the size of the block
-		fread(&block_type_id, 1, 1, file);
-		fread(&size_this_block, 4, 1, file);
-
-		fread(&_text->kerning_pair_block, sizeof(FNT_KERNING_PAIR_BLOCK), 1, file);
-	}
+	if (file == NULL)
+		log_fprint("ERROR: %s doesn't exist", name.c_str());
 
 	else
-		log_fprint("Font's '.FNT' was not found!");
+	{
+		char file_header[3];
+		fread(file_header, 3, 1, file);
+	
+		//if the header of the file has the correct signiture
+		if (file_header[0] == 'B' && file_header[1] == 'M'
+			&& file_header[2] == 'F')
+		{
+			//start at the 4th byte (v3)
+			fseek(file, 1, SEEK_CUR);
+
+			//read in the block id
+			uint8_t block_type_id;
+			fread(&block_type_id, 1, 1, file);
+
+			//get the size of this block
+			uint32_t size_this_block;
+			fread(&size_this_block, 4, 1, file);
+		
+			//get the size of the font in bytes (minus the font name in bytes)
+			fread(&_text->info_block, sizeof(FNT_INFO_BLOCK), 1, file);
+
+			//get the font name
+			int16_t name_size = size_this_block - sizeof(FNT_INFO_BLOCK);
+			_text->filename = (char*)malloc(name_size);
+			fread(_text->filename, name_size, 1, file);
+
+			//Each block starts with a one byte block type identifier, 
+			//followed by a 4 byte integer that gives the size of the block
+			fread(&block_type_id, 1, 1, file);
+			fread(&size_this_block, 4, 1, file);
+
+			fread(&_text->common_block, sizeof(FNT_COMMON_BLOCK), 1, file);
+
+			fseek(file, -1, SEEK_CUR);
+
+			//Each block starts with a one byte block type identifier, 
+			//followed by a 4 byte integer that gives the size of the block
+			fread(&block_type_id, 1, 1, file);
+			fread(&size_this_block, 4, 1, file);
+
+			_text->page_names = (char*)malloc(size_this_block);
+			fread(_text->page_names, size_this_block, 1, file);
+
+			//Each block starts with a one byte block type identifier, 
+			//followed by a 4 byte integer that gives the size of the block
+			fread(&block_type_id, 1, 1, file);
+			fread(&size_this_block, 4, 1, file);
+		
+			_text->num_char_block = size_this_block / sizeof(FNT_CHAR_BLOCK);
+			_text->char_block = (FNT_CHAR_BLOCK*)malloc(_text->num_char_block * sizeof(FNT_CHAR_BLOCK));
+			fread(&_text->char_block[0], size_this_block, 1, file);
+
+			//Each block starts with a one byte block type identifier, 
+			//followed by a 4 byte integer that gives the size of the block
+			fread(&block_type_id, 1, 1, file);
+			fread(&size_this_block, 4, 1, file);
+
+			fread(&_text->kerning_pair_block, sizeof(FNT_KERNING_PAIR_BLOCK), 1, file);
+		}
+
+		else
+			log_fprint("Font's '.FNT' was not found!");
+	}
 
 	//shut that file down boy
 	fclose(file);
@@ -200,10 +208,11 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_set_uniform_mat4(_text->model, &transform_get_model_matrix(_text->transform), true);
+	transform_get_model_matrix(_text->transform);
+	shader_set_uniform_mat4(_text->model, _text->transform.model_matrix, true);
 
 	//send the projection matrix off
-	shader_set_uniform_mat4(_text->projection, &_text->default_proj, false);
+	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
 
 	//set the font colour
 	shader_set_uniform_vec3(_text->colour, _text->font_colour);
@@ -236,10 +245,11 @@ void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, 
 	
 	//communicate w/ uniforms
 	//send the model matrix off
-	shader_set_uniform_mat4(_text->model, &transform_get_model_matrix(_text->transform), true);
+	transform_get_model_matrix(_text->transform);
+	shader_set_uniform_mat4(_text->model, _text->transform.model_matrix, true);
 
 	//send the projection matrix off
-	shader_set_uniform_mat4(_text->projection, &_text->default_proj, false);
+	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
 
 	//set the font colour
 	shader_set_uniform_vec3(_text->colour, _text->font_colour);

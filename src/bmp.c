@@ -4,7 +4,10 @@ BMP_24* bmp_24_load(const char* _filename)
 {
 	FILE* file = fopen(_filename, "rb");
 	
-	if (file != NULL)
+	if (file == NULL)
+		log_fprint("ERROR: %s doesn't exist", _filename);
+
+	else
 	{
 		//read the signiture to see if this is a BMP file
 		//then move file pointer back to start
@@ -50,12 +53,7 @@ BMP_24* bmp_24_load(const char* _filename)
 		}
 	}
 
-	else
-	{
-		fclose(file);
-		log_fprint("ERROR: %s does not exist", _filename);
-	}
-
+	fclose(file);
 	return NULL;
 }
 

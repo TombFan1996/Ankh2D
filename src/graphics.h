@@ -19,7 +19,7 @@ typedef struct
 	SDL_GLContext gl_context;
 } graphics;
 
-graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs);
+graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs);
 void graphics_clear();
 void graphics_update(graphics* _graphics);
 void graphics_get_fps(graphics* _graphics);

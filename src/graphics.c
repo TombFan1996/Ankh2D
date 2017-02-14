@@ -1,15 +1,15 @@
 #include "graphics.h"
 
-graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs)
+graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs)
 {
 	//clear previous logs
 	log_fclear();
 
-	graphics main_graphics;
+	graphics* main_graphics = (graphics*)malloc(sizeof(graphics));
 
-	main_graphics.title = _title;
-	main_graphics.width = _width;
-	main_graphics.height = _height;
+	main_graphics->title = _title;
+	main_graphics->width = _width;
+	main_graphics->height = _height;
 
 	//setup SDL+GL windows and contexts
 	SDL_Init(SDL_INIT_VIDEO);
@@ -26,18 +26,14 @@ graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, 
 	SDL_GL_SetSwapInterval(0);
 
 	if (_fs)
-	{
-		main_graphics.window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			main_graphics.width, main_graphics.height, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
-	}
+		main_graphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			main_graphics->width, main_graphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
 
 	else
-	{
-		main_graphics.window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			main_graphics.width, main_graphics.height, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE);
-	}
+		main_graphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			main_graphics->width, main_graphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE);
 
-	main_graphics.gl_context = SDL_GL_CreateContext(main_graphics.window);
+	main_graphics->gl_context = SDL_GL_CreateContext(main_graphics->window);
 
 	//get all GL functions for this OS/GPU
 	GLenum status = glewInit();
@@ -53,11 +49,11 @@ graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, 
 	//identify the name of the renderer used
 	log_fprint((char*)glGetString(GL_RENDERER));
 
-	main_graphics.closed = false;
+	main_graphics->closed = false;
 
-	main_graphics.num_frames = 0;
+	main_graphics->num_frames = 0;
 	//get the starting time
-	main_graphics.start_time = SDL_GetTicks();
+	main_graphics->start_time = SDL_GetTicks();
 
 	return main_graphics;
 }

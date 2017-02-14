@@ -11,8 +11,6 @@
 #include "transform.h"
 #include "texture2d.h"
 
-#define ASCII_SET_SIZE 128
-
 //http://www.angelcode.com/products/bmfont/doc/file_format.html
 
 typedef struct
@@ -88,10 +86,10 @@ typedef struct
 	FNT_KERNING_PAIR_BLOCK kerning_pair_block;
 
 	transform transform;
-	mat4 default_proj;
+	mat4* default_proj;
 } text;
 
-text* text_create(const char* _fontName, shader* _shader, transform _trans);
+text* text_create(const char* _fontPath, shader* _shader, transform _trans);
 void text_load_fnt(text* _text, const char* _name);
 void text_load_bmp(text* _text, const char* _name);
 void text_set_colour(text* _text, vec3 _colour);
