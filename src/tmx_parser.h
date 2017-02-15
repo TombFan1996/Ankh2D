@@ -2,7 +2,7 @@
 #define TMX_PARSER_H
 
 #include <stdint.h>
-#include <vector>
+#include <malloc.h>
 #include "logger.h"
 
 //this is a lite version of the tmx file format

@@ -2,6 +2,7 @@
 #define SPRITE_H
 
 #include <SDL.h>
+
 #include "bmath.h"
 #include "tmx_sprite.h"
 #include "transform.h"

@@ -30,6 +30,8 @@ texture2d* texture2d_create(const char* _filename)
 	free(texture_rgba);
 	free(texture);
 
+	log_fprint("'%s' successfully created", _filename);
+
 	return new_tex;
 }
 

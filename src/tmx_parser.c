@@ -56,6 +56,7 @@ tmx_map* tmx_parser_create(const char* _filename)
 			fread(&tmxm->collision_data[0], data_size, 1, file);
 		}
 		
+		log_fprint("'%s' successfully created", _filename);
 
 		fclose(file);
 		return tmxm;

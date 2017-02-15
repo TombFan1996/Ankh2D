@@ -2,11 +2,11 @@
 #define TMX_RENDERER_H
 
 #include <GL\glew.h>
+
 #include "bmath.h"
 #include "texture2d.h"
 #include "transform.h"
 #include "tmx_parser.h"
-
 #include "shader.h"
 
 typedef struct

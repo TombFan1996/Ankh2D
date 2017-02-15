@@ -3,10 +3,9 @@
 
 #if ANKH2D_SSE
 	#include <xmmintrin.h>
-#else
-	#include <stdlib.h> //needed for malloc
 #endif
 
+#include <malloc.h>
 #include <math.h>
 
 #define PI 3.14159265359f

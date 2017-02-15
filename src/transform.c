@@ -3,11 +3,13 @@
 transform transform_create(vec2 _pos, float _rotation, vec2 _scale)
 {
 	transform new_transform;
-	new_transform.model_matrix = (mat4*)malloc(sizeof(mat4));
-	mat4_identity(new_transform.model_matrix);
 	new_transform.position = _pos;
 	new_transform.rotation = _rotation;
 	new_transform.scale = _scale;
+
+	new_transform.model_matrix = (mat4*)malloc(sizeof(mat4));
+	mat4_identity(new_transform.model_matrix);
+
 	return new_transform;
 }
 

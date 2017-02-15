@@ -23,7 +23,8 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
 	//disable vsync
-	SDL_GL_SetSwapInterval(0);
+	if (SDL_GL_SetSwapInterval(0) == -1)
+		log_fprint("swap interval is not supported!");
 
 	if (_fs)
 		main_graphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -55,6 +56,8 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	//get the starting time
 	main_graphics->start_time = SDL_GetTicks();
 
+	log_fprint("'main graphics' successfully created");
+
 	return main_graphics;
 }
 
@@ -66,8 +69,6 @@ void graphics_clear()
 
 void graphics_update(graphics* _graphics)
 {
-	SDL_GL_SwapWindow(_graphics->window);
-
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -79,6 +80,7 @@ void graphics_update(graphics* _graphics)
 	}
 
 	graphics_get_fps(_graphics);
+	SDL_GL_SwapWindow(_graphics->window);
 }
 
 void graphics_get_fps(graphics* _graphics)

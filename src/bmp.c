@@ -35,6 +35,8 @@ BMP_24* bmp_24_load(const char* _filename)
 				new_bmp_24->pd = (BMP_PIXEL_24_DATA*)malloc(ct_size);
 				fread(&new_bmp_24->pd[0], ct_size, 1, file);
 
+				log_fprint("'%s' successfully created", _filename);
+
 				return new_bmp_24;
 			}
 

@@ -1,16 +1,12 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-
 #include <GL\glew.h>
+#include <cassert>
 
 #include "bmath.h"
 #include "bmp.h"
 
-#include <cassert>
 #include "logger.h"
 
 typedef struct

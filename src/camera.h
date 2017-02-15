@@ -1,20 +1,20 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "bmath.h"
-#include "transform.h"
 #include <SDL.h>
 
+#include "bmath.h"
+#include "transform.h"
 #include "sprite.h"
 
 typedef struct 
 {
+	mat4* projection;
 	bool free_camera;
 	transform transform;
 	const uint8_t* keys;
 	float speed; //camera speed when free (not attached to player)
 	float screen_width, screen_height;
-	mat4* projection;
 } camera;
 
 camera* camera_create();

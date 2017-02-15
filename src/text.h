@@ -1,11 +1,9 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include <stdint.h>
-#include <vector>
 #include <SDL.h>
-#include "bmath.h"
 
+#include "bmath.h"
 #include "logger.h"
 #include "shader.h"
 #include "transform.h"
@@ -71,6 +69,9 @@ typedef struct
 
 typedef struct
 {
+	mat4* default_proj;
+	transform transform;
+
 	GLuint *vao, *vbo;
 	GLuint colour, model, projection, char_index;
 	shader* shader;
@@ -84,9 +85,6 @@ typedef struct
 	FNT_CHAR_BLOCK* char_block;
 	FNT_COMMON_BLOCK common_block;
 	FNT_KERNING_PAIR_BLOCK kerning_pair_block;
-
-	transform transform;
-	mat4* default_proj;
 } text;
 
 text* text_create(const char* _fontPath, shader* _shader, transform _trans);

@@ -1,12 +1,8 @@
 #ifndef BMP_H
 #define BMP_H
 
-#include <stdio.h>
-#include <string>
-#include <stdlib.h>
 #include <stdint.h>
 #include "logger.h"
-
 #include "bmath.h"
 
 static vec3 alpha_colour_key;

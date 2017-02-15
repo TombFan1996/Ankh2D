@@ -108,6 +108,8 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 	glBindBuffer(GL_ARRAY_BUFFER, 0); 
 	glBindVertexArray(0);
 
+	log_fprint("'%s' successfully created", _mapName);
+
 	return new_map_sprite;
 }
 

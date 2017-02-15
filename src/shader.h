@@ -2,7 +2,6 @@
 #define SHADER_H
 
 #include <GL\glew.h>
-#include <fstream>
 #include <stdint.h>
 #include <string>
 #include "logger.h"

@@ -14,9 +14,6 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans)
 
 	int width, height;
 	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
-	//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
-	new_text->default_proj = (mat4*)malloc(sizeof(mat4));
-	mat4_orthographic(new_text->default_proj, 0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	//setup default font colour
 	new_text->font_colour = vec3_create(1.0f, 1.0f, 1.0f);
@@ -28,6 +25,12 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans)
 	//load the fnt file in binary
 	text_load_fnt(new_text, _fontPath);
 	text_load_bmp(new_text, new_text->page_names);
+
+	//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
+	new_text->default_proj = (mat4*)malloc(sizeof(mat4));
+	mat4_orthographic(new_text->default_proj, 0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+
+	log_fprint("'%s' successfully created", _fontPath);
 
 	return new_text;
 }

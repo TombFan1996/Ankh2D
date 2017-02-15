@@ -35,17 +35,15 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
 	glGenBuffers(1, &new_sprite->vbo);
     
 	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
 
-	//GLint size = (how many float elements per vertex)
-
-	//positional datas
 	glBindBuffer(GL_ARRAY_BUFFER, new_sprite->vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	log_fprint("'%s' successfully created", _name);
 
 	return new_sprite;
 }

@@ -3,7 +3,6 @@
 
 #include <SDL.h>
 #include <GL/glew.h>
-#include <stdint.h>
 #include <sstream>
 
 #include "logger.h"

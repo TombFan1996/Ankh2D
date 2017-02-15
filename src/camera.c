@@ -22,6 +22,8 @@ camera* camera_create()
 	main_camera->projection = (mat4*)malloc(sizeof(mat4));
 	mat4_orthographic(main_camera->projection, 0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
+	log_fprint("'main camera' successfully created");
+
 	return main_camera;
 }
 

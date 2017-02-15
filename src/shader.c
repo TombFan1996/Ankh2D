@@ -25,7 +25,7 @@ shader* shader_create(const char* _filename)
 	glValidateProgram(new_shader->program);
 	shader_check(new_shader->program, GL_VALIDATE_STATUS, true);
 
-	log_fprint("'%s' shader successfully loaded", _filename);
+	log_fprint("'%s' shader successfully created", _filename);
 
 	return new_shader;
 }
