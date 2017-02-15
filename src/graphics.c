@@ -66,7 +66,7 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	//get the starting time
 	main_graphics->start_time = glfwGetTime();
 
-	log_fprint("'main graphics' successfully created");
+	log_fprint("glfw successfully created");
 
 	return main_graphics;
 }
