@@ -104,16 +104,20 @@ void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_up
 					// - (_tmx_map->transform.scale.x / 2) is equal to how far we're into a tile in the coords 
 					// if 1 tile is 50 px wide and the map is 5 tiles wide and you place it at vec2(0,0), this would mean
 					// you're 25 pixels into the middle tile. (This is a prob, need to work it out realtime based off position)
-					float x1 = (current_x * _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
+					float x1 = (current_x * _tmx_map->transform.scale.x) - 
+						(_tmx_map->transform.scale.x / 2) + _tmx_map->transform.position.x;
 					if (_sprite->transform.position.x >= x1)
 					{
-						float x2 = ((current_x * _tmx_map->transform.scale.x) + _tmx_map->transform.scale.x) - (_tmx_map->transform.scale.x / 2);
+						float x2 = ((current_x * _tmx_map->transform.scale.x) + _tmx_map->transform.scale.x) - 
+							(_tmx_map->transform.scale.x / 2) + _tmx_map->transform.position.x;
 						if (_sprite->transform.position.x <= x2)
 						{
-							float y1 = (current_y * _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
+							float y1 = (current_y * _tmx_map->transform.scale.y) - 
+								(_tmx_map->transform.scale.y / 2) + _tmx_map->transform.position.y;
 							if (_sprite->transform.position.y >= y1)
 							{
-								float y2 = ((current_y * _tmx_map->transform.scale.y) + _tmx_map->transform.scale.y) - (_tmx_map->transform.scale.y / 2);
+								float y2 = ((current_y * _tmx_map->transform.scale.y) + _tmx_map->transform.scale.y) - 
+									(_tmx_map->transform.scale.y / 2) + _tmx_map->transform.position.y;
 								if (_sprite->transform.position.y <= y2)
 								{
 									//revert back the pre-collision position
