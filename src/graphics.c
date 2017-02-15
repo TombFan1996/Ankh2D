@@ -11,30 +11,39 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	main_graphics->width = _width;
 	main_graphics->height = _height;
 
-	//setup SDL+GL windows and contexts
-	SDL_Init(SDL_INIT_VIDEO);
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-
-	//disable vsync
-	if (SDL_GL_SetSwapInterval(0) == -1)
-		log_fprint("swap interval is not supported!");
-
-	if (_fs)
-		main_graphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			main_graphics->width, main_graphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
+	if (!glfwInit())
+		log_fprint("Glfw failed to init");
 
 	else
-		main_graphics->window = SDL_CreateWindow(_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			main_graphics->width, main_graphics->height, SDL_WINDOW_OPENGL | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE);
+	{
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
-	main_graphics->gl_context = SDL_GL_CreateContext(main_graphics->window);
+		glfwWindowHint(GLFW_RED_BITS, 8);
+		glfwWindowHint(GLFW_GREEN_BITS, 8);
+		glfwWindowHint(GLFW_BLUE_BITS, 8);
+		glfwWindowHint(GLFW_ALPHA_BITS, 8);
+
+		if (_fs)
+			main_graphics->window = glfwCreateWindow(main_graphics->width, main_graphics->height, main_graphics->title, glfwGetPrimaryMonitor(), NULL);
+		else
+			main_graphics->window = glfwCreateWindow(main_graphics->width, main_graphics->height, main_graphics->title, NULL, NULL);
+		
+		if (!main_graphics->window)
+			log_fprint("ERROR: Failed to create Glfw window");
+		
+		else
+		{
+			//disable vsync
+			glfwSwapInterval(0);
+			//create the GL context
+			glfwMakeContextCurrent(main_graphics->window);
+			//setup error callback
+			glfwSetErrorCallback(graphics_error_callback);
+			//setup keyboard callback
+			glfwSetKeyCallback(main_graphics->window, graphics_input_callback);
+		}
+	}
 
 	//get all GL functions for this OS/GPU
 	GLenum status = glewInit();
@@ -53,12 +62,24 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	main_graphics->closed = false;
 
 	main_graphics->num_frames = 0;
+	
 	//get the starting time
-	main_graphics->start_time = SDL_GetTicks();
+	main_graphics->start_time = glfwGetTime();
 
 	log_fprint("'main graphics' successfully created");
 
 	return main_graphics;
+}
+
+void graphics_error_callback(int error, const char* description)
+{
+	log_fprint("ERROR: %s", description);
+}
+
+void graphics_input_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 void graphics_clear()
@@ -69,30 +90,21 @@ void graphics_clear()
 
 void graphics_update(graphics* _graphics)
 {
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		if (event.type == SDL_QUIT)
-			_graphics->closed = true;
-
-		if (event.key.keysym.sym == SDLK_ESCAPE)
-			_graphics->closed = true;
-	}
-
+	glfwPollEvents();
 	graphics_get_fps(_graphics);
-	SDL_GL_SwapWindow(_graphics->window);
+	glfwSwapBuffers(_graphics->window);
 }
 
 void graphics_get_fps(graphics* _graphics)
 {
-	_graphics->end_time = SDL_GetTicks();
+	_graphics->end_time = glfwGetTime();
+	double delta = _graphics->end_time - _graphics->start_time;
 	_graphics->num_frames++;
 
 	//limit the drawing of fps
-	if ((_graphics->end_time - _graphics->start_time > 1000) 
-		&& _graphics->num_frames > 10)
+	if (delta >= 1.0)
 	{
-		double fps = (double)_graphics->num_frames / (_graphics->end_time / _graphics->start_time);
+		 double fps = double(_graphics->num_frames) / delta;
 		//update our starting time again
 		_graphics->start_time = _graphics->end_time;
 		//reset the frames
@@ -103,15 +115,15 @@ void graphics_get_fps(graphics* _graphics)
 		ss << " | ";
 		ss << fps;
 		ss << "fps";
-		SDL_SetWindowTitle(_graphics->window, ss.str().c_str());
+
+		glfwSetWindowTitle(_graphics->window, ss.str().c_str());
 	}
 }
 
 void graphics_destroy(graphics* _graphics)
 {
-	SDL_GL_DeleteContext(_graphics->gl_context);
-	log_fprint("Destroyed GL context");
-	SDL_DestroyWindow(_graphics->window);
-	log_fprint("Destroyed Window");
-	SDL_Quit();
+	glfwDestroyWindow(_graphics->window);
+	log_fprint("destroyed glfw window");
+	glfwTerminate();
+	log_fprint("destroyed glfw");
 }

@@ -1,7 +1,9 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include <SDL.h>
+//#include <SDL.h>
+#include <GL\glew.h>
+#include <GLFW\glfw3.h>
 
 #include "bmath.h"
 #include "tmx_sprite.h"
@@ -19,9 +21,10 @@ typedef struct
 	vec2 old_pos;
 	texture2d* texture;
 	GLuint vao, vbo;
+	GLFWwindow* window;
 } sprite;
 
-sprite* sprite_create(const char* _name, shader* _shader, transform _trans);
+sprite* sprite_create(const char* _name, shader* _shader, transform _trans, GLFWwindow* _window);
 bool sprite_update(sprite* _sprite);
 void sprite_draw(sprite* _sprite, mat4* _projection);
 void sprite_set_texture(sprite* _sprite, texture2d* _tex);

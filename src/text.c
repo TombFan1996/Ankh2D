@@ -1,8 +1,10 @@
 #include "text.h"
 
-text* text_create(const char* _fontPath, shader* _shader, transform _trans)
+text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFWwindow* _window)
 {
 	text* new_text = (text*)malloc(sizeof(text));
+
+	new_text->window = _window;
 
 	new_text->shader = _shader;
 	new_text->colour = shader_get_uniform_location(new_text->shader, "colour");
@@ -13,7 +15,7 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans)
 	new_text->transform = _trans;
 
 	int width, height;
-	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
+	glfwGetWindowSize(new_text->window, &width, &height);
 
 	//setup default font colour
 	new_text->font_colour = vec3_create(1.0f, 1.0f, 1.0f);

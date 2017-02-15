@@ -3,8 +3,8 @@
 A 2D C/OpenGL framework
 
 ### Dependencies ###
-* [SDL2](https://www.libsdl.org/download-2.0.php)
-* [GLEW](http://glew.sourceforge.net/)
+* [GLFW 3.2.1](http://www.glfw.org/)
+* [GLEW 2.0.0](http://glew.sourceforge.net/)
 
 ### Progress ###
 

@@ -1,8 +1,9 @@
 #include "sprite.h"
 
-sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
+sprite* sprite_create(const char* _name, shader* _shader, transform _trans, GLFWwindow* _window)
 {
 	sprite* new_sprite = (sprite*)malloc(sizeof(sprite));
+	new_sprite->window = _window;
 	new_sprite->shader = _shader;
 	new_sprite->texture = texture2d_create(_name);
 	new_sprite->transform = _trans;
@@ -15,7 +16,7 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	new_sprite->speed = 0.10f;
-	new_sprite->keys = SDL_GetKeyboardState(NULL);
+	//new_sprite->keys = SDL_GetKeyboardState(NULL);
 
 	GLfloat vertices[] = {
 		// Pos      // Tex
@@ -50,29 +51,28 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans)
 
 bool sprite_update(sprite* _sprite)
 {
-	SDL_PumpEvents();
 	vec2 pos = vec2_create(0.0f, 0.0f);
 	bool sprite_update = false;
 
-	if (_sprite->keys[SDL_SCANCODE_W])
+	if (glfwGetKey(_sprite->window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + 0.0f, pos.y + -_sprite->speed);
 		sprite_update = true;
 	}
 
-	if (_sprite->keys[SDL_SCANCODE_A])
+	if (glfwGetKey(_sprite->window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + -_sprite->speed, pos.y + 0.0f);
 		sprite_update = true;
 	}
 
-	if (_sprite->keys[SDL_SCANCODE_S])
+	if (glfwGetKey(_sprite->window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + 0.0f, pos.y + _sprite->speed);
 		sprite_update = true;
 	}
 
-	if (_sprite->keys[SDL_SCANCODE_D])
+	if (glfwGetKey(_sprite->window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + _sprite->speed, pos.y + 0.0f);
 		sprite_update = true;

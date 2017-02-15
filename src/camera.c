@@ -1,10 +1,11 @@
 #include "camera.h"
 
-camera* camera_create()
+camera* camera_create(GLFWwindow* _window)
 {
 	camera* main_camera = (camera*)malloc(sizeof(camera));
+	main_camera->window = _window;
 	int width, height;
-	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, &height);
+	glfwGetWindowSize(main_camera->window, &width, &height);
 
 	main_camera->transform;
 	main_camera->transform.position = vec2_create(0.0f, 0.0f);
@@ -15,7 +16,6 @@ camera* camera_create()
 	main_camera->screen_width = (float)width;
 
 	main_camera->speed = 0.25f;
-	main_camera->keys = SDL_GetKeyboardState(NULL);
 	main_camera->free_camera = true;
 
 	//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
@@ -60,26 +60,26 @@ bool camera_movement(camera* _camera)
 {
 	vec2 pos = vec2_create(0.0f, 0.0f);
 	bool sprite_update = false;
-
-	if (_camera->keys[SDL_SCANCODE_W])
+	
+	if (glfwGetKey(_camera->window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + 0.0f, pos.y + -_camera->speed);
 		sprite_update = true;
 	}
 
-	if (_camera->keys[SDL_SCANCODE_A])
+	if (glfwGetKey(_camera->window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + -_camera->speed, pos.y + 0.0f);
 		sprite_update = true;
 	}
 
-	if (_camera->keys[SDL_SCANCODE_S])
+	if (glfwGetKey(_camera->window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + 0.0f, pos.y + _camera->speed);
 		sprite_update = true;
 	}
 
-	if (_camera->keys[SDL_SCANCODE_D])
+	if (glfwGetKey(_camera->window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		pos = vec2_create(pos.x + _camera->speed, pos.y + 0.0f);
 		sprite_update = true;
@@ -97,5 +97,4 @@ bool camera_movement(camera* _camera)
 void camera_destroy(camera* _camera)
 {
 	free(_camera->projection);
-	_camera->keys = NULL;
 }

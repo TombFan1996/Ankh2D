@@ -1,7 +1,9 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include <SDL.h>
+//#include <SDL.h>
+#include <GL\glew.h>
+#include <GLFW\glfw3.h>
 
 #include "bmath.h"
 #include "logger.h"
@@ -78,6 +80,7 @@ typedef struct
 	vec3 font_colour;
 
 	texture2d* texture;
+	GLFWwindow* window;
 
 	FNT_INFO_BLOCK info_block;
 	char* filename, *page_names;
@@ -87,7 +90,7 @@ typedef struct
 	FNT_KERNING_PAIR_BLOCK kerning_pair_block;
 } text;
 
-text* text_create(const char* _fontPath, shader* _shader, transform _trans);
+text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFWwindow* _window);
 void text_load_fnt(text* _text, const char* _name);
 void text_load_bmp(text* _text, const char* _name);
 void text_set_colour(text* _text, vec3 _colour);
