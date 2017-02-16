@@ -54,6 +54,9 @@ tmx_map* tmx_parser_create(const char* _filename)
 			uint32_t data_size = sizeof(uint8_t) * (tmxm->layer[0].width * tmxm->layer[0].height);
 			tmxm->collision_data = (uint8_t*)malloc(data_size);
 			fread(&tmxm->collision_data[0], data_size, 1, file);
+
+			//setup the collisions for sprite/collision checks later
+			tmx_parser_setup_collisions(tmxm);
 		}
 		
 		log_fprint("'%s' successfully created", _filename);
@@ -66,6 +69,30 @@ tmx_map* tmx_parser_create(const char* _filename)
 	{
 		fclose(file);
 		return nullptr;
+	}
+}
+
+void tmx_parser_setup_collisions(tmx_map* _tmxm)
+{
+	uint8_t current_x = 0, current_y = 0;
+	_tmxm->collision_coords = (vec2*)malloc(sizeof(vec2) * _tmxm->num_collisions);
+	uint16_t current_collision_index = 0;
+	for (uint16_t i = 0; i < (_tmxm->map_height * _tmxm->map_width); i++)
+	{
+		//if this tile has a collision on it
+		if (_tmxm->collision_data[i] == 1)
+		{
+			_tmxm->collision_coords[current_collision_index].x = current_x;
+			_tmxm->collision_coords[current_collision_index].y = current_y;
+			current_collision_index++;
+		}
+
+		current_x++;
+		if (current_x == _tmxm->map_width)
+		{
+			current_x = 0;
+			current_y++;
+		}
 	}
 }
 

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <malloc.h>
 #include "logger.h"
+#include "bmath.h"
 
 //this is a lite version of the tmx file format
 //uses tinyxml2 and tiled map editor (0.18)
@@ -46,9 +47,13 @@ typedef struct
 	TILESET* tileset;
 	LAYER* layer;
 	uint8_t* collision_data;
+	vec2* collision_coords;
 } tmx_map;
 
 tmx_map* tmx_parser_create(const char* _filename);
+//pay the price for collision upfront, this way we don't 
+//need to loop through every tile each frame (killed my pc on 20 x 20 map)
+void tmx_parser_setup_collisions(tmx_map* _tmxm);
 void tmx_parser_destroy(tmx_map* _tmxm);
 
 #endif

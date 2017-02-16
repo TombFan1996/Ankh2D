@@ -44,8 +44,9 @@ void camera_update(camera* _camera, sprite* _sprite)
 {
 	bool camera_updated = camera_movement(_camera);
 
-	if (camera_updated)
-	{
+	//want the camera to snap to the sprite at the start
+	//if (camera_updated)
+	//{
 		//update orthographic camera following the sprite
 		vec2 targetPos = _sprite->transform.position;
 		_camera->transform.position = vec2_create(targetPos.x - (_camera->screen_width/2), targetPos.y - (_camera->screen_height/2));
@@ -53,7 +54,7 @@ void camera_update(camera* _camera, sprite* _sprite)
 		vec2 position = _camera->transform.position;
 		mat4_orthographic(_camera->projection, position.x, position.x + _camera->screen_width, 
 			position.y + _camera->screen_height, position.y, -1.0f, 1.0f);
-	}
+	//}
 }
 
 bool camera_movement(camera* _camera)
