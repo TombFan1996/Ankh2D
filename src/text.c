@@ -40,8 +40,13 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFW
 void text_load_bmp(text* _text, const char* _name)
 {
 	std::string name;
-	name += "./assets/";
+	name += "assets/";
 	name += _name;
+
+	//convert png to bmp in filename
+	name = name.substr(0, name.size() - 4);
+	name += ".bmp";
+
 	_text->texture = texture2d_create(name.c_str());
 	texture2d_bind(_text->texture);
 
