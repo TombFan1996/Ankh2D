@@ -249,7 +249,7 @@ void text_printf(mat4* _default_proj, text* _text, vec2 _pos, uint16_t _text_byt
 	//bind our font texture
 	texture2d_bind(_text->texture);
 
-	char text[64];
+	char text[128];
 	va_list ap;
 
 	va_start(ap, fmt);
