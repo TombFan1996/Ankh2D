@@ -113,7 +113,7 @@ tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _
 	return new_map_sprite;
 }
 
-void tmx_sprite_draw(tmx_sprite* _sprite, mat4* _projection)
+void tmx_sprite_draw(mat4* _projection, tmx_sprite* _sprite)
 {
 	//bind our program
 	glUseProgram(_sprite->shader->program);
@@ -121,7 +121,8 @@ void tmx_sprite_draw(tmx_sprite* _sprite, mat4* _projection)
 	//communicate w/ uniforms
 	//send the model matrix off
 	transform_get_model_matrix(_sprite->transform);
-	shader_set_uniform_mat4(_sprite->model, _sprite->transform.model_matrix, true);
+	mat4 model_matrix = transform_get_model_matrix(_sprite->transform);
+	shader_set_uniform_mat4(_sprite->model, &model_matrix, true);
 
 	//send the projection matrix off
 	shader_set_uniform_mat4(_sprite->projection, _projection, false);

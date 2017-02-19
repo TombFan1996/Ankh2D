@@ -15,8 +15,7 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans, GLFW
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-	new_sprite->speed = 0.10f;
-	//new_sprite->keys = SDL_GetKeyboardState(NULL);
+	new_sprite->speed = 100.0f;
 
 	GLfloat vertices[] = {
 		// Pos      // Tex
@@ -49,32 +48,34 @@ sprite* sprite_create(const char* _name, shader* _shader, transform _trans, GLFW
 	return new_sprite;
 }
 
-bool sprite_update(sprite* _sprite)
+bool sprite_update(sprite* _sprite, time* _time)
 {
 	vec2 pos = vec2_create(0.0f, 0.0f);
 	bool sprite_update = false;
 
+	float sprite_speed = _sprite->speed * _time->delta_time;
+
 	if (glfwGetKey(_sprite->window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		pos = vec2_create(pos.x + 0.0f, pos.y + -_sprite->speed);
+		pos = vec2_create(pos.x + 0.0f, pos.y + -sprite_speed);
 		sprite_update = true;
 	}
 
 	if (glfwGetKey(_sprite->window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		pos = vec2_create(pos.x + -_sprite->speed, pos.y + 0.0f);
+		pos = vec2_create(pos.x + -sprite_speed, pos.y + 0.0f);
 		sprite_update = true;
 	}
 
 	if (glfwGetKey(_sprite->window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		pos = vec2_create(pos.x + 0.0f, pos.y + _sprite->speed);
+		pos = vec2_create(pos.x + 0.0f, pos.y + sprite_speed);
 		sprite_update = true;
 	}
 
 	if (glfwGetKey(_sprite->window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		pos = vec2_create(pos.x + _sprite->speed, pos.y + 0.0f);
+		pos = vec2_create(pos.x + sprite_speed, pos.y + 0.0f);
 		sprite_update = true;
 	}
 
@@ -134,13 +135,14 @@ void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_up
 	_sprite->old_pos = _sprite->transform.position;
 }
 
-void sprite_draw(sprite* _sprite, mat4* _projection)
+void sprite_draw(mat4* _projection, sprite* _sprite)
 {
 	//bind our program
 	glUseProgram(_sprite->shader->program);
 
 	transform_get_model_matrix(_sprite->transform);
-	shader_set_uniform_mat4(_sprite->model, _sprite->transform.model_matrix, true);
+	mat4 model_matrix = transform_get_model_matrix(_sprite->transform);
+	shader_set_uniform_mat4(_sprite->model, &model_matrix, true);
 	shader_set_uniform_mat4(_sprite->projection, _projection, false);
 
 	//bind our texture

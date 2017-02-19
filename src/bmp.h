@@ -60,7 +60,6 @@ typedef struct
 
 BMP_24* bmp_24_load(const char* _filename);
 
-#pragma pack(push, 1)
 typedef struct
 {
 	uint8_t red;
@@ -68,7 +67,6 @@ typedef struct
 	uint8_t blue;
 	uint8_t alpha;
 } RGBA_DATA;
-#pragma pack(pop)
 
 //helper functions
 //convert the bgr format to the preferred rgb format

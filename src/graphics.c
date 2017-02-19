@@ -24,24 +24,28 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 		glfwWindowHint(GLFW_BLUE_BITS, 8);
 		glfwWindowHint(GLFW_ALPHA_BITS, 8);
 
+		main_graphics->fullscreen = _fs;
+
 		if (_fs)
 			main_graphics->window = glfwCreateWindow(main_graphics->width, main_graphics->height, main_graphics->title, glfwGetPrimaryMonitor(), NULL);
+
 		else
 			main_graphics->window = glfwCreateWindow(main_graphics->width, main_graphics->height, main_graphics->title, NULL, NULL);
-		
+
 		if (!main_graphics->window)
 			log_fprint("ERROR: Failed to create Glfw window");
 		
 		else
 		{
-			//disable vsync
-			glfwSwapInterval(0);
 			//create the GL context
 			glfwMakeContextCurrent(main_graphics->window);
 			//setup error callback
 			glfwSetErrorCallback(graphics_error_callback);
 			//setup keyboard callback
 			glfwSetKeyCallback(main_graphics->window, graphics_input_callback);
+			//always call after creating context
+			//the wglSwapInterval extension won't be registered pre-context
+			glfwSwapInterval(0);
 		}
 	}
 
@@ -71,6 +75,19 @@ graphics* graphics_create(const char* _title, uint16_t _width, uint16_t _height,
 	return main_graphics;
 }
 
+void graphics_set_swap_interval(bool _vsync)
+{
+	if (_vsync)
+		glfwSwapInterval(1);
+	else
+		glfwSwapInterval(0);
+}
+
+void graphics_window_size_callback(GLFWwindow* window, int width, int height)
+{
+	//update the main graphics width and height
+}
+
 void graphics_error_callback(int error, const char* description)
 {
 	log_fprint("ERROR: %s", description);
@@ -91,11 +108,10 @@ void graphics_clear()
 void graphics_update(graphics* _graphics)
 {
 	glfwPollEvents();
-	graphics_get_fps(_graphics);
 	glfwSwapBuffers(_graphics->window);
 }
 
-void graphics_get_fps(graphics* _graphics)
+void graphics_get_fps(graphics* _graphics, double* _fps)
 {
 	_graphics->end_time = glfwGetTime();
 	double delta = _graphics->end_time - _graphics->start_time;
@@ -104,19 +120,11 @@ void graphics_get_fps(graphics* _graphics)
 	//limit the drawing of fps
 	if (delta >= 1.0)
 	{
-		 double fps = double(_graphics->num_frames) / delta;
+		*_fps = (double)_graphics->num_frames / delta;
 		//update our starting time again
 		_graphics->start_time = _graphics->end_time;
 		//reset the frames
 		_graphics->num_frames = 0;
-
-		std::stringstream ss;
-		ss << _graphics->title;
-		ss << " | ";
-		ss << fps;
-		ss << "fps";
-
-		glfwSetWindowTitle(_graphics->window, ss.str().c_str());
 	}
 }
 

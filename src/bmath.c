@@ -117,38 +117,41 @@ void mat4_rotate(mat4* _model, float _degree)
 	#endif
 }
 
-mat4* mat4_create()
+mat4 mat4_create()
 {
 	//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
-	mat4* mat_new = (mat4*)malloc(sizeof(mat4));
-	mat4_identity(mat_new);
+	mat4 mat_new;
+	mat4_identity(&mat_new);
 	return mat_new;
 }
 
 //http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho
-void mat4_orthographic(mat4* _ortho, float _left, float _right, float _bottom, float _top, float _zNear, float _zFar)
+mat4 mat4_orthographic(float _left, float _right, float _bottom, float _top, float _zNear, float _zFar)
 {
-	mat4_identity(_ortho);
+	mat4 mat_ortho;
+	mat4_identity(&mat_ortho);
 
 	#if ANKH2D_SSE
-		_ortho->element[0] = _mm_set_ps(2.0f / (_right - _left), 0.0f, 0.0f, 0.0f);
-		_ortho->element[1] = _mm_set_ps(0.0f, 2.0f / (_top - _bottom), 0.0f, 0.0f);
-		_ortho->element[2] = _mm_set_ps(0.0f, 0.0f, -2.0f / (_zFar - _zNear), 0.0f);
-		_ortho->element[3] = _mm_set_ps(
+		mat_ortho.element[0] = _mm_set_ps(2.0f / (_right - _left), 0.0f, 0.0f, 0.0f);
+		mat_ortho.element[1] = _mm_set_ps(0.0f, 2.0f / (_top - _bottom), 0.0f, 0.0f);
+		mat_ortho.element[2] = _mm_set_ps(0.0f, 0.0f, -2.0f / (_zFar - _zNear), 0.0f);
+		mat_ortho.element[3] = _mm_set_ps(
 			-((_right + _left) / (_right - _left)),
 			-((_top + _bottom) / (_top - _bottom)),
 			-((_zFar + _zNear) / (_zFar - _zNear)),
 			1.0f);
 
-		mat4_reverse(_ortho);
+		mat4_reverse(&mat_ortho);
 	#else
-		_ortho->element[0][0] = 2.0f / (_right - _left);
-		_ortho->element[1][1] = 2.0f / (_top - _bottom);
-		_ortho->element[2][2] = -2.0f / (_zFar - _zNear);
-		_ortho->element[3][0] = -((_right + _left) / (_right - _left)); 
-		_ortho->element[3][1] = -((_top + _bottom) / (_top - _bottom));
-		_ortho->element[3][2] = -((_zFar + _zNear) / (_zFar - _zNear));
+		mat_ortho.element[0][0] = 2.0f / (_right - _left);
+		mat_ortho.element[1][1] = 2.0f / (_top - _bottom);
+		mat_ortho.element[2][2] = -2.0f / (_zFar - _zNear);
+		mat_ortho.element[3][0] = -((_right + _left) / (_right - _left)); 
+		mat_ortho.element[3][1] = -((_top + _bottom) / (_top - _bottom));
+		mat_ortho.element[3][2] = -((_zFar + _zNear) / (_zFar - _zNear));
 	#endif
+
+	return mat_ortho;
 }
 
 void mat4_identity(mat4* _mat_iden)

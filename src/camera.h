@@ -11,7 +11,7 @@
 
 typedef struct 
 {
-	mat4* projection;
+	//mat4 projection;
 	bool free_camera;
 	transform transform;
 	float speed; //camera speed when free (not attached to player)
@@ -19,8 +19,7 @@ typedef struct
 	GLFWwindow* window;
 } camera;
 
-camera* camera_create(GLFWwindow* _window);
-void camera_destroy(camera* _camera);
+camera camera_create(GLFWwindow* _window);
 void camera_update(camera* _camera);
 void camera_update(camera* _camera, sprite* _sprite);
 bool camera_movement(camera* _camera);

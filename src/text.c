@@ -29,8 +29,8 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFW
 	text_load_bmp(new_text, new_text->page_names);
 
 	//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
-	new_text->default_proj = (mat4*)malloc(sizeof(mat4));
-	mat4_orthographic(new_text->default_proj, 0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	//new_text->default_proj = (mat4*)malloc(sizeof(mat4));
+	//mat4_orthographic(&new_text->default_proj, 0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	log_fprint("'%s' successfully created", _fontPath);
 
@@ -52,17 +52,6 @@ void text_load_bmp(text* _text, const char* _name)
 
 	_text->vao = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
 	_text->vbo = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
-
-	/*GLfloat vertices[] = {
-			// Pos      // Tex
-			0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 0.0f, 
-    
-			0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 1.0f, 1.0f, 1.0f,
-			1.0f, 0.0f, 1.0f, 0.0f
-		};*/
 
 	//normalised uv coords now
 	float x_width = 1.0f / _text->common_block.scale_w;
@@ -90,17 +79,6 @@ void text_load_bmp(text* _text, const char* _name)
 			x_pos2, y_pos2, x_tex2, y_tex2,
 			x_pos2, y_pos, x_tex2, y_tex
 		};
-
-		/*GLfloat vertices[] = {
-			// Pos      // Tex
-			0.0f, 1.0f, x_tex, y_tex2,
-			1.0f, 0.0f, x_tex2, y_tex,
-			0.0f, 0.0f, x_tex, y_tex, 
-    
-			0.0f, 1.0f, x_tex, y_tex2,
-			1.0f, 1.0f, x_tex2, y_tex2,
-			1.0f, 0.0f, x_tex2, y_tex
-		};*/
 
 		glGenVertexArrays(1, &_text->vao[i]);
 		glBindVertexArray(_text->vao[i]);
@@ -197,6 +175,8 @@ void text_load_fnt(text* _text, const char* _name)
 
 	//shut that file down boy
 	fclose(file);
+
+	log_fprint("'%s' successfully loaded", name.c_str());
 }
 
 void text_set_colour(text* _text, vec3 _colour)
@@ -206,7 +186,7 @@ void text_set_colour(text* _text, vec3 _colour)
 
 //improve drawing by binding all textures onto 1 big quad (1 draw call)
 //position coords become uv coords and the quad is the size of all letters combined.
-void text_draw(std::string _str, text* _text, vec2 _pos)
+void text_draw(mat4* _default_proj, text* _text, vec2 _pos, std::string _str)
 {
 	//spacing between each char in the text for the shader
 	float char_index = 0.0f;
@@ -219,10 +199,11 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	//communicate w/ uniforms
 	//send the model matrix off
 	transform_get_model_matrix(_text->transform);
-	shader_set_uniform_mat4(_text->model, _text->transform.model_matrix, true);
+	mat4 model_matrix = transform_get_model_matrix(_text->transform);
+	shader_set_uniform_mat4(_text->model, &model_matrix, true);
 
 	//send the projection matrix off
-	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
+	shader_set_uniform_mat4(_text->projection, _default_proj, false);
 
 	//set the font colour
 	shader_set_uniform_vec3(_text->colour, _text->font_colour);
@@ -243,7 +224,7 @@ void text_draw(std::string _str, text* _text, vec2 _pos)
 	}
 }
 
-void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, ...)
+void text_printf(mat4* _default_proj, text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, ...)
 {
 	//spacing between each char in the text for the shader
 	float char_index = 0.0f;
@@ -256,10 +237,11 @@ void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, 
 	//communicate w/ uniforms
 	//send the model matrix off
 	transform_get_model_matrix(_text->transform);
-	shader_set_uniform_mat4(_text->model, _text->transform.model_matrix, true);
+	mat4 model_matrix = transform_get_model_matrix(_text->transform);
+	shader_set_uniform_mat4(_text->model, &model_matrix, true);
 
 	//send the projection matrix off
-	shader_set_uniform_mat4(_text->projection, _text->default_proj, false);
+	shader_set_uniform_mat4(_text->projection, _default_proj, false);
 
 	//set the font colour
 	shader_set_uniform_vec3(_text->colour, _text->font_colour);
@@ -267,7 +249,7 @@ void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, 
 	//bind our font texture
 	texture2d_bind(_text->texture);
 
-	char text[50];
+	char text[64];
 	va_list ap;
 
 	va_start(ap, fmt);

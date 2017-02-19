@@ -71,7 +71,7 @@ typedef struct
 
 typedef struct
 {
-	mat4* default_proj;
+	//mat4 default_proj;
 	transform transform;
 
 	GLuint *vao, *vbo;
@@ -83,7 +83,8 @@ typedef struct
 	GLFWwindow* window;
 
 	FNT_INFO_BLOCK info_block;
-	char* filename, *page_names;
+	char* filename;
+	char* page_names;
 	uint16_t num_char_block;
 	FNT_CHAR_BLOCK* char_block;
 	FNT_COMMON_BLOCK common_block;
@@ -94,8 +95,8 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFW
 void text_load_fnt(text* _text, const char* _name);
 void text_load_bmp(text* _text, const char* _name);
 void text_set_colour(text* _text, vec3 _colour);
-void text_printf(text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, ...);
-void text_draw(std::string _str, text* _text, vec2 _pos);
+void text_printf(mat4* _default_proj, text* _text, vec2 _pos, uint16_t _text_bytes, const char *fmt, ...);
+void text_draw(mat4* _default_proj, text* _text, vec2 _pos, std::string _str);
 void text_destroy(text* _text);
 
 #endif
