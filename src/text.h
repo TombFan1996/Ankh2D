@@ -91,7 +91,7 @@ typedef struct
 	FNT_KERNING_PAIR_BLOCK kerning_pair_block;
 } text;
 
-text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFWwindow* _window);
+text* text_create(const char* _font_path, shader* _shader, transform _trans, GLFWwindow* _window);
 void text_load_fnt(text* _text, const char* _name);
 void text_load_bmp(text* _text, const char* _name);
 void text_set_colour(text* _text, vec3 _colour);

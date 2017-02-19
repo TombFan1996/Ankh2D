@@ -1,6 +1,6 @@
 #include "text.h"
 
-text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFWwindow* _window)
+text* text_create(const char* _font_path, shader* _shader, transform _trans, GLFWwindow* _window)
 {
 	text* new_text = (text*)malloc(sizeof(text));
 
@@ -25,14 +25,14 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFW
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	//load the fnt file in binary
-	text_load_fnt(new_text, _fontPath);
+	text_load_fnt(new_text, _font_path);
 	text_load_bmp(new_text, new_text->page_names);
 
 	//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
 	//new_text->default_proj = (mat4*)malloc(sizeof(mat4));
 	//mat4_orthographic(&new_text->default_proj, 0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
-	log_fprint("'%s' successfully created", _fontPath);
+	log_fprint("'%s' successfully created", _font_path);
 
 	return new_text;
 }
@@ -40,9 +40,8 @@ text* text_create(const char* _fontPath, shader* _shader, transform _trans, GLFW
 void text_load_bmp(text* _text, const char* _name)
 {
 	std::string name;
-	name += "assets/";
+	name += "assets/fonts/";
 	name += _name;
-
 	//convert png to bmp in filename
 	name = name.substr(0, name.size() - 4);
 	name += ".bmp";
@@ -53,21 +52,22 @@ void text_load_bmp(text* _text, const char* _name)
 	_text->vao = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
 	_text->vbo = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
 
-	//normalised uv coords now
-	float x_width = 1.0f / _text->common_block.scale_w;
-	float y_height = 1.0f / _text->common_block.scale_h;
+	//normalise the whole texture so we can work with the uv's
+	float x_units = 1.0f / _text->common_block.scale_w;
+	float y_units = 1.0f / _text->common_block.scale_h;
 
 	for (uint16_t i = 0; i < _text->num_char_block; i++)
 	{
-		float x_tex = x_width * _text->char_block[i].x;
-		float x_tex2 = x_width * (_text->char_block[i].x + _text->char_block[i].width);
-		float y_tex = y_height * _text->char_block[i].y;
-		float y_tex2 = y_height * (_text->char_block[i].y + _text->char_block[i].height);
+		//get the bitmap char from the texture atlas using positioning and scale
+		float x_tex = x_units * _text->char_block[i].x;
+		float x_tex2 = x_units * (_text->char_block[i].x + _text->char_block[i].width);
+		float y_tex = y_units * _text->char_block[i].y;
+		float y_tex2 = y_units * (_text->char_block[i].y + _text->char_block[i].height);
 
 		float x_pos = 0.0f;
 		float x_pos2 = 1.0f;
 		float y_pos = 0.0f;
-		float y_pos2 = 1.0f;
+		float y_pos2 = 1.75f; //temp value as the height isn't according to the bitmap
 
 		GLfloat vertices[] = {
 			// Pos      // Tex
