@@ -1,11 +1,14 @@
 # Ankh2D
 
-A 2D C/OpenGL framework
+A lightweight 2D framework for testing both C and graphics programming
 
-### Dependencies ###
+### PC Dependencies ###
 * [GLFW 3.2.1](http://www.glfw.org/)
 * [GLEW 2.0.0](http://glew.sourceforge.net/)
 * [OpenAL](https://www.openal.org/downloads/)
+
+### PSX Dependencies ###
+* [Psy-Q](http://www.psxdev.net/help/psyq_install.html)
 
 ### Progress ###
 
