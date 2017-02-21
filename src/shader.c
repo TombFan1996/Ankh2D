@@ -1,30 +1,30 @@
 #include "shader.h"
 
 #if ANKH2D_WIN32
-	shader* shader_create(const char* _filename)
+	shader shader_create(const char* _filename)
 	{
-		shader* new_shader = (shader*)malloc(sizeof(shader));
+		shader new_shader;
 		//create shader program
-		new_shader->program = glCreateProgram();
+		new_shader.program = glCreateProgram();
 		std::string filename(_filename);
 
 		const char* vert_buf = shader_load((filename + ".vert").c_str());
-		new_shader->shaders[VERTEX] = shader_get(vert_buf, GL_VERTEX_SHADER);
+		new_shader.shaders[VERTEX] = shader_get(vert_buf, GL_VERTEX_SHADER);
 
 		const char* frag_buf = shader_load((filename + ".frag").c_str());
-		new_shader->shaders[FRAGMENT] = shader_get(frag_buf, GL_FRAGMENT_SHADER);
+		new_shader.shaders[FRAGMENT] = shader_get(frag_buf, GL_FRAGMENT_SHADER);
 
 		//attach shaders to the shader program
 		for (uint8_t i = 0; i < NUM_SHADERS; i++){
-			glAttachShader(new_shader->program, new_shader->shaders[i]);
+			glAttachShader(new_shader.program, new_shader.shaders[i]);
 		}
 
-		glLinkProgram(new_shader->program);
-		shader_check(new_shader->program, GL_LINK_STATUS, true);
+		glLinkProgram(new_shader.program);
+		shader_check(new_shader.program, GL_LINK_STATUS, true);
 
 		//check if valid (post link)
-		glValidateProgram(new_shader->program);
-		shader_check(new_shader->program, GL_VALIDATE_STATUS, true);
+		glValidateProgram(new_shader.program);
+		shader_check(new_shader.program, GL_VALIDATE_STATUS, true);
 
 		log_fprint("'%s' shader successfully created", _filename);
 

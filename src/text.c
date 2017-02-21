@@ -1,33 +1,33 @@
 #include "text.h"
 
 #if ANKH2D_WIN32
-	text* text_create(const char* _font_path, shader* _shader, transform _trans, GLFWwindow* _window)
+	text text_create(const char* _font_path, shader* _shader, transform _trans, GLFWwindow* _window)
 	{
-		text* new_text = (text*)malloc(sizeof(text));
+		text new_text;
 
-		new_text->window = _window;
+		new_text.window = _window;
 
-		new_text->shader = _shader;
-		new_text->colour = shader_get_uniform_location(new_text->shader, "colour");
-		new_text->model = shader_get_uniform_location(new_text->shader, "model");
-		new_text->projection = shader_get_uniform_location(new_text->shader, "projection");
-		new_text->char_index = shader_get_uniform_location(new_text->shader, "char_index");
+		new_text.shader = *_shader;
+		new_text.colour = shader_get_uniform_location(&new_text.shader, "colour");
+		new_text.model = shader_get_uniform_location(&new_text.shader, "model");
+		new_text.projection = shader_get_uniform_location(&new_text.shader, "projection");
+		new_text.char_index = shader_get_uniform_location(&new_text.shader, "char_index");
 	
-		new_text->transform = _trans;
+		new_text.transform = _trans;
 
 		int width, height;
-		glfwGetWindowSize(new_text->window, &width, &height);
+		glfwGetWindowSize(new_text.window, &width, &height);
 
 		//setup default font colour
-		new_text->font_colour = vec3_create(1.0f, 1.0f, 1.0f);
+		new_text.font_colour = vec3_create(1.0f, 1.0f, 1.0f);
 
 		//transparency on the font
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 		//load the fnt file in binary
-		text_load_fnt(new_text, _font_path);
-		text_load_bmp(new_text, new_text->page_names);
+		text_load_fnt(&new_text, _font_path);
+		text_load_bmp(&new_text, new_text.page_names);
 
 		//SSE = __m128 (16 byte bound), float[4][4] also 16 bytes
 		//new_text->default_proj = (mat4*)malloc(sizeof(mat4));
@@ -48,7 +48,7 @@
 		name += ".bmp";
 
 		_text->texture = texture2d_create(name.c_str());
-		texture2d_bind(_text->texture);
+		texture2d_bind(&_text->texture);
 
 		_text->vao = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
 		_text->vbo = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
@@ -195,7 +195,7 @@
 		_text->transform.position = _pos;
 
 		//bind our program
-		glUseProgram(_text->shader->program);
+		glUseProgram(_text->shader.program);
 	
 		//communicate w/ uniforms
 		//send the model matrix off
@@ -210,7 +210,7 @@
 		shader_set_uniform_vec3(_text->colour, _text->font_colour);
 
 		//bind our font texture
-		texture2d_bind(_text->texture);
+		texture2d_bind(&_text->texture);
 
 		//debug the first character '@'
 		for (uint8_t i = 0; i < _str.size(); i++)
@@ -233,7 +233,7 @@
 		_text->transform.position = _pos;
 
 		//bind our program
-		glUseProgram(_text->shader->program);
+		glUseProgram(_text->shader.program);
 	
 		//communicate w/ uniforms
 		//send the model matrix off
@@ -248,7 +248,7 @@
 		shader_set_uniform_vec3(_text->colour, _text->font_colour);
 
 		//bind our font texture
-		texture2d_bind(_text->texture);
+		texture2d_bind(&_text->texture);
 
 		char text[128];
 		va_list ap;
@@ -272,8 +272,8 @@
 
 	void text_destroy(text* _text)
 	{
-		shader_destroy(_text->shader);
-		texture2d_destroy(_text->texture);
+		shader_destroy(&_text->shader);
+		texture2d_destroy(&_text->texture);
 		glDeleteBuffers(_text->num_char_block, &_text->vbo[0]);
 		glDeleteBuffers(_text->num_char_block, &_text->vao[0]);
 	}

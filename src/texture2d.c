@@ -1,19 +1,19 @@
 #include "texture2d.h"
 
 #if ANKH2D_WIN32
-	texture2d* texture2d_create(const char* _filename)
+	texture2d texture2d_create(const char* _filename)
 	{
-		texture2d* new_tex = (texture2d*)malloc(sizeof(texture2d));
+		texture2d new_tex;
 
 		BMP_24* texture = bmp_24_load(_filename);
 		RGBA_DATA* texture_rgba = bmp_24_bgr_rgba(texture);
 
-		new_tex->width = texture->ih.width;
-		new_tex->height = texture->ih.height;
+		new_tex.width = texture->ih.width;
+		new_tex.height = texture->ih.height;
 
 		//create and bind texture
-		glGenTextures(1, &new_tex->texture);
-		glBindTexture(GL_TEXTURE_2D, new_tex->texture);
+		glGenTextures(1, &new_tex.texture);
+		glBindTexture(GL_TEXTURE_2D, new_tex.texture);
 
 		//if we read outside the texture size, it will start again (wrap repeat)
 		//use GL_CLAMP for a default colour to be used outside bounds of tex
@@ -26,7 +26,7 @@
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		//construct the texture image
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, new_tex->width, new_tex->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_rgba); 
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, new_tex.width, new_tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_rgba); 
 
 		free(texture_rgba);
 		free(texture);

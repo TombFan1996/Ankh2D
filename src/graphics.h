@@ -65,7 +65,7 @@ void graphics_destroy(graphics* _graphics);
 	void graphics_input_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void graphics_window_size_callback(GLFWwindow* window, int width, int height);
 #elif ANKH2D_PSX
-	void graphics_create(graphics* _graphics);
+	graphics graphics_create();
 	void graphics_set_background_color(graphics* _graphics, uint8_vec3 _color);
 	void graphics_setup_debug_font(uint8_t _pos_x, uint8_t _pos_y, uint8_t _bkg_clear, uint16_t _max_chars);
 #endif

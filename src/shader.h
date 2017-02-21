@@ -19,7 +19,7 @@
 		GLuint shaders[NUM_SHADERS];
 	} shader;
 
-	shader* shader_create(const char* _filename);
+	shader shader_create(const char* _filename);
 	const char* shader_load(const char* _filename);
 	void shader_check(GLuint _shader, GLuint _flag, bool _isProgram);
 	GLuint shader_get(const char* _buffer, GLenum _shaderType);

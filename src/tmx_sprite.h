@@ -13,16 +13,16 @@
 	typedef struct
 	{
 		GLuint model, projection;
-		shader* shader;
+		shader shader;
 		transform transform;
 		uint8_t num_layers;
 		uint32_t num_tiles;
 		GLuint vao, vbo;
-		texture2d* tilemap;
+		texture2d tilemap;
 		tmx_map* map;
 	} tmx_sprite;
 
-	tmx_sprite* tmx_sprite_create(const char* _mapName, shader* _shader, transform _trans);
+	tmx_sprite tmx_sprite_create(const char* _mapName, shader* _shader, transform _trans);
 	void tmx_sprite_draw(mat4* _projection, tmx_sprite* _sprite);
 	void tmx_sprite_destroy(tmx_sprite* _sprite);
 

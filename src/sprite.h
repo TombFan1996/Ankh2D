@@ -16,15 +16,15 @@
 	{
 		float speed;
 		GLuint model, projection;
-		shader* shader;
+		shader shader;
 		transform transform;
 		vec2 old_pos;
-		texture2d* texture;
+		texture2d texture;
 		GLuint vao, vbo;
 		GLFWwindow* window;
 	} sprite;
 
-	sprite* sprite_create(const char* _name, shader* _shader, transform _trans, GLFWwindow* _window);
+	sprite sprite_create(const char* _name, shader* _shader, transform _trans, GLFWwindow* _window);
 	bool sprite_update(sprite* _sprite, time* _time);
 	void sprite_draw(mat4* _projection, sprite* _sprite);
 	void sprite_set_texture(sprite* _sprite, texture2d* _tex);

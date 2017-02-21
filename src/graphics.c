@@ -124,6 +124,11 @@
 			SetVideoMode(0);
 		}
 
+		// set the graphics mode resolutions. You may also try using 'GsNONINTER' (read LIBOVR46.PDF in PSYQ/DOCS for detailed information)
+		GsInitGraph(SCREEN_WIDTH, SCREEN_HEIGHT, GsINTER|GsOFSGPU, 1, 0); 
+		// set the top left coordinates of the two buffers in video memory
+		GsDefDispBuff(0, 0, 0, SCREEN_HEIGHT);
+
 		// init the ordering tables
 		// easier way to access GPU "packets"
 		_graphics->ot[0].length = OT_LENGTH;
@@ -190,7 +195,8 @@ void graphics_update(graphics* _graphics)
 		// flip the double buffers
 		GsSwapDispBuff();
 		// clear the ordering table with a background color.
-		GsSortClear(50, 50, 50, &_graphics->ot[_graphics->current_buffer]);
+		GsSortClear(_graphics->background_color.x, _graphics->background_color.y, 
+			_graphics->background_color.z, &_graphics->ot[_graphics->current_buffer]);
 		// Draw the ordering table for the CurrentBuffer
 		GsDrawOt(&_graphics->ot[_graphics->current_buffer]);
 

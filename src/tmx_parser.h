@@ -51,7 +51,7 @@
 		vec2* collision_coords;
 	} tmx_map;
 
-	tmx_map* tmx_parser_create(const char* _filename);
+	tmx_map tmx_parser_create(const char* _filename);
 	//pay the price for collision upfront, this way we don't 
 	//need to loop through every tile each frame (killed my pc on 20 x 20 map)
 	void tmx_parser_setup_collisions(tmx_map* _tmxm);

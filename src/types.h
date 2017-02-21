@@ -3,9 +3,6 @@
 
 #if ANKH2D_PSX
 	#include <stdlib.h>
-	#include <libgte.h>
-	#include <libgpu.h>
-	#include <libgs.h>
 
 	#define false 0
 	#define true 1
