@@ -16,7 +16,7 @@
 	{
 		float speed;
 		GLuint model, projection;
-		shader shader;
+		shader* shader;
 		transform transform;
 		vec2 old_pos;
 		texture2d texture;

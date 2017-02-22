@@ -28,7 +28,7 @@
 		return main_camera;
 	}
 
-	void camera_update(camera* _camera)
+	void camera_update(camera* _camera, mat4* _proj)
 	{
 		bool camera_updated = camera_movement(_camera);
 
@@ -36,12 +36,14 @@
 		{
 			//update orthographic camera normally
 			vec2 position = _camera->transform.position;
+			*_proj = mat4_orthographic(position.x, position.x + _camera->screen_width, 
+				position.y + _camera->screen_height, position.y, -1.0f, 1.0f);
 			//mat4_orthographic(&_camera->projection, position.x, position.x + _camera->screen_width, 
 				//position.y + _camera->screen_height, position.y, -1.0f, 1.0f);
 		}
 	}
 
-	void camera_update(camera* _camera, sprite* _sprite)
+	void camera_update(camera* _camera, sprite* _sprite, mat4* _proj)
 	{
 		bool camera_updated = camera_movement(_camera);
 
@@ -53,6 +55,8 @@
 			_camera->transform.position = vec2_create(targetPos.x - (_camera->screen_width/2), targetPos.y - (_camera->screen_height/2));
 	
 			vec2 position = _camera->transform.position;
+			*_proj = mat4_orthographic(position.x, position.x + _camera->screen_width, 
+				position.y + _camera->screen_height, position.y, -1.0f, 1.0f);
 			//mat4_orthographic(&_camera->projection, position.x, position.x + _camera->screen_width, 
 				//position.y + _camera->screen_height, position.y, -1.0f, 1.0f);
 		//}

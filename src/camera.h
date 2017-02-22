@@ -13,7 +13,6 @@
 #if ANKH2D_WIN32
 	typedef struct 
 	{
-		//mat4 projection;
 		bool free_camera;
 		transform transform;
 		float speed; //camera speed when free (not attached to player)
@@ -22,8 +21,8 @@
 	} camera;
 
 	camera camera_create(GLFWwindow* _window);
-	void camera_update(camera* _camera);
-	void camera_update(camera* _camera, sprite* _sprite);
+	void camera_update(camera* _camera, mat4* _proj);
+	void camera_update(camera* _camera, sprite* _sprite, mat4* _proj);
 	bool camera_movement(camera* _camera);
 #elif ANKH2D_PSX
 

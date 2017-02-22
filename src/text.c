@@ -7,11 +7,11 @@
 
 		new_text.window = _window;
 
-		new_text.shader = *_shader;
-		new_text.colour = shader_get_uniform_location(&new_text.shader, "colour");
-		new_text.model = shader_get_uniform_location(&new_text.shader, "model");
-		new_text.projection = shader_get_uniform_location(&new_text.shader, "projection");
-		new_text.char_index = shader_get_uniform_location(&new_text.shader, "char_index");
+		new_text.shader = _shader;
+		new_text.colour = shader_get_uniform_location(new_text.shader, "colour");
+		new_text.model = shader_get_uniform_location(new_text.shader, "model");
+		new_text.projection = shader_get_uniform_location(new_text.shader, "projection");
+		new_text.char_index = shader_get_uniform_location(new_text.shader, "char_index");
 	
 		new_text.transform = _trans;
 
@@ -195,7 +195,7 @@
 		_text->transform.position = _pos;
 
 		//bind our program
-		glUseProgram(_text->shader.program);
+		glUseProgram(_text->shader->program);
 	
 		//communicate w/ uniforms
 		//send the model matrix off
@@ -233,7 +233,7 @@
 		_text->transform.position = _pos;
 
 		//bind our program
-		glUseProgram(_text->shader.program);
+		glUseProgram(_text->shader->program);
 	
 		//communicate w/ uniforms
 		//send the model matrix off
@@ -272,8 +272,9 @@
 
 	void text_destroy(text* _text)
 	{
-		shader_destroy(&_text->shader);
 		texture2d_destroy(&_text->texture);
+		_text->window = NULL;
+		_text->shader = NULL;
 		glDeleteBuffers(_text->num_char_block, &_text->vbo[0]);
 		glDeleteBuffers(_text->num_char_block, &_text->vao[0]);
 	}

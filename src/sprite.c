@@ -4,12 +4,12 @@ sprite sprite_create(const char* _name, shader* _shader, transform _trans, GLFWw
 {
 	sprite new_sprite;
 	new_sprite.window = _window;
-	new_sprite.shader = *_shader;
+	new_sprite.shader = _shader;
 	new_sprite.texture = texture2d_create(_name);
 	new_sprite.transform = _trans;
 	
-	new_sprite.model = shader_get_uniform_location(&new_sprite.shader, "model");
-	new_sprite.projection = shader_get_uniform_location(&new_sprite.shader, "projection");
+	new_sprite.model = shader_get_uniform_location(new_sprite.shader, "model");
+	new_sprite.projection = shader_get_uniform_location(new_sprite.shader, "projection");
 
 	//transparency on the font
 	glEnable(GL_BLEND);
@@ -94,12 +94,12 @@ void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_up
 	//dont waste cycles if we havent moved the sprite
 	if (_sprite_update)
 	{
-		if (_tmx_map->map->num_collisions != 0)
+		if (_tmx_map->map.num_collisions != 0)
 		{
-			for (uint8_t i = 0; i < _tmx_map->map->num_collisions; i++)
+			for (uint8_t i = 0; i < _tmx_map->map.num_collisions; i++)
 			{
-				uint8_t current_x = _tmx_map->map->collision_coords[i].x;
-				uint8_t current_y = _tmx_map->map->collision_coords[i].y;
+				uint8_t current_x = _tmx_map->map.collision_coords[i].x;
+				uint8_t current_y = _tmx_map->map.collision_coords[i].y;
 
 				// - (_tmx_map->transform.scale.x / 2) is equal to how far we're into a tile in the coords 
 				// if 1 tile is 50 px wide and the map is 5 tiles wide and you place it at vec2(0,0), this would mean
@@ -138,7 +138,7 @@ void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_up
 void sprite_draw(mat4* _projection, sprite* _sprite)
 {
 	//bind our program
-	glUseProgram(_sprite->shader.program);
+	glUseProgram(_sprite->shader->program);
 
 	transform_get_model_matrix(_sprite->transform);
 	mat4 model_matrix = transform_get_model_matrix(_sprite->transform);
@@ -168,8 +168,8 @@ void sprite_set_texture(sprite* _sprite, texture2d* _tex)
 void sprite_destroy(sprite* _sprite)
 {
 	texture2d_destroy(&_sprite->texture);
-	shader_destroy(&_sprite->shader);
-
+	_sprite->window = NULL;
+	_sprite->shader = NULL;
 	glDeleteBuffers(1, &_sprite->vao);
 	glDeleteBuffers(1, &_sprite->vbo);
 }

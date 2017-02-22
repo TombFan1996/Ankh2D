@@ -1,40 +1,40 @@
 #include "tmx_sprite.h"
 
 #if ANKH2D_WIN32
-	tmx_sprite tmx_sprite_create(const char* _mapName, shader* _shader, transform _trans)
+	tmx_sprite tmx_sprite_create(const char* _map_name, shader* _shader, transform _trans)
 	{
 		tmx_sprite new_map_sprite;
-		new_map_sprite.map = &tmx_parser_create(_mapName);
-		new_map_sprite.shader = *_shader;
+		new_map_sprite.map = tmx_parser_create(_map_name);
+		new_map_sprite.shader = _shader;
 
 		new_map_sprite.transform = _trans;
 		//inverse the y scale as we now use BMP
 		//newMapSprite->transform.scale.y = 1.0f - newMapSprite->transform.scale.y;
 
-		new_map_sprite.model = shader_get_uniform_location(&new_map_sprite.shader, "model");
-		new_map_sprite.projection = shader_get_uniform_location(&new_map_sprite.shader, "projection");
+		new_map_sprite.model = shader_get_uniform_location(new_map_sprite.shader, "model");
+		new_map_sprite.projection = shader_get_uniform_location(new_map_sprite.shader, "projection");
 	
 		//transparency on the font
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 		std::string filename("assets/maps/");
-		filename += new_map_sprite.map->tileset[0].filename;
+		filename += new_map_sprite.map.tileset[0].filename;
 		new_map_sprite.tilemap = texture2d_create(filename.c_str());
 	
 		//get the number of tiles per layer
-		new_map_sprite.num_tiles = new_map_sprite.map->layer[0].width * new_map_sprite.map->layer[0].height;
+		new_map_sprite.num_tiles = new_map_sprite.map.layer[0].width * new_map_sprite.map.layer[0].height;
 		//get how many layers we have
-		new_map_sprite.num_layers = new_map_sprite.map->num_layers;
+		new_map_sprite.num_layers = new_map_sprite.map.num_layers;
 
 		//get the width and height of the map 
 		//(doesn't matter which layer, all layers will be the same)
-		uint16_t map_size_x = new_map_sprite.map->layer[0].width;
-		uint16_t map_size_y = new_map_sprite.map->layer[0].height;
+		uint16_t map_size_x = new_map_sprite.map.layer[0].width;
+		uint16_t map_size_y = new_map_sprite.map.layer[0].height;
 
 		//get the size of each tile in px
-		uint16_t tile_size_x = new_map_sprite.map->tileset[0].tile_width;
-		uint16_t tile_size_y = new_map_sprite.map->tileset[0].tile_height;
+		uint16_t tile_size_x = new_map_sprite.map.tileset[0].tile_width;
+		uint16_t tile_size_y = new_map_sprite.map.tileset[0].tile_height;
 
 		//normalised coords for the whole textures
 		float image_normal_x = (1.0f / new_map_sprite.tilemap.width) * tile_size_x;
@@ -69,7 +69,7 @@
 			{
 				//cannot do -1 on unsigned int, underflow will occur, we do
 				//the -1 later when we know the tile isn't 0
-				uint16_t index = new_map_sprite.map->layer[layer].data[tile];
+				uint16_t index = new_map_sprite.map.layer[layer].data[tile];
 
 				//what tile are we traversing
 				current_tile_x = tile % map_size_x;
@@ -109,7 +109,7 @@
 		glBindBuffer(GL_ARRAY_BUFFER, 0); 
 		glBindVertexArray(0);
 
-		log_fprint("'%s' successfully created", _mapName);
+		log_fprint("'%s' successfully created", _map_name);
 
 		return new_map_sprite;
 	}
@@ -117,7 +117,7 @@
 	void tmx_sprite_draw(mat4* _projection, tmx_sprite* _sprite)
 	{
 		//bind our program
-		glUseProgram(_sprite->shader.program);
+		glUseProgram(_sprite->shader->program);
 
 		//communicate w/ uniforms
 		//send the model matrix off
@@ -138,9 +138,9 @@
 
 	void tmx_sprite_destroy(tmx_sprite* _sprite)
 	{
-		//tmx_parser_destroy(_sprite->map);
+		tmx_parser_destroy(&_sprite->map);
 		texture2d_destroy(&_sprite->tilemap);
-
+		_sprite->shader = NULL;
 		glDeleteBuffers(1, &_sprite->vbo);
 		glDeleteBuffers(1, &_sprite->vao);
 	}

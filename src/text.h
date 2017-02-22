@@ -76,7 +76,7 @@
 
 		GLuint *vao, *vbo;
 		GLuint colour, model, projection, char_index;
-		shader shader;
+		shader* shader;
 		vec3 font_colour;
 
 		texture2d texture;
