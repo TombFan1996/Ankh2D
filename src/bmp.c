@@ -31,10 +31,35 @@
 					//move file pointer to the start of pixel data
 					fseek(file, new_bmp_24->fh.pixel_offset, SEEK_SET);
 
+					//calculate padding for the bmp
+					//needs to be aligned to 4 bytes, 24 bits = 3 bytes
+					//pad factor will stay 0 if the width is in alignment
+					uint8_t pad_factor = 0;
+					// Each row needs to be a multiple of 4 bytes.  
+					if ((new_bmp_24->ih.width * 3) % 4 != 0)
+						pad_factor = 4 - ((new_bmp_24->ih.width * 3) % 4); 
+
 					//read the pixel data in
-					uint32_t ct_size = new_bmp_24->ih.image_size;
-					new_bmp_24->pd = (BMP_PIXEL_24_DATA*)malloc(ct_size);
-					fread(&new_bmp_24->pd[0], ct_size, 1, file);
+					uint32_t ct_size = (new_bmp_24->ih.width * new_bmp_24->ih.height) * sizeof(BMP_PIXEL_24_DATA);//new_bmp_24->ih.image_size;
+					new_bmp_24->pd = (BMP_PIXEL_24_DATA*)calloc(1, ct_size);
+
+					uint32_t pixel_counter = 0;
+
+					//loop through each pixel, need to pad the 24 bit bitmap
+					for (uint16_t col = 0; col < new_bmp_24->ih.height; col++)
+					{
+						for (uint16_t row = 0; row < new_bmp_24->ih.width; row++)
+						{
+							//push bgr data to our pixel data
+							fread(&new_bmp_24->pd[pixel_counter], sizeof(BMP_PIXEL_24_DATA), 1, file);
+							pixel_counter++;
+						}
+
+						//offset the file pointer by the padding amount
+						fseek(file, pad_factor, SEEK_CUR);
+					}
+
+					//fread(&new_bmp_24->pd[0], ct_size, 1, file);
 
 					log_fprint("'%s' successfully created", _filename);
 
