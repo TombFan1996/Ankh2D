@@ -13,8 +13,17 @@
 
 	transform transform_create(vec2 _pos, float _rotation, vec2 _scale);
 	mat4 transform_get_model_matrix(transform _trans);
-#elif ANKH2D_PSX
 
+#elif ANKH2D_PSX
+	#include "bmath.h"
+
+	typedef struct
+	{
+		int16_vec2 position;
+	} transform;
+
+	void transform_create(transform* _trans, int16_vec2 _pos);
+	
 #endif
 
 #endif

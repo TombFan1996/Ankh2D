@@ -50,4 +50,28 @@
 
 #elif ANKH2D_PSX
 
+	void texture2d_create(texture2d* _tex, uint32_t* _tpage, uint32_t* _clut)
+	{
+		//_tpage = texture page location
+		GsGetTimInfo((uint32_t*)(_tpage+4), &_tex->tim);
+
+		//Load pattern into VRAM
+		_tex->rect.x = _tex->tim.px;
+   		_tex->rect.y = _tex->tim.py;
+   		_tex->rect.w = _tex->tim.pw;
+   		_tex->rect.h = _tex->tim.ph;
+   		LoadImage(&_tex->rect, _tex->tim.pixel); 
+
+   		//Load CLUT into VRAM
+   		_tex->rect.x = _tex->tim.cx;
+   		_tex->rect.y = _tex->tim.cy;
+   		_tex->rect.w = _tex->tim.cw;
+   		_tex->rect.h = _tex->tim.ch;
+   		LoadImage(&_tex->rect, _tex->tim.clut); 
+
+   		//Return updated TPage and Clut IDs
+   		(*_tpage) = GetTPage(_tex->tim.pmode, 1, _tex->tim.px, _tex->tim.py);
+   		(*_clut) = GetClut(_tex->tim.cx, _tex->tim.cy);
+	}
+
 #endif

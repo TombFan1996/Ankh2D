@@ -33,4 +33,9 @@
 
 #elif ANKH2D_PSX
 
+	void transform_create(transform* _trans, int16_vec2 _pos)
+	{
+		_trans->position = _pos;
+	}
+
 #endif

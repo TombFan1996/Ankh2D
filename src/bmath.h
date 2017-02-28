@@ -65,20 +65,38 @@
 
 	typedef struct
 	{
-		uint8_t x;
-		uint8_t y;
-	} uint8_vec2;
+		int8_t x;
+		int8_t y;
+	} int8_vec2;
 
-	uint8_vec2 uint8_vec2_create(uint8_t _x, uint8_t _y);
+	int8_vec2 int8_vec2_create(int8_t _x, int8_t _y);
 
 	typedef struct
 	{
-		uint8_t x;
-		uint8_t y;
-		uint8_t z;
-	} uint8_vec3;
+		int8_t x;
+		int8_t y;
+		int8_t z;
+	} int8_vec3;
 
-	uint8_vec3 uint8_vec3_create(uint8_t _x, uint8_t _y, uint8_t _z);
+	int8_vec3 int8_vec3_create(int8_t _x, int8_t _y, int8_t _z);
+
+	typedef struct
+	{
+		int16_t x;
+		int16_t y;
+	} int16_vec2;
+
+	int16_vec2 int16_vec2_create(int16_t _x, int16_t _y);
+
+	typedef struct
+	{
+		int16_t x;
+		int16_t y;
+		int16_t z;
+	} int16_vec3;
+
+	int16_vec3 int16_vec3_create(int16_t _x, int16_t _y, int16_t _z);
+
 #endif
 
 #endif

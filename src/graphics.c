@@ -107,21 +107,39 @@
 	}
 
 #elif ANKH2D_PSX
-	void graphics_create(graphics* _graphics)
+	void graphics_create(graphics* _graphics, uint16_t _debug)
 	{
-		//clear previous logs
-		//log_fclear();
+		//init all the hardware
+		ResetCallback();
+		//Cold reset the gs
+		ResetGraph(0);
+		
+		//init the 1st controller
+		PadInit(0);
+		
+		//clear the vram
+		graphics_clear_vram();
+
+		//set debugging options
+		//0 = off
+		//1 = monitor
+		//2 = dump
+		SetGraphDebug(_debug);
 
 		//set it to PAL if E, else NTSC
 		if (*(char *)0xbfc7ff52=='E'){
 			//log_fprint("PSX video mode: PAL");
 			SetVideoMode(1); 
+			SCREEN_WIDTH = 320;
+			SCREEN_HEIGHT = 256;
 		}
 
 		else
 		{
 			//log_fprint("PSX video mode: NTSC");
 			SetVideoMode(0);
+			SCREEN_WIDTH = 320;
+			SCREEN_HEIGHT = 240;
 		}
 
 		// set the graphics mode resolutions. You may also try using 'GsNONINTER' (read LIBOVR46.PDF in PSYQ/DOCS for detailed information)
@@ -131,8 +149,8 @@
 
 		// init the ordering tables
 		// easier way to access GPU "packets"
-		_graphics->ot[0].length = OT_LENGTH;
-		_graphics->ot[1].length = OT_LENGTH;
+		_graphics->ot[0].length = LENGTH_OT;
+		_graphics->ot[1].length = LENGTH_OT;
 		_graphics->ot[0].org = _graphics->ot_tag[0];
 		_graphics->ot[1].org = _graphics->ot_tag[1];
 
@@ -147,8 +165,7 @@
 		graphics_setup_debug_font(5, 20, 0, 512);
 
 		//set the background colour to black default
-		_graphics->background_color = uint8_vec3_create(0, 0, 0);
-
+		_graphics->background_color = int8_vec3_create(0, 0, 0);
 		_graphics->current_buffer = 0;
 	}
 
@@ -165,11 +182,35 @@
 		//log_fprint("Loaded basic font pattern (4-bit, 256 x 128), and set attributes successfully");	
 	}
 
-	void graphics_set_background_color(graphics* _graphics, uint8_vec3 _color)
+	void graphics_set_background_color(graphics* _graphics, int8_vec3 _color)
 	{
 		_graphics->background_color.x = _color.x;
 		_graphics->background_color.y = _color.y;
 		_graphics->background_color.z = _color.z;
+	}
+
+	//clears the framebuffer (1024px X 512px) w/ colour black
+	//ensures no garbage when loading new images
+	void graphics_clear_vram()
+	{
+		RECT rectTL;
+		setRECT(&rectTL, 0, 0, 1024, 512);
+		ClearImage2(&rectTL, 0, 0, 0);
+		// ensure that the VRAM is clear before exiting
+		DrawSync(0); 
+	}
+
+	void graphics_pre_draw(graphics* _graphics)
+	{
+		//flush print buffer
+		FntFlush(-1);
+		//get the current buffer and setup "packets"
+		//for rendering
+		_graphics->current_buffer = GsGetActiveBuff();
+		// setup the packet workbase
+		GsSetWorkBase((PACKET*)_graphics->gpu_packet_area[_graphics->current_buffer]); 
+		// clear the ordering table
+		GsClearOt(0, 0, &_graphics->ot[_graphics->current_buffer]); 
 	}
 #endif
 
@@ -179,15 +220,6 @@ void graphics_update(graphics* _graphics)
 		glfwPollEvents();
 		glfwSwapBuffers(_graphics->window);
 	#elif ANKH2D_PSX
-		//refresh the font (if its in use)
-		FntFlush(-1);
-		//get the current buffer and setup "packets"
-		//for rendering
-		_graphics->current_buffer = GsGetActiveBuff();
-		// setup the packet workbase
-		GsSetWorkBase((PACKET*)_graphics->gpu_packet_area[_graphics->current_buffer]); 
-		// clear the ordering table
-		GsClearOt(0, 0, &_graphics->ot[_graphics->current_buffer]); 
 		//wait for all drawing
 		DrawSync(0);
 		//wait for v blank interrupt
@@ -199,7 +231,6 @@ void graphics_update(graphics* _graphics)
 			_graphics->background_color.z, &_graphics->ot[_graphics->current_buffer]);
 		// Draw the ordering table for the CurrentBuffer
 		GsDrawOt(&_graphics->ot[_graphics->current_buffer]);
-
 	#endif
 }
 

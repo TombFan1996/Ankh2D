@@ -30,8 +30,31 @@
 	void sprite_set_texture(sprite* _sprite, texture2d* _tex);
 	void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update);
 	void sprite_destroy(sprite* _sprite);
+
 #elif ANKH2D_PSX
 
+	#include "types.h"
+	#include <libgte.h>
+	#include <libgpu.h>
+	#include <libetc.h>
+	#include <libgs.h>
+
+	#include "texture2d.h"
+	#include "transform.h"
+
+	typedef struct
+	{
+		//tim image struct
+		texture2d texture;
+		//sprite based on tim_image
+		GsSPRITE gs_sprite;
+		//the position of the sprite (int16_vec2)
+		transform trans;
+	} sprite;
+
+	void sprite_create(sprite* _sprite, transform _trans, uint32_t* _tpage, uint32_t* _clut);
+	void sprite_draw(GsOT* _ot, sprite* _sprite);
+	
 #endif
 
 #endif

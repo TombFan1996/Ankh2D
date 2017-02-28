@@ -23,6 +23,20 @@
 
 #elif ANKH2D_PSX
 
+	#include "types.h"
+	#include <libetc.h>
+	#include <libgte.h>
+	#include <libgpu.h>
+	#include <libgs.h>
+
+	typedef struct
+	{
+		RECT rect;
+		GsIMAGE tim;
+	} texture2d;
+
+	void texture2d_create(texture2d* _tex, uint32_t* _tpage, uint32_t* _clut);
+
 #endif
 
 #endif
