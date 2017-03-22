@@ -186,37 +186,5 @@
 	}
 
 #elif ANKH2D_PSX
-	int8_vec2 int8_vec2_create(int8_t _x, int8_t _y)
-	{
-		int8_vec2 new_vec2;
-		new_vec2.x = _x;
-		new_vec2.y = _y;
-		return new_vec2;
-	}
-
-	int8_vec3 int8_vec3_create(int8_t _x, int8_t _y, int8_t _z)
-	{
-		int8_vec3 new_vec3;
-		new_vec3.x = _x;
-		new_vec3.y = _y;
-		new_vec3.z = _z;
-		return new_vec3;
-	}
-
-	int16_vec2 int16_vec2_create(int16_t _x, int16_t _y)
-	{
-		int16_vec2 new_vec2;
-		new_vec2.x = _x;
-		new_vec2.y = _y;
-		return new_vec2;
-	}
-
-	int16_vec3 int16_vec3_create(int16_t _x, int16_t _y, int16_t _z)
-	{
-		int16_vec3 new_vec3;
-		new_vec3.x = _x;
-		new_vec3.y = _y;
-		new_vec3.z = _z;
-		return new_vec3;
-	}
+	
 #endif

@@ -1,6 +1,6 @@
 # Ankh2D
 
-A lightweight 2D framework for testing both C and graphics programming
+A lightweight 2D framework
 
 ### PC Dependencies ###
 * [GLFW 3.2.1](http://www.glfw.org/)

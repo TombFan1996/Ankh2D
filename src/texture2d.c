@@ -39,7 +39,7 @@
 	void texture2d_bind(texture2d* _tex)
 	{
 		//change which texture GL is working w/
-		glActiveTexture(GL_TEXTURE0);
+		//glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _tex->texture);
 	}
 
@@ -73,5 +73,5 @@
    		(*_tpage) = GetTPage(_tex->tim.pmode, 1, _tex->tim.px, _tex->tim.py);
    		(*_clut) = GetClut(_tex->tim.cx, _tex->tim.cy);
 	}
-
+	
 #endif

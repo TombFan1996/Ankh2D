@@ -1,12 +1,12 @@
 #include "sprite.h"
 
 #if ANKH2D_WIN32
-	sprite sprite_create(const char* _name, shader* _shader, transform _trans, GLFWwindow* _window)
+	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans, GLFWwindow* _window)
 	{
 		sprite new_sprite;
 		new_sprite.window = _window;
 		new_sprite.shader = _shader;
-		new_sprite.texture = texture2d_create(_name);
+		new_sprite.texture = _texture;
 		new_sprite.transform = _trans;
 	
 		new_sprite.model = shader_get_uniform_location(new_sprite.shader, "model");
@@ -43,8 +43,6 @@
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
-
-		log_fprint("'%s' successfully created", _name);
 
 		return new_sprite;
 	}
@@ -140,14 +138,12 @@
 	{
 		//bind our program
 		glUseProgram(_sprite->shader->program);
+		texture2d_bind(_sprite->texture);
 
-		transform_get_model_matrix(_sprite->transform);
+		//transform_get_model_matrix(_sprite->transform);
 		mat4 model_matrix = transform_get_model_matrix(_sprite->transform);
 		shader_set_uniform_mat4(_sprite->model, &model_matrix, true);
 		shader_set_uniform_mat4(_sprite->projection, _projection, false);
-
-		//bind our texture
-		texture2d_bind(&_sprite->texture);
 
 		//bind and draw our object
 		glBindVertexArray(_sprite->vao);
@@ -157,18 +153,12 @@
 
 	void sprite_set_texture(sprite* _sprite, texture2d* _tex)
 	{
-		if (!&_sprite->texture){
-			free(&_sprite->texture);
-			//_sprite->texture = NULL;
-		}
-
-		else
-			_sprite->texture = *_tex;
+		_sprite->texture = _tex;
 	}
 
 	void sprite_destroy(sprite* _sprite)
 	{
-		texture2d_destroy(&_sprite->texture);
+		_sprite->texture = NULL;
 		_sprite->window = NULL;
 		_sprite->shader = NULL;
 		glDeleteBuffers(1, &_sprite->vao);
@@ -177,22 +167,17 @@
 
 #elif ANKH2D_PSX
 
-	void sprite_create(sprite* _sprite, transform _trans, uint32_t* _tpage, uint32_t* _clut)
+	void sprite_create(sprite* _sprite, uint32_t* _tpage, uint32_t* _clut)
 	{
 		//create the rect and GsImage for the GsSprite
 		texture2d_create(&_sprite->texture, _tpage, _clut);
-		
-		//this will point to the transformation properties of the sprite
-		//you can either go through transform (will be a far similar code base
-		//to other rendersystems if so) or go through the GsSprite.
-		_sprite->trans = _trans;
 
 		// 16 bit CLUT, all options off (0x1 = 8-bit, 0x2 = 16-bit)
 		_sprite->gs_sprite.attribute = 0x2000000;
 		
 		//get positional data through the transform
-		_sprite->gs_sprite.x = _sprite->trans.position.x;
-		_sprite->gs_sprite.y = _sprite->trans.position.y;
+		_sprite->gs_sprite.x = _sprite->transform.position.x;
+		_sprite->gs_sprite.y = _sprite->transform.position.y;
 		
 		//get the w/h through the rect
 		_sprite->gs_sprite.w = _sprite->texture.tim.pw;
@@ -243,7 +228,7 @@
 		DrawSync(0);
 	}
 
-	void sprite_draw(GsOT* _ot, sprite* _sprite)
+	void sprite_draw(sprite* _sprite, GsOT* _ot)
 	{
 		// insert sprites into the ordering table ready for drawing
 	   GsSortSprite(&_sprite->gs_sprite, _ot, 0);

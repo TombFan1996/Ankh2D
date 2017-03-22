@@ -1,6 +1,7 @@
-#include "transform.h"
-
 #if ANKH2D_WIN32
+
+	#include "transform.h"
+	
 	transform transform_create(vec2 _pos, float _rotation, vec2 _scale)
 	{
 		transform new_transform;
@@ -32,10 +33,5 @@
 	}
 
 #elif ANKH2D_PSX
-
-	void transform_create(transform* _trans, int16_vec2 _pos)
-	{
-		_trans->position = _pos;
-	}
 
 #endif

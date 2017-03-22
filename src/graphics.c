@@ -106,8 +106,44 @@
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
+	void graphics_update(graphics* _graphics)
+	{
+		glfwPollEvents();
+		glfwSwapBuffers(_graphics->window);
+	}
+
+	int graphics_check_quit(graphics* _graphics)
+	{
+		return !glfwWindowShouldClose(_graphics->window);
+	}
+
+	void graphics_get_fps(graphics* _graphics, double* _fps)
+	{
+		_graphics->end_time = glfwGetTime();
+		double delta = _graphics->end_time - _graphics->start_time;
+		_graphics->num_frames++;
+
+		//limit the drawing of fps
+		if (delta >= 1.0)
+		{
+			*_fps = (double)_graphics->num_frames / delta;
+			//update our starting time again
+			_graphics->start_time = _graphics->end_time;
+			//reset the frames
+			_graphics->num_frames = 0;
+		}
+	}
+
+	void graphics_destroy(graphics* _graphics)
+	{
+		glfwDestroyWindow(_graphics->window);
+		log_fprint("destroyed glfw window");
+		glfwTerminate();
+		log_fprint("destroyed glfw");
+	}
+
 #elif ANKH2D_PSX
-	void graphics_create(graphics* _graphics, uint16_t _debug)
+	void graphics_create(graphics* _graphics, uint8_t _debug)
 	{
 		//init all the hardware
 		ResetCallback();
@@ -165,7 +201,10 @@
 		graphics_setup_debug_font(5, 20, 0, 512);
 
 		//set the background colour to black default
-		_graphics->background_color = int8_vec3_create(0, 0, 0);
+		_graphics->background_color.x = 0;
+		_graphics->background_color.y = 0;
+		_graphics->background_color.z = 0;
+
 		_graphics->current_buffer = 0;
 	}
 
@@ -212,14 +251,9 @@
 		// clear the ordering table
 		GsClearOt(0, 0, &_graphics->ot[_graphics->current_buffer]); 
 	}
-#endif
 
-void graphics_update(graphics* _graphics)
-{
-	#if ANKH2D_WIN32
-		glfwPollEvents();
-		glfwSwapBuffers(_graphics->window);
-	#elif ANKH2D_PSX
+	void graphics_update(graphics* _graphics)
+	{
 		//wait for all drawing
 		DrawSync(0);
 		//wait for v blank interrupt
@@ -230,49 +264,21 @@ void graphics_update(graphics* _graphics)
 		GsSortClear(_graphics->background_color.x, _graphics->background_color.y, 
 			_graphics->background_color.z, &_graphics->ot[_graphics->current_buffer]);
 		// Draw the ordering table for the CurrentBuffer
-		GsDrawOt(&_graphics->ot[_graphics->current_buffer]);
-	#endif
-}
+		GsDrawOt(&_graphics->ot[_graphics->current_buffer]);	
+	}
 
-int graphics_check_quit(graphics* _graphics)
-{
-	#if ANKH2D_WIN32
-		return !glfwWindowShouldClose(_graphics->window);
-	#elif ANKH2D_PSX
-		return 1; // infinite running for now..
-	#endif
-}
+	int graphics_check_quit()
+	{
+		return 1;
+	}
 
-void graphics_get_fps(graphics* _graphics, double* _fps)
-{
-	#if ANKH2D_WIN32
-		_graphics->end_time = glfwGetTime();
-		double delta = _graphics->end_time - _graphics->start_time;
-		_graphics->num_frames++;
+	void graphics_get_fps()
+	{
 
-		//limit the drawing of fps
-		if (delta >= 1.0)
-		{
-			*_fps = (double)_graphics->num_frames / delta;
-			//update our starting time again
-			_graphics->start_time = _graphics->end_time;
-			//reset the frames
-			_graphics->num_frames = 0;
-		}
+	}
+
+	void graphics_destroy()
+	{
 	
-	#elif ANKH2D_PSX
-
-	#endif
-}
-
-void graphics_destroy(graphics* _graphics)
-{
-	#if ANKH2D_WIN32
-		glfwDestroyWindow(_graphics->window);
-		log_fprint("destroyed glfw window");
-		glfwTerminate();
-		log_fprint("destroyed glfw");
-	#elif ANKH2D_PSX
-	
-	#endif
-}
+	}
+#endif

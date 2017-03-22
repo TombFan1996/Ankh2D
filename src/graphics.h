@@ -9,6 +9,8 @@
 	#include <GLFW\glfw3.h>
 	#include <sstream>
 
+	#include "logger.h"
+
 	typedef struct
 	{
 		bool closed;
@@ -20,6 +22,17 @@
 		bool fullscreen;
 	} graphics;
 
+	graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs);
+	int graphics_check_quit(graphics* _graphics);
+	void graphics_update(graphics* _graphics);
+	void graphics_get_fps(graphics* _graphics, double* _fps);
+	void graphics_destroy(graphics* _graphics);
+	void graphics_set_vsync(bool _vsync);
+	void graphics_clear();
+	void graphics_error_callback(int error, const char* description);
+	void graphics_input_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	void graphics_window_size_callback(GLFWwindow* window, int width, int height);
+
 #elif ANKH2D_PSX
 	#include <stdlib.h>
 	#include <libgte.h>
@@ -27,7 +40,6 @@
 	#include <libgs.h>
 
 	#include "types.h"
-	#include "bmath.h"
 
 	uint16_t SCREEN_WIDTH;
 	uint16_t SCREEN_HEIGHT;
@@ -53,27 +65,12 @@
 		PACKET gpu_packet_area[2][MAX_SPRITE];
 		int8_vec3 background_color;
 	} graphics;
-#endif
 
-#include "logger.h"
-
-//generic all purpose functions (for most platforms)
-int graphics_check_quit(graphics* _graphics);
-void graphics_update(graphics* _graphics);
-void graphics_get_fps(graphics* _graphics, double* _fps);
-void graphics_destroy(graphics* _graphics);
-
-//platform specific
-
-#if ANKH2D_WIN32
-	graphics graphics_create(const char* _title, uint16_t _width, uint16_t _height, bool _fs);
-	void graphics_set_vsync(bool _vsync);
-	void graphics_clear();
-	void graphics_error_callback(int error, const char* description);
-	void graphics_input_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	void graphics_window_size_callback(GLFWwindow* window, int width, int height);
-#elif ANKH2D_PSX
-	void graphics_create(graphics* _graphics, uint16_t _debug);
+	void graphics_create(graphics* _graphics, uint8_t _debug);
+	int graphics_check_quit();
+	void graphics_update(graphics* _graphics);
+	void graphics_get_fps();
+	void graphics_destroy();
 	void graphics_pre_draw(graphics* _graphics);
 	void graphics_set_background_color(graphics* _graphics, int8_vec3 _color);
 	void graphics_setup_debug_font(uint8_t _pos_x, uint8_t _pos_y, uint8_t _bkg_clear, uint16_t _max_chars);

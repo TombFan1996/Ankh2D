@@ -19,12 +19,12 @@
 		shader* shader;
 		transform transform;
 		vec2 old_pos;
-		texture2d texture;
+		texture2d* texture;
 		GLuint vao, vbo;
 		GLFWwindow* window;
 	} sprite;
 
-	sprite sprite_create(const char* _name, shader* _shader, transform _trans, GLFWwindow* _window);
+	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans, GLFWwindow* _window);
 	bool sprite_update(sprite* _sprite, time* _time);
 	void sprite_draw(mat4* _projection, sprite* _sprite);
 	void sprite_set_texture(sprite* _sprite, texture2d* _tex);
@@ -39,8 +39,8 @@
 	#include <libetc.h>
 	#include <libgs.h>
 
-	#include "texture2d.h"
 	#include "transform.h"
+	#include "texture2d.h"
 
 	typedef struct
 	{
@@ -49,11 +49,11 @@
 		//sprite based on tim_image
 		GsSPRITE gs_sprite;
 		//the position of the sprite (int16_vec2)
-		transform trans;
+		transform transform;
 	} sprite;
 
-	void sprite_create(sprite* _sprite, transform _trans, uint32_t* _tpage, uint32_t* _clut);
-	void sprite_draw(GsOT* _ot, sprite* _sprite);
+	void sprite_create(sprite* _sprite, uint32_t* _tpage, uint32_t* _clut);
+	void sprite_draw(sprite* _sprite, GsOT* _ot);
 	
 #endif
 
