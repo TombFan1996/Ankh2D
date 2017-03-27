@@ -8,6 +8,7 @@
 	#include <GL/glew.h>
 	#include <GLFW\glfw3.h>
 	#include <sstream>
+	#include "bmath.h"
 
 	#include "logger.h"
 
@@ -32,6 +33,9 @@
 	void graphics_error_callback(int error, const char* description);
 	void graphics_input_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void graphics_window_size_callback(GLFWwindow* window, int width, int height);
+	void graphics_toggle_mouse(GLFWwindow* _window, bool _enabled);
+	vec2 graphics_get_mouse_position(GLFWwindow* _window);
+	
 
 #elif ANKH2D_PSX
 	#include <stdlib.h>

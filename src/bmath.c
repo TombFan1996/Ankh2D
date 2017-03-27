@@ -19,6 +19,14 @@
 		return temp_vec2;
 	}
 
+	int_vec2 int_vec2_create(uint32_t _x, uint32_t _y)
+	{
+		int_vec2 temp_vec2;
+		temp_vec2.x = _x;
+		temp_vec2.y = _y;
+		return temp_vec2;
+	}
+
 	vec3 vec3_create(float _x, float _y, float _z)
 	{
 		vec3 temp_vec3;

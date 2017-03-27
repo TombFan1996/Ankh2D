@@ -76,12 +76,30 @@
 		return main_graphics;
 	}
 
+	void graphics_toggle_mouse(GLFWwindow* _window, bool _enabled)
+	{
+		if (_enabled)
+			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		else
+			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	}
+
 	void graphics_set_vsync(bool _vsync)
 	{
 		if (_vsync)
 			glfwSwapInterval(1);
 		else
 			glfwSwapInterval(0);
+	}
+
+	vec2 graphics_get_mouse_position(GLFWwindow* _window)
+	{
+		double m_x, m_y;
+		glfwGetCursorPos(_window, &m_x, &m_y);
+		vec2 mouse_pos;
+		mouse_pos.x = m_x;
+		mouse_pos.y = m_y;
+		return mouse_pos;
 	}
 
 	void graphics_window_size_callback(GLFWwindow* window, int width, int height)
