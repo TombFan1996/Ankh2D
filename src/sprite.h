@@ -10,7 +10,7 @@
 	#include "transform.h"
 	#include "texture2d.h"
 	#include "shader.h"
-	#include "time.h"
+	#include "btime.h"
 
 	typedef struct
 	{
@@ -25,7 +25,7 @@
 	} sprite;
 
 	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans, GLFWwindow* _window);
-	bool sprite_update(sprite* _sprite, time* _time);
+	bool sprite_update(sprite* _sprite, btime* _time);
 	void sprite_draw(mat4* _projection, sprite* _sprite);
 	void sprite_set_texture(sprite* _sprite, texture2d* _tex);
 	void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update);

@@ -47,7 +47,7 @@
 		return new_sprite;
 	}
 
-	bool sprite_update(sprite* _sprite, time* _time)
+	bool sprite_update(sprite* _sprite, btime* _time)
 	{
 		vec2 pos = vec2_create(0.0f, 0.0f);
 		bool sprite_update = false;
