@@ -13,14 +13,12 @@
 	typedef struct
 	{
 		GLuint model, projection;
-		shader* shader;
-		transform* transform;
+		transform transform;
 		GLuint vao, vbo;
-		texture2d tilemap;
 	} batch_sprite;
 
-	batch_sprite batch_sprite_create(const char* _sprite_name, uint8_t _tilesize, shader* _shader, transform _trans);
-	void batch_sprite_draw(uint8_t _draw_id, mat4* _projection, batch_sprite* _sprite);
+	batch_sprite batch_sprite_create(int32_vec2 _pixel_coord, vec2 _tile_size, texture2d* _tex, shader* _shader, transform _trans);
+	void batch_sprite_draw(mat4* _projection, batch_sprite* _sprite);
 	void batch_sprite_destroy(batch_sprite* _sprite);
 
 #elif ANKH2D_PSX

@@ -19,9 +19,9 @@
 		return temp_vec2;
 	}
 
-	int_vec2 int_vec2_create(uint32_t _x, uint32_t _y)
+	int32_vec2 int32_vec2_create(uint32_t _x, uint32_t _y)
 	{
-		int_vec2 temp_vec2;
+		int32_vec2 temp_vec2;
 		temp_vec2.x = _x;
 		temp_vec2.y = _y;
 		return temp_vec2;

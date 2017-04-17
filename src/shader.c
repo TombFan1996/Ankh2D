@@ -81,6 +81,12 @@
 		glBindAttribLocation(_shader->program, _index, _name);
 	}
 
+	void shader_bind_program(GLuint* _program)
+	{
+		//bind our program
+		glUseProgram(*_program);
+	}
+
 	void shader_set_uniform_mat4(GLuint _uniform, const mat4* _matrix4, bool _transpose)
 	{
 		#if ANKH2D_SSE

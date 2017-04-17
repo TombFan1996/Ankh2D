@@ -119,6 +119,9 @@
 		//bind our program
 		glUseProgram(_sprite->shader->program);
 
+		//bind our texture
+		texture2d_bind(&_sprite->tilemap);
+
 		//communicate w/ uniforms
 		//send the model matrix off
 		mat4 model_matrix = transform_get_model_matrix(_sprite->transform);
@@ -126,9 +129,6 @@
 
 		//send the projection matrix off
 		shader_set_uniform_mat4(_sprite->projection, _projection, false);
-
-		//bind our texture
-		texture2d_bind(&_sprite->tilemap);
 
 		glBindVertexArray(_sprite->vao);
 		glDrawArrays(GL_TRIANGLES, 0, 6 * (_sprite->num_tiles * _sprite->num_layers));
