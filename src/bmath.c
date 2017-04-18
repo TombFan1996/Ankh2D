@@ -3,12 +3,12 @@
 #if ANKH2D_WIN32
 	float deg_to_rad(float _deg)
 	{
-		return _deg * (PI / 180);
+		return _deg * (PI / 180.0f);
 	}
 
 	float rad_to_deg(float _rad)
 	{
-		return _rad * (180 / PI);
+		return _rad * (180.0f / PI);
 	}
 
 	vec2 vec2_create(float _x, float _y)
@@ -72,7 +72,7 @@
 			__m128 new_pos_2 = _mm_set_ps(0.0f, 0.0f, 0.0f, 0.0f);
 			_model->element[2] = _mm_add_ps(_model->element[2], new_pos_2);
 		#else
-			_model->element[0][0] += _model->element[3][0] * _pos.x;
+			/*_model->element[0][0] += _model->element[3][0] * _pos.x;
 			_model->element[1][0] += _model->element[3][0] * _pos.y;
 			_model->element[2][0] += _model->element[3][0] * 0.0f;
 
@@ -86,7 +86,11 @@
 
 			_model->element[0][3] += _model->element[3][3] * _pos.x;
 			_model->element[1][3] += _model->element[3][3] * _pos.y;
-			_model->element[2][3] += _model->element[3][3] * 0.0f;
+			_model->element[2][3] += _model->element[3][3] * 0.0f;*/
+
+			_model->element[0][3] = _pos.x;
+			_model->element[1][3] = _pos.y;
+			_model->element[2][3] = 0.0f;
 		#endif
 	}
 
@@ -108,7 +112,7 @@
 	void mat4_rotate(mat4* _model, float _degree)
 	{
 		//degree was rotating wrong way
-		float radians = -deg_to_rad(_degree);
+		float radians = deg_to_rad(_degree);
 
 		#if ANKH2D_SSE
 			__m128 new_elem_0 = _mm_set_ps(_model->element[0].m128_f32[0] * cosf(radians) + _model->element[0].m128_f32[1] * -sinf(radians),
@@ -119,10 +123,15 @@
 				_model->element[1].m128_f32[0] * sinf(radians) + _model->element[1].m128_f32[1] * cosf(radians), 0.0f, 0.0f);
 			_model->element[1] = _mm_add_ps(_model->element[1], new_elem_1);
 		#else
-			_model->element[0][0] = _model->element[0][0] * cosf(radians) + _model->element[0][1] * -sinf(radians);
-			_model->element[0][1] = _model->element[0][0] * sinf(radians) + _model->element[0][1] * cosf(radians);
-			_model->element[1][0] = _model->element[1][0] * cosf(radians) + _model->element[1][1] * -sinf(radians);
-			_model->element[1][1] = _model->element[1][0] * sinf(radians) + _model->element[1][1] * cosf(radians);
+			//_model->element[0][0] = _model->element[0][0] * cosf(radians) + _model->element[0][1] * -sinf(radians);
+			//_model->element[0][1] = _model->element[0][0] * sinf(radians) + _model->element[0][1] * cosf(radians);
+			//_model->element[1][0] = _model->element[1][0] * cosf(radians) + _model->element[1][1] * -sinf(radians);
+			//_model->element[1][1] = _model->element[1][0] * sinf(radians) + _model->element[1][1] * cosf(radians);
+
+			_model->element[0][0] *= cosf(radians);// + _model->element[0][1] * -sinf(radians);
+			_model->element[0][1] *= -sinf(radians);// + _model->element[0][1] * cosf(radians);
+			_model->element[1][0] *= sinf(radians);// + _model->element[1][1] * -sinf(radians);
+			_model->element[1][1] *= cosf(radians);// + _model->element[1][1] * cosf(radians);
 		#endif
 	}
 

@@ -14,21 +14,19 @@
 
 	typedef struct
 	{
-		float speed;
 		GLuint model, projection;
 		shader* shader;
 		transform transform;
-		vec2 old_pos;
+		//vec2 old_pos;
 		texture2d* texture;
 		GLuint vao, vbo;
-		GLFWwindow* window;
+		//GLFWwindow* window;
 	} sprite;
 
 	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans, GLFWwindow* _window);
-	bool sprite_update(sprite* _sprite, btime* _time);
+	//bool sprite_update(sprite* _sprite, btime* _time);
 	void sprite_draw(mat4* _projection, sprite* _sprite);
-	void sprite_set_texture(sprite* _sprite, texture2d* _tex);
-	void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update);
+	//void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update);
 	void sprite_destroy(sprite* _sprite);
 
 #elif ANKH2D_PSX

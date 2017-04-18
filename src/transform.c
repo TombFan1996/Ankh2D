@@ -22,8 +22,8 @@
 		mat4 model_matrix;
 		mat4_identity(&model_matrix);
 		mat4_scale(&model_matrix, _trans.scale);
-		mat4_rotate(&model_matrix, _trans.rotation);
 		mat4_translate(&model_matrix, _trans.position);
+		mat4_rotate(&model_matrix, _trans.rotation);
 
 		#if ANKH2D_SSE
 			mat4_reverse(&model_matrix);

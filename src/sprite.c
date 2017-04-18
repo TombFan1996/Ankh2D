@@ -4,7 +4,7 @@
 	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans, GLFWwindow* _window)
 	{
 		sprite new_sprite;
-		new_sprite.window = _window;
+		//new_sprite.window = _window;
 		new_sprite.shader = _shader;
 		new_sprite.texture = _texture;
 		new_sprite.transform = _trans;
@@ -16,7 +16,7 @@
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-		new_sprite.speed = 100.0f;
+		//new_sprite.speed = 100.0f;
 
 		GLfloat vertices[] = {
 			// Pos      // Tex
@@ -47,7 +47,7 @@
 		return new_sprite;
 	}
 
-	bool sprite_update(sprite* _sprite, btime* _time)
+	/*bool sprite_update(sprite* _sprite, btime* _time)
 	{
 		vec2 pos = vec2_create(0.0f, 0.0f);
 		bool sprite_update = false;
@@ -86,9 +86,9 @@
 		}
 
 		return sprite_update;
-	}
+	}*/
 
-	void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update)
+	/*void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update)
 	{
 		//dont waste cycles if we havent moved the sprite
 		if (_sprite_update)
@@ -132,7 +132,7 @@
 
 		//update the old position (used for collisions)
 		_sprite->old_pos = _sprite->transform.position;
-	}
+	}*/
 
 	void sprite_draw(mat4* _projection, sprite* _sprite)
 	{
@@ -151,15 +151,9 @@
 		glBindVertexArray(0);
 	}
 
-	void sprite_set_texture(sprite* _sprite, texture2d* _tex)
-	{
-		_sprite->texture = _tex;
-	}
-
 	void sprite_destroy(sprite* _sprite)
 	{
 		_sprite->texture = NULL;
-		_sprite->window = NULL;
 		_sprite->shader = NULL;
 		glDeleteBuffers(1, &_sprite->vao);
 		glDeleteBuffers(1, &_sprite->vbo);
