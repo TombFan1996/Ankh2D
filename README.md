@@ -2,7 +2,7 @@
 
 A lightweight 2D framework
 
-###Note: This is NOT complete###
+### Note: This is NOT complete ###
 
 ### PC Dependencies ###
 * [GLFW 3.2.1](http://www.glfw.org/)
