@@ -1,7 +1,7 @@
 #include "sprite.h"
 
 #if ANKH2D_WIN32
-	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans, GLFWwindow* _window)
+	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans)
 	{
 		sprite new_sprite;
 		//new_sprite.window = _window;
@@ -140,7 +140,6 @@
 		glUseProgram(_sprite->shader->program);
 		texture2d_bind(_sprite->texture);
 
-		//transform_get_model_matrix(_sprite->transform);
 		mat4 model_matrix = transform_get_model_matrix(_sprite->transform);
 		shader_set_uniform_mat4(_sprite->model, &model_matrix, true);
 		shader_set_uniform_mat4(_sprite->projection, _projection, false);

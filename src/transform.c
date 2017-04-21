@@ -20,10 +20,25 @@
 	mat4 transform_get_model_matrix(transform _trans)
 	{
 		mat4 model_matrix;
+		mat4 translate, pivot, scale, rot;
+
+		//set all to identity
 		mat4_identity(&model_matrix);
-		mat4_scale(&model_matrix, _trans.scale);
-		mat4_translate(&model_matrix, _trans.position);
-		mat4_rotate(&model_matrix, _trans.rotation);
+		mat4_identity(&translate);
+		mat4_identity(&pivot);
+		mat4_identity(&scale);
+		mat4_identity(&rot);
+
+		//create the matrices from the transform property of the sprite
+		mat4_scale(&scale, _trans.scale);
+		mat4_rotate(&rot, _trans.rotation);
+		mat4_translate(&translate, _trans.position);
+		mat4_translate(&pivot, vec2_create(-_trans.scale.x / 2, -_trans.scale.y / 2));
+
+		mat4_mul(&model_matrix, &scale);
+		mat4_mul(&model_matrix, &pivot);
+		mat4_mul(&model_matrix, &rot);
+		mat4_mul(&model_matrix, &translate);
 
 		#if ANKH2D_SSE
 			mat4_reverse(&model_matrix);

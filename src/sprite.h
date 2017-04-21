@@ -23,7 +23,7 @@
 		//GLFWwindow* window;
 	} sprite;
 
-	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans, GLFWwindow* _window);
+	sprite sprite_create(texture2d* _texture, shader* _shader, transform _trans);
 	//bool sprite_update(sprite* _sprite, btime* _time);
 	void sprite_draw(mat4* _projection, sprite* _sprite);
 	//void sprite_map_intersect(tmx_sprite* _tmx_map, sprite* _sprite, bool _sprite_update);

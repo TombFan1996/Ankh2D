@@ -20,7 +20,8 @@
 
 		std::string filename("assets/maps/");
 		filename += new_map_sprite.map.tileset[0].filename;
-		new_map_sprite.tilemap = texture2d_create(filename.c_str());
+		new_map_sprite.tilemap = texture2d_create(filename.c_str(), 
+			A2D_TEXTURE_NEAREST, A2D_TEXTURE_REPEAT);
 	
 		//get the number of tiles per layer
 		new_map_sprite.num_tiles = new_map_sprite.map.layer[0].width * new_map_sprite.map.layer[0].height;

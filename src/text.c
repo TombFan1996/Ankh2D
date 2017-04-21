@@ -5,7 +5,7 @@
 	{
 		text new_text;
 
-		new_text.window = _window;
+		//new_text.window = _window;
 
 		new_text.shader = _shader;
 		new_text.colour = shader_get_uniform_location(new_text.shader, "colour");
@@ -15,8 +15,8 @@
 	
 		new_text.transform = _trans;
 
-		int width, height;
-		glfwGetWindowSize(new_text.window, &width, &height);
+		//int width, height;
+		//glfwGetWindowSize(new_text.window, &width, &height);
 
 		//setup default font colour
 		new_text.font_colour = vec3_create(1.0f, 1.0f, 1.0f);
@@ -47,8 +47,9 @@
 		name = name.substr(0, name.size() - 4);
 		name += ".bmp";
 
-		_text->texture = texture2d_create(name.c_str());
-		texture2d_bind(&_text->texture);
+		_text->texture = texture2d_create(name.c_str(), 
+			A2D_TEXTURE_LINEAR, A2D_TEXTURE_REPEAT);
+		//texture2d_bind(&_text->texture);
 
 		_text->vao = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
 		_text->vbo = (GLuint*)malloc(sizeof(GLuint) * _text->num_char_block);
@@ -273,7 +274,7 @@
 	void text_destroy(text* _text)
 	{
 		texture2d_destroy(&_text->texture);
-		_text->window = NULL;
+		//_text->window = NULL;
 		_text->shader = NULL;
 		glDeleteBuffers(_text->num_char_block, &_text->vbo[0]);
 		glDeleteBuffers(_text->num_char_block, &_text->vao[0]);

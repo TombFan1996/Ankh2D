@@ -80,7 +80,7 @@
 		vec3 font_colour;
 
 		texture2d texture;
-		GLFWwindow* window;
+		//GLFWwindow* window;
 
 		FNT_INFO_BLOCK info_block;
 		char* filename;

@@ -55,6 +55,14 @@
 		#endif
 	}
 
+	vec2 mat4_vec2_add(mat4* _mat, vec2 _vec)
+	{
+		vec2 vec2_new;
+		vec2_new.x = (_mat->element[0][0] * _vec.x) + (_mat->element[1][0] * _vec.x) + (_mat->element[2][0] * _vec.x) + (_mat->element[3][0] * _vec.x);
+		vec2_new.y = (_mat->element[0][1] * _vec.y) + (_mat->element[1][1] * _vec.y) + (_mat->element[2][1] * _vec.y) + (_mat->element[3][1] * _vec.y);
+		return vec2_new;
+	}
+
 	void mat4_translate(mat4* _model, vec2 _pos)
 	{
 		#if ANKH2D_SSE
@@ -90,7 +98,6 @@
 
 			_model->element[0][3] = _pos.x;
 			_model->element[1][3] = _pos.y;
-			_model->element[2][3] = 0.0f;
 		#endif
 	}
 
@@ -99,11 +106,10 @@
 		#if ANKH2D_SSE
 			_model->element[0] = _mm_set_ps(_scale.x, 0.0f, 0.0f, 0.0f);
 			_model->element[1] = _mm_set_ps(0.0f, _scale.y, 0.0f, 0.0f);
-			_model->element[2] = _mm_set_ps(0.0f, 0.0f, 0.0f, 0.0f);
+			_model->element[2] = _mm_set_ps(0.0f, 0.0f, 1.0f, 0.0f);
 		#else
 			_model->element[0][0] = _scale.x;
 			_model->element[1][1] = _scale.y;
-			_model->element[2][2] = 0.0f;
 		#endif
 	}
 
@@ -128,11 +134,165 @@
 			//_model->element[1][0] = _model->element[1][0] * cosf(radians) + _model->element[1][1] * -sinf(radians);
 			//_model->element[1][1] = _model->element[1][0] * sinf(radians) + _model->element[1][1] * cosf(radians);
 
-			_model->element[0][0] *= cosf(radians);// + _model->element[0][1] * -sinf(radians);
-			_model->element[0][1] *= -sinf(radians);// + _model->element[0][1] * cosf(radians);
-			_model->element[1][0] *= sinf(radians);// + _model->element[1][1] * -sinf(radians);
-			_model->element[1][1] *= cosf(radians);// + _model->element[1][1] * cosf(radians);
+			_model->element[0][0] = cosf(radians);
+			_model->element[1][0] = -sinf(radians);
+			_model->element[0][1] = sinf(radians);
+			_model->element[1][1] = cosf(radians);
+
+			//-0.75 should be 48 deg
+			//_model->element[0][0] = 1.0f;
+			//_model->element[1][0] = 0.0f;
+			//_model->element[0][1] = -0.75f;
+			//_model->element[1][1] = 1.0f;
 		#endif
+	}
+
+	//[COLUMN][ROW]
+	void mat4_mul(mat4* _orig_mat, mat4* _mul_mat)
+	{
+		//row 1 start
+		_orig_mat->element[0][0] = (_orig_mat->element[0][0] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[1][0] * _mul_mat->element[0][1]) + (_orig_mat->element[2][0] * _mul_mat->element[0][2]) +
+				(_orig_mat->element[3][0] * _mul_mat->element[0][3]);
+
+		_orig_mat->element[1][0] = (_orig_mat->element[0][0] * _mul_mat->element[1][0]) +
+			(_orig_mat->element[1][0] * _mul_mat->element[1][1]) + (_orig_mat->element[2][0] * _mul_mat->element[1][2]) +
+				(_orig_mat->element[3][0] * _mul_mat->element[1][3]);
+
+		_orig_mat->element[2][0] = (_orig_mat->element[0][0] * _mul_mat->element[2][0]) +
+			(_orig_mat->element[1][0] * _mul_mat->element[2][1]) + (_orig_mat->element[2][0] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[3][0] * _mul_mat->element[2][3]);
+
+		_orig_mat->element[3][0] = (_orig_mat->element[0][0] * _mul_mat->element[3][0]) +
+			(_orig_mat->element[1][0] * _mul_mat->element[3][1]) + (_orig_mat->element[2][0] * _mul_mat->element[3][2]) +
+				(_orig_mat->element[3][0] * _mul_mat->element[3][3]);
+		//row 1 end
+
+		//row 2 start
+		_orig_mat->element[0][1] = (_orig_mat->element[0][1] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[0][1]) + (_orig_mat->element[2][1] * _mul_mat->element[0][2]) +
+				(_orig_mat->element[3][1] * _mul_mat->element[0][3]);
+
+		_orig_mat->element[1][1] = (_orig_mat->element[0][1] * _mul_mat->element[1][0]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[1][1]) + (_orig_mat->element[2][1] * _mul_mat->element[1][2]) +
+				(_orig_mat->element[3][1] * _mul_mat->element[1][3]);
+
+		_orig_mat->element[2][1] = (_orig_mat->element[0][1] * _mul_mat->element[2][0]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[2][1]) + (_orig_mat->element[2][1] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[3][1] * _mul_mat->element[2][3]);
+
+		_orig_mat->element[3][1] = (_orig_mat->element[0][1] * _mul_mat->element[3][0]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[3][1]) + (_orig_mat->element[2][1] * _mul_mat->element[3][2]) +
+				(_orig_mat->element[3][1] * _mul_mat->element[3][3]);
+		//row 2 end
+
+		//row 3 start
+		_orig_mat->element[0][2] = (_orig_mat->element[0][2] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[1][2] * _mul_mat->element[0][1]) + (_orig_mat->element[2][2] * _mul_mat->element[0][2]) +
+				(_orig_mat->element[3][2] * _mul_mat->element[0][3]);
+
+		_orig_mat->element[1][2] = (_orig_mat->element[0][2] * _mul_mat->element[1][0]) +
+			(_orig_mat->element[1][2] * _mul_mat->element[1][1]) + (_orig_mat->element[2][2] * _mul_mat->element[1][2]) +
+				(_orig_mat->element[3][2] * _mul_mat->element[1][3]);
+
+		_orig_mat->element[2][2] = (_orig_mat->element[0][2] * _mul_mat->element[2][0]) +
+			(_orig_mat->element[1][2] * _mul_mat->element[2][1]) + (_orig_mat->element[2][2] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[3][2] * _mul_mat->element[2][3]);
+
+		_orig_mat->element[3][2] = (_orig_mat->element[0][2] * _mul_mat->element[3][0]) +
+			(_orig_mat->element[1][2] * _mul_mat->element[3][1]) + (_orig_mat->element[2][2] * _mul_mat->element[3][2]) +
+				(_orig_mat->element[3][2] * _mul_mat->element[3][3]);
+		//row 3 end
+
+		//row 3 start
+		_orig_mat->element[0][3] = (_orig_mat->element[0][3] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[1][3] * _mul_mat->element[0][1]) + (_orig_mat->element[2][3] * _mul_mat->element[0][2]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[0][3]);
+
+		_orig_mat->element[1][3] = (_orig_mat->element[0][3] * _mul_mat->element[1][0]) +
+			(_orig_mat->element[1][3] * _mul_mat->element[1][1]) + (_orig_mat->element[2][3] * _mul_mat->element[1][2]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[1][3]);
+
+		_orig_mat->element[2][3] = (_orig_mat->element[0][3] * _mul_mat->element[2][0]) +
+			(_orig_mat->element[1][3] * _mul_mat->element[2][1]) + (_orig_mat->element[2][3] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[2][3]);
+
+		_orig_mat->element[3][3] = (_orig_mat->element[0][3] * _mul_mat->element[3][0]) +
+			(_orig_mat->element[1][3] * _mul_mat->element[3][1]) + (_orig_mat->element[2][3] * _mul_mat->element[3][2]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[3][3]);
+		//row 3 end
+
+		/*row 1 start
+		_orig_mat->element[0][0] = (_orig_mat->element[0][0] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[0][1] * _mul_mat->element[1][0]) + (_orig_mat->element[0][2] * _mul_mat->element[2][0]) +
+				(_orig_mat->element[0][3] * _mul_mat->element[3][0]);
+
+		_orig_mat->element[0][1] = (_orig_mat->element[0][0] * _mul_mat->element[0][1]) +
+			(_orig_mat->element[0][1] * _mul_mat->element[1][1]) + (_orig_mat->element[0][2] * _mul_mat->element[2][1]) +
+				(_orig_mat->element[0][3] * _mul_mat->element[3][1]);
+
+		_orig_mat->element[0][2] = (_orig_mat->element[0][0] * _mul_mat->element[0][2]) +
+			(_orig_mat->element[0][1] * _mul_mat->element[1][2]) + (_orig_mat->element[0][2] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[0][3] * _mul_mat->element[3][2]);
+
+		_orig_mat->element[0][3] = (_orig_mat->element[0][0] * _mul_mat->element[0][3]) +
+			(_orig_mat->element[0][1] * _mul_mat->element[1][3]) + (_orig_mat->element[0][2] * _mul_mat->element[2][3]) +
+				(_orig_mat->element[0][3] * _mul_mat->element[3][3]);
+		//row 1 end
+
+		//row 2 start
+		_orig_mat->element[1][0] = (_orig_mat->element[1][0] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[1][0]) + (_orig_mat->element[1][2] * _mul_mat->element[2][0]) +
+				(_orig_mat->element[1][3] * _mul_mat->element[3][0]);
+
+		_orig_mat->element[1][1] = (_orig_mat->element[1][0] * _mul_mat->element[0][1]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[1][1]) + (_orig_mat->element[1][2] * _mul_mat->element[2][0]) +
+				(_orig_mat->element[1][3] * _mul_mat->element[3][1]);
+
+		_orig_mat->element[1][2] = (_orig_mat->element[1][0] * _mul_mat->element[0][2]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[1][2]) + (_orig_mat->element[1][2] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[1][3] * _mul_mat->element[3][2]);
+
+		_orig_mat->element[1][3] = (_orig_mat->element[1][0] * _mul_mat->element[0][3]) +
+			(_orig_mat->element[1][1] * _mul_mat->element[1][3]) + (_orig_mat->element[1][2] * _mul_mat->element[2][3]) +
+				(_orig_mat->element[1][3] * _mul_mat->element[3][3]);
+		//row 2 end
+
+		//row 3 start
+		_orig_mat->element[2][0] = (_orig_mat->element[2][0] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[2][1] * _mul_mat->element[1][0]) + (_orig_mat->element[2][2] * _mul_mat->element[2][0]) +
+				(_orig_mat->element[2][3] * _mul_mat->element[3][0]);
+
+		_orig_mat->element[2][1] = (_orig_mat->element[2][0] * _mul_mat->element[0][1]) +
+			(_orig_mat->element[2][1] * _mul_mat->element[1][1]) + (_orig_mat->element[2][2] * _mul_mat->element[2][1]) +
+				(_orig_mat->element[2][3] * _mul_mat->element[3][1]);
+
+		_orig_mat->element[2][2] = (_orig_mat->element[2][0] * _mul_mat->element[0][2]) +
+			(_orig_mat->element[2][1] * _mul_mat->element[1][2]) + (_orig_mat->element[2][2] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[2][3] * _mul_mat->element[3][2]);
+
+		_orig_mat->element[2][3] = (_orig_mat->element[2][0] * _mul_mat->element[0][3]) +
+			(_orig_mat->element[2][1] * _mul_mat->element[1][3]) + (_orig_mat->element[2][2] * _mul_mat->element[2][3]) +
+				(_orig_mat->element[2][3] * _mul_mat->element[3][3]);
+		//row 3 end
+
+		//row 3 start
+		_orig_mat->element[3][0] = (_orig_mat->element[3][0] * _mul_mat->element[0][0]) +
+			(_orig_mat->element[3][1] * _mul_mat->element[1][0]) + (_orig_mat->element[3][2] * _mul_mat->element[2][0]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[3][0]);
+
+		_orig_mat->element[3][1] = (_orig_mat->element[3][0] * _mul_mat->element[0][1]) +
+			(_orig_mat->element[3][1] * _mul_mat->element[1][1]) + (_orig_mat->element[3][2] * _mul_mat->element[2][1]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[3][1]);
+
+		_orig_mat->element[3][2] = (_orig_mat->element[3][0] * _mul_mat->element[0][2]) +
+			(_orig_mat->element[3][1] * _mul_mat->element[1][2]) + (_orig_mat->element[3][2] * _mul_mat->element[2][2]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[3][2]);
+
+		_orig_mat->element[3][3] = (_orig_mat->element[3][0] * _mul_mat->element[0][3]) +
+			(_orig_mat->element[3][1] * _mul_mat->element[1][3]) + (_orig_mat->element[3][2] * _mul_mat->element[2][3]) +
+				(_orig_mat->element[3][3] * _mul_mat->element[3][3]);
+		//row 3 end*/
 	}
 
 	mat4 mat4_create()

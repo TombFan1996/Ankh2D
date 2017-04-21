@@ -61,6 +61,8 @@
 		} mat4;
 	#endif
 
+	void mat4_mul(mat4* _orig_mat, mat4* _mul_mat);
+	vec2 mat4_vec2_add(mat4* _mat, vec2 _vec);
 	void mat4_reverse(mat4* _old_mat4);
 	mat4 mat4_create();
 	void mat4_identity(mat4* _mat_iden);

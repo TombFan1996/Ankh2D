@@ -10,6 +10,14 @@
 
 	#include "logger.h"
 
+	//wrapping modes for GL atm
+	#define A2D_TEXTURE_REPEAT 0
+	#define A2D_TEXTURE_CLAMP 1
+
+	//filter modes for GL atm
+	#define A2D_TEXTURE_LINEAR 0
+	#define A2D_TEXTURE_NEAREST 1
+
 	typedef struct
 	{
 		uint16_t width, height;
@@ -17,7 +25,7 @@
 	} texture2d;
 
 	void texture2d_alpha_colour(vec3 _alphaCol);
-	texture2d texture2d_create(const char* _filename);
+	texture2d texture2d_create(const char* _filename, uint8_t _tf_opt, uint8_t _tw_opt);
 	void texture2d_bind(texture2d* _tex);
 	void texture2d_destroy(texture2d* _tex);
 

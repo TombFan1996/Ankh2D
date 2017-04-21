@@ -1,7 +1,8 @@
 #include "texture2d.h"
 
 #if ANKH2D_WIN32
-	texture2d texture2d_create(const char* _filename)
+	//tf_opt = texture filter & tw_opt = texture wrapping
+	texture2d texture2d_create(const char* _filename, uint8_t _tf_opt, uint8_t _tw_opt)
 	{
 		texture2d new_tex;
 
@@ -15,15 +16,33 @@
 		glGenTextures(1, &new_tex.texture);
 		glBindTexture(GL_TEXTURE_2D, new_tex.texture);
 
-		//if we read outside the texture size, it will start again (wrap repeat)
-		//use GL_CLAMP for a default colour to be used outside bounds of tex
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		if (_tw_opt == A2D_TEXTURE_REPEAT)
+		{
+			//if we read outside the texture size, it will start again (wrap repeat)
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
 
-		//if texture is bigger than specified or rotate, linearly interpolate
-		//GL_NEAREST give no texture filtering.
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		else if (_tw_opt == A2D_TEXTURE_CLAMP)
+		{
+			//use GL_CLAMP for a default colour to be used outside bounds of tex
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		}
+
+		if (_tf_opt == A2D_TEXTURE_LINEAR)
+		{
+			//if texture is bigger than specified or rotate, linearly interpolate
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+
+		else if (_tf_opt == A2D_TEXTURE_NEAREST)
+		{
+			//GL_NEAREST give no texture filtering.
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
 
 		//construct the texture image
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, new_tex.width, new_tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_rgba); 
