@@ -19,11 +19,13 @@
 	//model = scale * trans * rotation
 	mat4 transform_get_model_matrix(transform _trans)
 	{
-		mat4 model_matrix;
+		mat4 mat4_comp1, mat4_comp2;
 		mat4 translate, pivot, scale, rot;
 
+		mat4_empty(&mat4_comp1);
+		mat4_empty(&mat4_comp2);
+
 		//set all to identity
-		mat4_identity(&model_matrix);
 		mat4_identity(&translate);
 		mat4_identity(&pivot);
 		mat4_identity(&scale);
@@ -35,16 +37,15 @@
 		mat4_translate(&translate, _trans.position);
 		mat4_translate(&pivot, vec2_create(-_trans.scale.x / 2, -_trans.scale.y / 2));
 
-		mat4_mul(&model_matrix, &scale);
-		mat4_mul(&model_matrix, &pivot);
-		mat4_mul(&model_matrix, &rot);
-		mat4_mul(&model_matrix, &translate);
+		mat4_mul(&mat4_comp1, &scale, &pivot);
+		mat4_mul(&mat4_comp2, &mat4_comp1, &rot);
+		mat4_mul(&mat4_comp2, &mat4_comp2, &translate);
 
 		#if ANKH2D_SSE
 			mat4_reverse(&model_matrix);
 		#endif
 
-		return model_matrix;
+		return mat4_comp2;
 	}
 
 #elif ANKH2D_PSX

@@ -200,7 +200,7 @@
 	
 		//communicate w/ uniforms
 		//send the model matrix off
-		transform_get_model_matrix(_text->transform);
+		//transform_get_model_matrix(_text->transform);
 		mat4 model_matrix = transform_get_model_matrix(_text->transform);
 		shader_set_uniform_mat4(_text->model, &model_matrix, true);
 
@@ -238,7 +238,7 @@
 	
 		//communicate w/ uniforms
 		//send the model matrix off
-		transform_get_model_matrix(_text->transform);
+		//transform_get_model_matrix(_text->transform);
 		mat4 model_matrix = transform_get_model_matrix(_text->transform);
 		shader_set_uniform_mat4(_text->model, &model_matrix, true);
 

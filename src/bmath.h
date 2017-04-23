@@ -61,10 +61,10 @@
 		} mat4;
 	#endif
 
-	void mat4_mul(mat4* _orig_mat, mat4* _mul_mat);
+	void mat4_mul(mat4* _mat0, mat4* _mat1, mat4* _mat2);
 	vec2 mat4_vec2_add(mat4* _mat, vec2 _vec);
 	void mat4_reverse(mat4* _old_mat4);
-	mat4 mat4_create();
+	void mat4_empty(mat4* _mat_new);
 	void mat4_identity(mat4* _mat_iden);
 	mat4 mat4_orthographic(float _left, float _right, float _bottom, float _top, float _zNear, float _zFar);
 	void mat4_translate(mat4* _model, vec2 _pos);

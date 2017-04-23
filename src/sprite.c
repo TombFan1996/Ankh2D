@@ -142,6 +142,7 @@
 
 		mat4 model_matrix = transform_get_model_matrix(_sprite->transform);
 		shader_set_uniform_mat4(_sprite->model, &model_matrix, true);
+
 		shader_set_uniform_mat4(_sprite->projection, _projection, false);
 
 		//bind and draw our object
